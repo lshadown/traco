@@ -3,7 +3,7 @@
 import ctypes
 import sys
   
-LIBRARY_PATH = '/home/marek/issf/py/CPython/my_library.so'
+LIBRARY_PATH = '/home/marek/traco/py/CPython/my_library.so'
 
 
 def makearr( L ):
