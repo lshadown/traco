@@ -1,0 +1,43 @@
+#!/bin/bash
+echo "C++ packages..."
+sudo apt-get install libgmp-dev libntl-dev flex bison
+if [ ! -f barvinok-0.36.tar.gz ]
+then
+ echo "Barvinok download..."
+ wget http://barvinok.gforge.inria.fr/barvinok-0.36.tar.gz
+ echo "Barvinok unpack..."
+ tar xvzf barvinok-0.36.tar.gz
+fi
+if [ ! -f barvinok-0.36/iscc ]
+then
+ echo "Barvinok setup..."
+ cd barvinok-0.36
+ ./configure --enable-shared-barvinok
+ make
+ sudo make install
+ sudo ln -s /usr/local/lib/libbarvinok.so /usr/lib/libbarvinok.so
+ sudo ln -s /usr/local/lib/libisl-polylib.so.0 /usr/lib/libisl-polylib.so.0
+ sudo ln -s /usr/local/lib/libpolylibgmp.so.8 /usr/lib/libpolylibgmp.so.8
+ cd ..
+fi
+echo "Other packages..."
+sudo apt-get install realpath libboost-regex-dev libboost-graph-dev
+echo "Python packages..."
+sudo apt-get install python-pip python-dev
+echo "ISLPY..."
+sudo pip install islpy
+sudo pip install easyprocess pexpect
+echo "Almost done, graphviz..."
+sudo apt-get install graphviz libgv-python python-pygraphviz python-pydot
+sudo easy_install python-graph-core python-graph-dot
+sudo ln -s "$PWD"/issf /usr/bin/issf
+if [ ! -f framework/obj/framework ]
+then
+echo "TRACO compiling..."
+make all
+make framework
+fi
+rm barv_script
+echo "$PWD/barvinok-0.36/iscc < barvinok_input > ppp" >> barv_script
+echo "touch lock" >> barv_script
+echo "Done."

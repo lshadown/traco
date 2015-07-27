@@ -1,0 +1,2 @@
+/home/marek/issf/barvinok-0.36/iscc < barvinok_input > ppp
+touch lock
