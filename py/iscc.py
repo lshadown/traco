@@ -11,12 +11,12 @@ import islpy as isl
 ctx = isl.Context()
 
 
-barv_script = "/home/marek/issf/barvinok-0.36/iscc"
-oc_script = "/home/marek/issf/omega_calc/obj/oc < tmp/oc.txt"
+barv_script = "/home/marek/traco/barvinok-0.36/iscc"
+oc_script = "/home/marek/traco/omega_calc/obj/oc < tmp/oc.txt"
 
     #start = time.time()
     #end = time.time()
-    #elapsed = end -  start.
+    #elapsed = end - start
     #print "Time taken: ", elapsed, "seconds." 
 
 def CreateLex(array1, array2, n):

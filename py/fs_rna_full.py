@@ -34,7 +34,8 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-val = str("10")
+N= 3000
+val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
 
@@ -74,7 +75,7 @@ I1 = S21.domain()
 
 
 
-for i in range(0,150):
+for i in range(0,2*N):
     if i == 0:
 
         J0 = S10.range()
@@ -103,18 +104,16 @@ for i in range(0,150):
     D1 = J0.apply(S11)
 
 
-
     L0 = L0.subtract(D0).coalesce()
     L1 = L1.subtract(D1).coalesce()
 
     Lay0 = L0.subtract(D0).coalesce()
     Lay1 = L1.subtract(D1).coalesce()
 
-
     if Lay0.is_empty() and Lay1.is_empty():
         break
 
-    print "======="
+    print "=======" + str(i) + "========"
 
     print Lay0
     print Lay1

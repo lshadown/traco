@@ -189,7 +189,7 @@ def fs_rk1(rel, SIMPLIFY, indt):
     uds = rel.domain().subtract(rel.range()).coalesce()
 
     # ADD INDEPENDENT TILES TO UDS
-    #uds = uds.union(indt).coalesce()
+    uds = uds.union(indt).coalesce()
 
     print "UDS"
     print uds
@@ -228,6 +228,5 @@ def fs_rk1(rel, SIMPLIFY, indt):
 
     if(SIMPLIFY):
         sk = imperf_tile.SimplifySlice(sk)
-
 
     return sk
