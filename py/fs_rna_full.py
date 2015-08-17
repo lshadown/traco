@@ -34,7 +34,7 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-N= 3000
+N= 1000
 val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
@@ -56,7 +56,7 @@ r11 = "[N] -> {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}"
 R11 = isl.UnionMap(str(r11))
 
 PAR = isl.UnionMap(_par)
-print PAR
+#print PAR
 
 
 R00 = R00.intersect(PAR).coalesce()
@@ -73,7 +73,7 @@ S21 = R11.union(R10).coalesce()
 I0 = S20.domain()
 I1 = S21.domain()
 
-
+all = ''
 
 for i in range(0,2*N):
     if i == 0:
@@ -84,8 +84,8 @@ for i in range(0,2*N):
         FS0 = I0.subtract(J0).coalesce()
         FS1 = I1.subtract(J1).coalesce()
 
-        print FS0
-        print FS1
+        #print FS0
+        #print FS1
 
         tmp_L0 = FS0
         tmp_L1 = FS1
@@ -113,10 +113,10 @@ for i in range(0,2*N):
     if Lay0.is_empty() and Lay1.is_empty():
         break
 
-    print "=======" + str(i) + "========"
+    #print "=======" + str(i) + "========"
 
-    print Lay0
-    print Lay1
+    #print Lay0
+    #print Lay1
 
     #if not Lay0.is_empty():
     #    print Lay0.subtract(tmp_L0)
@@ -130,8 +130,9 @@ for i in range(0,2*N):
     Lay = Lay0.union(Lay1).coalesce()
 
     nloop = iscc.iscc_communicate("L :=" + str(Lay) + "; codegen L;")
-    #print nloop
+    print nloop
+    print '-------------'
 
 
 
-
+#print all
