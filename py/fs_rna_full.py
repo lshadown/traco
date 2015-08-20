@@ -1,4 +1,5 @@
 import iscc
+import re
 
 try:
     import islpy as isl
@@ -34,7 +35,7 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-N= 1000
+N= 300
 val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
@@ -57,6 +58,12 @@ R11 = isl.UnionMap(str(r11))
 
 PAR = isl.UnionMap(_par)
 #print PAR
+
+
+#statements
+it = ['i','j','k']
+s0 = "S[i][j] = MAX(S[i][k+i] + S[k+i+1][j], S[i][j]);"
+s1 = "S[i][j] = MAX(S[i][j], S[i+1][j-1] + can_par(RNA[i],RNA[j]));"
 
 
 R00 = R00.intersect(PAR).coalesce()
@@ -113,26 +120,60 @@ for i in range(0,2*N):
     if Lay0.is_empty() and Lay1.is_empty():
         break
 
-    #print "=======" + str(i) + "========"
-
-    #print Lay0
-    #print Lay1
-
-    #if not Lay0.is_empty():
-    #    print Lay0.subtract(tmp_L0)
-    #    tmp_L0 = Lay0
-    #if not Lay1.is_empty():
-    #    print Lay1.subtract(tmp_L1)
-    #    tmp_L1 = Lay1
-
-
 
     Lay = Lay0.union(Lay1).coalesce()
 
-    nloop = iscc.iscc_communicate("L :=" + str(Lay) + "; codegen L;")
-    print nloop
-    print '-------------'
+    all = all + iscc.iscc_communicate("L :=" + str(Lay) + "; codegen L;")
+    all = all + '// --------------\n'
 
 
 
-#print all
+lines = all.split('\n')
+
+lines2 = []
+
+pragma = 1
+
+lines2.append('#pragma acc kernels copyin(RNA) copy(S)')
+lines2.append('{')
+
+for line in lines:
+    if '(' in line and not 'if' in line and not 'for' in line:
+        #line = line + ' // s' + str(line.count(',') -1)
+
+        tab = " " * (len(line) - len(line.lstrip()))
+        line = line.replace('(','').replace(')','').replace(' ','').replace(';','')
+        st = line.count(',')-1
+        vector = line.split(',')
+
+        if st == 0:
+            line = s1
+        else:
+            line = s0
+
+        for i in range(0,len(vector)):
+            line = line.replace(it[i], vector[i])
+
+        line = tab + line
+        line = line.replace('par', 'pair')
+
+    if '// -----' in line:
+        pragma = 1
+
+    if 'for' in line and pragma == 1:
+        lines2.append('#pragma acc loop')
+        pragma = 0
+
+    if(line == 'if (N == '+str(N)+') {'):
+        lines2.append('} // CPU')
+
+    if(not line == 'if (N == '+str(N)+')'):
+        lines2.append(line)
+
+
+
+#lines2.append('}')
+
+
+all = '\n'.join(lines2)
+print all
