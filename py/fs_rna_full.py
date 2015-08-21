@@ -35,7 +35,7 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-N= 300
+N= 10
 val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
@@ -161,11 +161,12 @@ for line in lines:
         pragma = 1
 
     if 'for' in line and pragma == 1:
-        lines2.append('#pragma acc loop')
-        pragma = 0
+        lines2.append('#pragma acc loop independent')
+
 
     if(line == 'if (N == '+str(N)+') {'):
         lines2.append('} // CPU')
+        pragma = 0
 
     if(not line == 'if (N == '+str(N)+')'):
         lines2.append(line)
