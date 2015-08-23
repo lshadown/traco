@@ -1149,6 +1149,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             if(output_file != ""):
                 return ""
             if(not schedule_mode):
+                rtile = tiling_schedule.get_RTILE(z, sym_exvars, isl_rel, Extend)
+                print "RTILE:"
+                print rtile
                 sys.exit()
     
 
@@ -1164,6 +1167,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             tiling_schedule.tile_par(isl_TILEprim, isl_TILEbis, sym_exvars, symb, isl_rel, isl_relplus, isl_relclosure)
         else:
             tiling_schedule.tile_par3(z, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Extend, _rap, Dodatek,SIMPLIFY, ii_SET)
+
 
 
 # przelec po blokach znajdz relacje jak nie ma to parallel
