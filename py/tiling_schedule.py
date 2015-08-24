@@ -677,7 +677,40 @@ def get_RTILE(isl_TILEbis, sym_exvars, isl_rel, Extend):
 
     rel_simple = rel_simple.coalesce()
 
+    get_RCYCLE(rel_simple)
+
     return rel_simple
+
+
+def get_RCYCLE(rel_simple):
+
+    rplus = rel_simple.transitive_closure()[0].coalesce()
+    inp = []
+    outp = []
+
+
+    n = rel_simple.dim(isl.dim_type.in_)
+
+    for i in range(0,n):
+        inp.append("i" + str(i))
+        outp.append("o" + str(i))
+
+    rlex = "{[" + ",".join(inp) + "] -> [" + ",".join(outp) + "] : " + tiling_v3.CreateLex(outp, inp) + "}"
+    rlex = isl.Map(rlex)
+
+    invert_rel = rel_simple.fixed_power_val(-1).coalesce()
+
+
+
+
+    r_out = rlex.intersect(rplus.intersect(invert_rel)).coalesce()
+
+
+    print 'R_CYCLE'
+    print r_out
+
+    return r_out
+
 
 
 
