@@ -687,6 +687,7 @@ def get_RCYCLE(rel_simple):
     rplus = rel_simple.transitive_closure()[0].coalesce()
     inp = []
     outp = []
+    symb = []
 
 
     n = rel_simple.dim(isl.dim_type.in_)
@@ -694,6 +695,7 @@ def get_RCYCLE(rel_simple):
     for i in range(0,n):
         inp.append("i" + str(i))
         outp.append("o" + str(i))
+        symb.append("s" + str(i))
 
     rlex = "{[" + ",".join(inp) + "] -> [" + ",".join(outp) + "] : " + tiling_v3.CreateLex(outp, inp) + "}"
     rlex = isl.Map(rlex)
@@ -708,6 +710,16 @@ def get_RCYCLE(rel_simple):
 
     print 'R_CYCLE'
     print r_out
+
+    print '#nowa prosta implementacja R_CYCLE'
+
+    S = "[" + ",".join(symb) + "] -> {[" + ",".join(symb) + "]}"
+    S = isl.Set(S)
+
+    R_CYCLE2 = S.apply(rplus).intersect(S).coalesce()
+
+    print R_CYCLE2
+
 
     return r_out
 
