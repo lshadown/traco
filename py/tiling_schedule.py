@@ -684,6 +684,8 @@ def get_RTILE(isl_TILEbis, sym_exvars, isl_rel, Extend):
 
 def get_RCYCLE(rel_simple):
 
+    #rel_simple = isl.Map("[n] -> {[i,j] -> [i',j'] : 1 <= i <= n && 1 <= j <= n && 1 <= i' <= n && 1 <= j' <= n}")
+
     rplus = rel_simple.transitive_closure()[0].coalesce()
     inp = []
     outp = []
