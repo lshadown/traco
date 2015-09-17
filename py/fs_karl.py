@@ -14,6 +14,8 @@ def Project(S, sym_exvars):
 
     return S
 
+import sys
+
 
 r1 = "[n] -> {[i,-1,1] -> [i,1,2] : 1 <= i <= n}"
 r2 = "[n] -> {[i,j,2] -> [i',j,2] : 1 <= i < n && 1 <= j <= n && i' = i+ 1}"
@@ -39,7 +41,6 @@ rp = rp.coalesce()
 c = isl.Constraint.ineq_from_names(rp.get_space(), {'ik1': 1, 1 : 0})
 rp = rp.add_constraint(c)
 rp = rp.coalesce()
-print rp
 
 # ---------------------------------------------------
 #R0'
@@ -70,9 +71,12 @@ uds = r.domain().subtract(r.range()).coalesce()
 # ---------------------------------------------------
 # [0, X ]
 
-S = rp.domain()
+S = uds
+S = S.insert_dims(isl.dim_type.set, 0, 1)
+S = S.set_dim_name(isl.dim_type.set,0, 'ik1')
 c = isl.Constraint.eq_from_names(S.get_space(), {'ik1': 1, 1 : 0})
-S = isl.Set(str(c))
+S = S.add_constraint(c)
+
 
 # ----------------------------------------------------
 
@@ -91,31 +95,39 @@ FS = isl.Map.from_domain_and_range(D, G).coalesce()
 
 FS1 = isl.Map.from_domain_and_range(uds, G).coalesce()
 
+
 # -----------------------------------------------------
 
-r0p_star = r0p.transitive_closure()[0]
-RG = S.apply(r0p_star)
 
+r0p_star = r0p.transitive_closure()[0]
+isl_ident = isl.Map.identity(r0p.get_space())
+r0p_plus = r0p_star.union(isl_ident).coalesce()
+
+
+RG = S.apply(r0p_plus)
+
+FS1 = isl.Map.from_domain_and_range(uds, G).coalesce()
 FS2 = isl.Map.from_domain_and_range(D, RG).coalesce()
 
-FS12 = FS1.intersect(FS2).coalesce()
+FS12 = FS1.intersect(FS2)
 
 FS12 = FS12.insert_dims(isl.dim_type.param, 0, 1)
 FS12 = FS12.set_dim_name(isl.dim_type.param,0, 'k0k')
 
-print FS12.get_space()
+
 
 c = isl.Constraint.eq_from_names(FS12.get_space(), {'ik1': -1, 'k0k':1})
 FS12 = FS12.add_constraint(c)
 FS12 = FS12.coalesce()
 
+
+
 # -----------------------------------------------------
 
 r1p_star = r1p.transitive_closure()[0]
-isl_ident = isl.Map.identity(r1p.get_space())
-r1p_plus = r1p_star.union(isl_ident).coalesce()
 
-RG1 = S.apply(r1p_plus)
+
+RG1 = S.apply(r1p_star)
 
 FS3 = isl.Map.from_domain_and_range(D, RG1).coalesce()
 
@@ -125,8 +137,6 @@ FS3 = FS3.set_dim_name(isl.dim_type.param,0, 'k1k')
 FS3 = FS3.insert_dims(isl.dim_type.param, 0, 1)
 FS3 = FS3.set_dim_name(isl.dim_type.param,0, 'k0k')
 
-print FS3.get_space()
-
 
 
 c = isl.Constraint.eq_from_names(FS3.get_space(), {'ok1': -1, 'k1k':1})
@@ -135,6 +145,7 @@ FS3 = FS3.coalesce()
 
 
 c = isl.Constraint.ineq_from_names(FS3.get_space(), {'k1k': 1, 'k0k':-1, 1 : -1})
+
 FS3 = FS3.add_constraint(c)
 FS3 = FS3.coalesce()
 
@@ -148,5 +159,4 @@ FS = Project(FS, ["k0k"])
 FS = Project(FS, ["k1k"])
 
 SK = FS.range()
-
 print SK
