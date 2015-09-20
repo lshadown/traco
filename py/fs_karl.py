@@ -15,16 +15,21 @@ def FSwithoutRG(r):
 
     # ---------------------------------------------------
     # r' = {[k, X ] -> [k +1, Y ] : constraints and k >= 0}.
+
+    r = isl.Map(str(r))
+
     rp = r
     rp = rp.insert_dims(isl.dim_type.in_, 0, 1)
     rp = rp.insert_dims(isl.dim_type.out, 0, 1)
     rp = rp.set_dim_name(isl.dim_type.in_,0, 'ik1')
     rp = rp.set_dim_name(isl.dim_type.out,0, 'ok1')
 
-    #rp = rp.set_dim_name(isl.dim_type.out,1, 'ii')
+    print rp.get_space()
+
 
 
     c = isl.Constraint.eq_from_names(rp.get_space(), {'ik1': -1, 'ok1':1, 1 : -1})
+
 
     rp = rp.add_constraint(c)
     rp = rp.coalesce()
@@ -117,7 +122,7 @@ def FSwithoutRG(r):
     FS = FS + ' and not exists k0k : k0k > i0 and ' + ORGp.replace('i0', 'k0k')
 
     FS = FS + '}'
-    FS = isl.UnionSet(FS)
+    FS = isl.Set(FS)
 
     #print FS
     return FS

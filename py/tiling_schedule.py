@@ -16,6 +16,8 @@ import sys
 import imperf_tile
 import slicing
 import fs_rk
+import fs_karl
+
 
 def fs_pragma(loops1):
     loop = []
@@ -1052,16 +1054,18 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
         #indt = rel_.domain().union(rel_.range()).coalesce()
         #indt = ii_SET.subtract(indt).coalesce()
 
-	indt = ""
+        indt = ""
+
+
+
+        # FS z RK
         sk = fs_rk.fs_rk1(rel_, SIMPLIFY, indt)
 
 
-
-
+        # FS bez RK
+        sk = fs_karl.FSwithoutRG(rel_)
 
         sk = sk.insert_dims(isl.dim_type.set, x*len(sym_exvars)+1,x*len(sym_exvars))
-
-
 
 
         bis = isl_TILEbis.insert_dims(isl.dim_type.set, 0, 1)
