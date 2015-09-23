@@ -6,7 +6,7 @@
 
 int N = 100;
 
-int can_pair(float *input, int a, int b){
+int can_pair(int *input, int a, int b){
    return ((((input[a] + input[b]) == 3) && (a < b - 1))) ? 1 : 0;
 }
 
@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
 
     float (*S)[DIM];
     S = (float (*)[DIM])malloc(DIM * DIM * sizeof(float));
-    float *RNA;
-    RNA = (float (*))malloc(DIM * sizeof(float));
+    int *RNA;
+    RNA = (int (*))malloc(DIM * sizeof(float));
 
 
     start = omp_get_wtime();
