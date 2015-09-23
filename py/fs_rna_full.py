@@ -35,7 +35,7 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-N= 10
+N= 2500
 val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
@@ -63,7 +63,7 @@ PAR = isl.UnionMap(_par)
 #statements
 it = ['i','j','k']
 s0 = "S[i][j] = MAX(S[i][k+i] + S[k+i+1][j], S[i][j]);"
-s1 = "S[i][j] = MAX(S[i][j], S[i+1][j-1] + can_par(RNA[i],RNA[j]));"
+s1 = "S[i][j] = MAX(S[i][j], S[i+1][j-1] + can_par(RNA, i, j));"
 
 
 R00 = R00.intersect(PAR).coalesce()
@@ -134,7 +134,8 @@ lines2 = []
 
 pragma = 1
 
-lines2.append('#pragma acc kernels copyin(RNA) copy(S)')
+#lines2.append('#pragma acc kernels copyin(RNA) copy(S)')
+lines2.append("#pragma parallel shared(S,RNA)")
 lines2.append('{')
 
 for line in lines:
@@ -157,15 +158,18 @@ for line in lines:
         line = tab + line
         line = line.replace('par', 'pair')
 
+    line = line.replace('int ', '')
+
     if '// -----' in line:
         pragma = 1
 
     if 'for' in line and pragma == 1:
-        lines2.append('#pragma acc loop independent')
-
+        #lines2.append('#pragma acc loop independent')
+        lines2.append('#pragma omp for')
+        pragma = 0
 
     if(line == 'if (N == '+str(N)+') {'):
-        lines2.append('} // CPU')
+        #lines2.append('} // GPU')
         pragma = 0
 
     if(not line == 'if (N == '+str(N)+')'):
@@ -173,7 +177,7 @@ for line in lines:
 
 
 
-#lines2.append('}')
+lines2.append('}') #CPU
 
 
 all = '\n'.join(lines2)
