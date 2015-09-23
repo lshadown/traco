@@ -2,9 +2,9 @@
 #include<stdlib.h>
 #include<omp.h>
 
-#define max(x,y)    ((x) > (y)? (x) : (y))
+#define MAX(x,y)    ((x) > (y)? (x) : (y))
 
-int N = 100;
+int N = 500;
 
 int can_pair(int *input, int a, int b){
    return ((((input[a] + input[b]) == 3) && (a < b - 1))) ? 1 : 0;
@@ -39,14 +39,14 @@ int main(int argc, char *argv[])
     for (i = N-1; i >= 0; i--) {
      for (j = i+1; j < N; j++) {
       for (k = 0; k < j-i; k++) {
-         S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]); // s0
+         S[i][j] = MAX(S[i][k+i] + S[k+i+1][j], S[i][j]); // s0
       }
-      S[i][j] = max(S[i][j], S[i+1][j-1] +can_pair(RNA, i, j));
+      S[i][j] = MAX(S[i][j], S[i+1][j-1] +can_pair(RNA, i, j));
      }
     }
 
     end = omp_get_wtime();
-	printf("%.3f\n", end - start);
+	printf("%.6f\n", end - start);
 
     return 0;
 
