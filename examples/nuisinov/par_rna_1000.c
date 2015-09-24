@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
 
     omp_set_num_threads(num_proc);
 
+    start = omp_get_wtime();
+
 #pragma omp parallel shared(S,RNA)
 {
 // --------------
@@ -13397,7 +13399,7 @@ if (N == 1000) {
 }
 }
 
-    start = omp_get_wtime();
+
 
 
 
