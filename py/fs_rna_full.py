@@ -36,7 +36,7 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-N= 100
+N= 10
 val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
@@ -129,15 +129,20 @@ for i in range(0,2*N):
     crd = crd.replace("[N] -> { ", "")
     crd = crd.replace(" : N = " + str(N) + " }", "")
 
-    if(int(crd) >= 1000):
-        print crd
 
 
+    if(int(crd) < 1000):
+        all = all + '// --------------\n'
+    else:
+        all = all + '// parallel -----\n'
 
 
 
     all = all + iscc.iscc_communicate("L :=" + str(Lay) + "; codegen L;")
-    all = all + '// --------------\n'
+
+
+
+
 
 
 
@@ -145,7 +150,9 @@ lines = all.split('\n')
 
 lines2 = []
 
-pragma = 1
+pragma_par = 0
+pragma_single = 0
+single_block = 0
 
 #lines2.append('#pragma acc kernels copyin(RNA) copy(S)')
 lines2.append("#pragma omp parallel shared(S,RNA)")
@@ -173,13 +180,28 @@ for line in lines:
 
     line = line.replace('int ', '')
 
-    if '// -----' in line:
-        pragma = 1
+    if '// parallel -----' in line:
+        pragma_par = 1
+        if(single_block == 1):
+            lines2.append('}')
+            single_block = 0
 
-    if 'for' in line and pragma == 1:
+    if '// -------------' in line:
+        pragma_single = 1
+
+    if 'for' in line and pragma_par == 1:
         #lines2.append('#pragma acc loop independent')
         lines2.append('#pragma omp for')
-        pragma = 0
+        pragma_par = 0
+
+
+    if 'for' in line and pragma_single == 1 and single_block == 0:
+        #lines2.append('#pragma acc loop independent')
+        lines2.append('#pragma single')
+        lines2.append('{')
+        pragma_single = 0
+        single_block = 1
+
 
     if(line == 'if (N == '+str(N)+') {'):
         #lines2.append('} // GPU')
@@ -189,9 +211,9 @@ for line in lines:
         lines2.append(line)
 
 
-
+lines2.append('}')
 lines2.append('}') #CPU
 
 
 all = '\n'.join(lines2)
-#print all
+print all
