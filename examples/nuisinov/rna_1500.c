@@ -3,6 +3,10 @@
 #include<omp.h>
 
 #define MAX(x,y)    ((x) > (y)? (x) : (y))
+#define ceild(n,d)  ceil(((double)(n))/((double)(d)))
+#define floord(n,d) floor(((double)(n))/((double)(d)))
+#define max(x,y)    ((x) > (y)? (x) : (y))
+#define min(x,y)    ((x) < (y)? (x) : (y))
 
 int N = 500;
 
