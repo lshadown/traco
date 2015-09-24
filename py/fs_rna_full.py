@@ -36,7 +36,7 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-N= 10
+N= 1500
 val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
@@ -197,7 +197,7 @@ for line in lines:
 
     if 'for' in line and pragma_single == 1 and single_block == 0:
         #lines2.append('#pragma acc loop independent')
-        lines2.append('#pragma single')
+        lines2.append('#pragma omp single')
         lines2.append('{')
         pragma_single = 0
         single_block = 1
