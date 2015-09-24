@@ -1,5 +1,6 @@
 import iscc
 import re
+import test_isl
 
 try:
     import islpy as isl
@@ -35,7 +36,7 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-N= 500
+N= 100
 val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
@@ -123,6 +124,18 @@ for i in range(0,2*N):
 
     Lay = Lay0.union(Lay1).coalesce()
 
+    #Lay.card()
+    crd = test_isl.StringToCard(str(Lay))
+    crd = crd.replace("[N] -> { ", "")
+    crd = crd.replace(" : N = " + str(N) + " }", "")
+
+    if(int(crd) >= 1000):
+        print crd
+
+
+
+
+
     all = all + iscc.iscc_communicate("L :=" + str(Lay) + "; codegen L;")
     all = all + '// --------------\n'
 
@@ -135,7 +148,7 @@ lines2 = []
 pragma = 1
 
 #lines2.append('#pragma acc kernels copyin(RNA) copy(S)')
-lines2.append("#pragma parallel shared(S,RNA)")
+lines2.append("#pragma omp parallel shared(S,RNA)")
 lines2.append('{')
 
 for line in lines:
@@ -181,4 +194,4 @@ lines2.append('}') #CPU
 
 
 all = '\n'.join(lines2)
-print all
+#print all
