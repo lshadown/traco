@@ -19,6 +19,7 @@ import petit_int
       
 SIMPLIFY = False
 permute = False
+rplus_file = ''
 
 
 
@@ -102,6 +103,9 @@ if len(sys.argv) > 3:
         for i in range(4, len(sys.argv)):
             if('--permute' in sys.argv[i]):
                 permute = True
+            if('--rplus' in sys.argv[i]):
+                rplus_file = sys.argv[i].replace('--rplus=', '')
+
 
         if('=' in sys.argv[3]):
             line_tmp = sys.argv[3].replace('--tiling=', '')
@@ -120,7 +124,7 @@ if len(sys.argv) > 3:
         partile = '--partile' in sys.argv[3];
 
         if('--tiling3' in sys.argv[3] or partile):
-            tiling_v3.tile(sys.argv[1], block, permute, "", "0", SIMPLIFY, perfect_mode, partile)
+            tiling_v3.tile(sys.argv[1], block, permute, "", "0", SIMPLIFY, perfect_mode, partile, rplus_file)
             sys.exit()
             
         if('--slicing' in sys.argv[3]):

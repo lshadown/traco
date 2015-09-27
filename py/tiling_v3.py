@@ -404,7 +404,7 @@ def MultiNest(instrukcje):
 ###############################################################
 
 
-def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False):
+def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
 
     schedule_mode = parallel_option
 
@@ -695,7 +695,19 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #if maxl > isl_rel:
 
     start = time.time()
-    isl_relclosure = isl_rel.transitive_closure()[0].coalesce()
+
+    # **************************************************************************
+    exact_rplus = '-1'
+    isl_relclosure = isl_rel
+    if(rplus_file != ''):
+        with open (rplus_file, "r") as myfile:
+            data=myfile.read().replace('\n', '')
+            isl_relclosure = isl.Map(str(data))
+    else:
+        isl_relclosure = isl_rel.transitive_closure()
+        exact_rplus = isl_relclosure[1]
+        isl_relclosure = isl_relclosure[0]
+
     isl_relplus = isl_relclosure
     end = time.time()
     elapsed = end - start
@@ -705,9 +717,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
 
     if(_debug_):
-        print "R+"
+        print "R*"
         print isl_relclosure
-        print isl_rel.transitive_closure()[1]
+        print exact_rplus
+    # **************************************************************************
        
     isl_symb = isl_rel.get_var_names(isl.dim_type.param)
     symb = isl_symb
