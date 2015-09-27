@@ -820,6 +820,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     isl_TILE2 = []
     isl_TILEprim = []
     isl_TILEbis = []
+    isl_TILEorig = []
 
     
 
@@ -956,6 +957,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 #print isl_TILEprim[i]
 
         isl_TILEbis.append(Project(isl_TILEprim[i].apply(Rapply).coalesce(), sym_exvars).coalesce())
+        isl_TILEorig.append(Project(isl_TILE[i].apply(Rapply).coalesce(), sym_exvars).coalesce())
 
         if(_debug_):
             print "TILE"
@@ -1009,6 +1011,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             #sys.exit(0)
 
             isl_TILEbis[i] =  isl_TILEbis[i].intersect(cor_set).coalesce()
+            isl_TILEorig[i] =  isl_TILEorig[i].intersect(cor_set).coalesce()
 
 
 
@@ -1041,6 +1044,25 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             z = z.union(isl_TILEbis[j].apply(_rap))
         else:
             z = z.union(isl_TILEbis[j])
+
+
+    # -----------------------------------------------------------------
+
+    if(Extend):
+        zorig = isl_TILEorig[0].apply(_rap)
+    else:
+        zorig = isl_TILEorig[0]
+
+    for j in range(1, len(isl_TILEorig)):
+        _rap =  GetRapply2(vars, sym_exvars, _SYM, instrukcje, j)
+        if(Extend):
+            zorig = zorig.union(isl_TILEorig[j].apply(_rap))
+        else:
+            zorig = zorig.union(isl_TILEorig[j])
+
+    zorig = zorig.coalesce()
+
+    # ---------------------------------------------------------------
     
     z = z.coalesce()
     z = z.remove_redundancies()
@@ -1165,6 +1187,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 rtile = tiling_schedule.get_RTILE(z, sym_exvars, isl_rel, Extend)
                 print "RTILE:"
                 print rtile
+                rtileorig = tiling_schedule.get_RTILE(zorig, sym_exvars, isl_rel, Extend)
+                print "RTILE_ORIG:"
+                print rtileorig
 
     
 

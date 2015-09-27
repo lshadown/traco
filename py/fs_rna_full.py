@@ -36,7 +36,7 @@ except ImportError, e:
 # 1 : 1
 # {[i,j] -> [i-1,j+1] : 1 <= i < j <= N-2}
 
-N= 1500
+N= 2500
 val = str(N)
 
 _par = "[N] -> {[i,j]->[i',j'] : N = " + val + "; [i,j]->[i',j',k'] : N = " + val + "; [i,j,k]->[i',j'] : N = " + val + "; [i,j,k]->[i',j',k'] : N = " + val + " } "
