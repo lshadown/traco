@@ -78,18 +78,20 @@ else if(kind == 3){
 int c0,c1,c2,c3,c4,c5;
 
 for (c0 = 0; c0 <= floord(N, 16); c0 += 1)
-  for (c1 = 0; c1 <= N / 16; c1 += 1)
-    if (N >= 16 * c1 + 16) {
-      for (c3 = 16 * c1; c3 <= 16 * c1 + 15; c3 += 1)
-        b[16*c0][c3]=b[16*c0+1][N-c3];
-    } else
-      for (c2 = 16 * c0; c2 <= min(16 * c0 + 15, N); c2 += 1) {
-        if (c2 >= 16 * c0 + 1)
-          for (c3 = 0; c3 < 16 * c1; c3 += 1)
-            b[c2][c3]=b[c2+1][N-c3];
-        for (c3 = 16 * c1; c3 <= N; c3 += 1)
+  for (c1 = 0; c1 <= N / 16; c1 += 1) {
+    for (c3 = 16 * c1; c3 <= min(N, 16 * c1 + 15); c3 += 1)
+      b[16*c0][c3]=b[16*c0+1][N-c3];
+    for (c2 = 16 * c0 + 1; c2 <= min(N, 16 * c0 + 15); c2 += 1) {
+      if (c2 == 16 * c0 + 1) {
+        for (c3 = max(0, N - 16 * c1 - 15); c3 <= min(16 * c1 - 1, N - 16 * c1); c3 += 1)
+          b[16*c0+1][c3]=b[16*c0+1+1][N-c3];
+      } else
+        for (c3 = max(0, N - 16 * c1 - 15); c3 <= min(16 * c1 - 1, N - 16 * c1); c3 += 1)
           b[c2][c3]=b[c2+1][N-c3];
-      }
+      for (c3 = max(N - 16 * c1 - 15, 16 * c1); c3 <= min(N, 16 * c1 + 15); c3 += 1)
+        b[c2][c3]=b[c2+1][N-c3];
+    }
+  }
 
 }
     double end = omp_get_wtime();
