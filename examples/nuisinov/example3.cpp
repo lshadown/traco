@@ -41,15 +41,15 @@ int main(int argc, char *argv[]) {
 	int k,l,i,j,t,loop=N,n=N;
 
 	// Declare arrays on the stack
-	double **b = new double*[N+2];
+	long double **b = new long double*[N+2];
 	for (i=0; i<N+2; i++)
-	  b[i] = new double[N+2];
+	  b[i] = new long double[N+2];
 
 
 	// Set the input data
 	for (i=0; i<N+2; i++) {
 		for (j=0; j<N+2; j++) {
-			b[i][j] = ((double) i*i*(j+2) + 2) / N;
+			b[i][j] = ((long double) i*i*(j+2) + 2) / N;
 		}
 	}
 
@@ -77,21 +77,21 @@ else if(kind == 3){
 
 int c0,c1,c2,c3,c4,c5;
 
-for (c0 = 0; c0 <= floord(N, 32); c0 += 1)
-  for (c1 = 0; c1 <= N / 32; c1 += 1)
-    if (N >= 32 * c1 + 32) {
-      for (c3 = 32 * c1; c3 <= 32 * c1 + 31; c3 += 1)
-        b[32*c0][c3]=b[32*c0+1][N-c3];
+for (c0 = 0; c0 <= floord(N, 16); c0 += 1)
+  for (c1 = 0; c1 <= N / 16; c1 += 1)
+    if (N >= 16 * c1 + 16) {
+      for (c3 = 16 * c1; c3 <= 16 * c1 + 15; c3 += 1)
+        b[16*c0][c3]=b[16*c0+1][N-c3];
     } else
-      for (c2 = 32 * c0; c2 <= min(32 * c0 + 31, N); c2 += 1) {
-        if (c2 >= 32 * c0 + 1)
-          for (c3 = 0; c3 < 32 * c1; c3 += 1)
+      for (c2 = 16 * c0; c2 <= min(16 * c0 + 15, N); c2 += 1) {
+        if (c2 >= 16 * c0 + 1)
+          for (c3 = 0; c3 < 16 * c1; c3 += 1)
             b[c2][c3]=b[c2+1][N-c3];
-        for (c3 = 32 * c1; c3 <= N; c3 += 1)
+        for (c3 = 16 * c1; c3 <= N; c3 += 1)
           b[c2][c3]=b[c2+1][N-c3];
       }
-}
 
+}
     double end = omp_get_wtime();
 	printf("%.3f\n", end - start);
 
@@ -100,4 +100,5 @@ for (c0 = 0; c0 <= floord(N, 32); c0 += 1)
 	// Clean-up and exit the function
 	fflush(stdout);
 	return 0;
+
 }
