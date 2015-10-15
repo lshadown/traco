@@ -412,7 +412,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     LPetit = "tmp/tmp_petit"+L+".t"
     LDeps = "tmp/deps"+L+".txt"
 
-
+    # strong perfect
     if perfect_mode:
         print 'Perfectly nested loop mode: enabled'
 
@@ -532,7 +532,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     elapsed = end - start
     print "Dependence analysis: time taken: ", elapsed, "seconds."
 
-    print dane
+    if(DEBUG):
+        print dane
 
     dane = dane.split("#")
     
@@ -645,26 +646,31 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     start = time.time()
 
+
     tmp_st = []
     if(perfect_mode):
         firstst = str(instrukcje[0]['st'][0])
-        print rel
+        #print rel
         rel = re.sub(r"v = \d+", "v = " + firstst, rel)
         rel = re.sub(r"v' = \d+", "v' = " + firstst, rel)
-        print rel
+        #print rel
         tmp_st = instrukcje[0]['st']
         instrukcje[0]['st'] = [instrukcje[0]['st'][0]]
-        print instrukcje[0]['st']
+        #print instrukcje[0]['st']
         # wywal reszte zapisz gdzies tablice
         # exit(1)
 
 
+    # strong perfect mode
     isl_rel = isl.Map(str(rel))
+    isl_ident = isl_rel.identity(isl_rel.get_space())
 
 
+    if(perfect_mode):
+        print "Removing internal dependences for perfect nested loop"
+        isl_rel = isl_rel.subtract(isl_ident)
 
-
-
+    print isl_rel
 
     z = isl_rel.dim(isl.dim_type.out)
     zz = maxl - z  + 1
@@ -1115,10 +1121,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         if(barv == 1):
             loop_x = iscc.iscc_communicate("L :=" + str(z) + "; codegen L;")
         else:  #cloog
-
-            loop_x = codegen.tile_gen_short(vars, sym_exvars, symb,z,instrukcje, Extend)
+            #loop_x = codegen.tile_gen_short(vars, sym_exvars, symb,z,instrukcje, Extend)
+            with open ('loopx', "r") as myfile:
+                loop_x=myfile.read()
         #loop_x = iscc.oc_communicate(z)
         #loop_x = codegen.tile_gen(vars, sym_exvars, symb, isl_TILEbis, instrukcje, "", [], stuff)
+
+
 
         end = time.time()
         elapsed = end - start
