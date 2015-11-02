@@ -116,7 +116,9 @@ def CorrectFile(name, priv_vars_extra, reduce_op):
 
 
     b = 0   
-    noi = 0 
+    noi = 0
+
+
     for i in range(0, len(lines)-1):
  
         if('{' in lines[i]):
@@ -126,15 +128,15 @@ def CorrectFile(name, priv_vars_extra, reduce_op):
         if('}' in lines[i]):
             b = b-1
  
-       
-        if(b > 0 and lines[i][0] != ' ' and lines[i][0] != '' and noi == 0):
-            for j in range(0,2*b):
-                lines[i] = ' ' + lines[i]    
+        if(len(lines[i]) > 0 ):
+            if(b > 0 and lines[i][0] != ' ' and lines[i][0] != '' and noi == 0):
+                for j in range(0,2*b):
+                    lines[i] = ' ' + lines[i]
         
         noi = 0      
         lines[i] = lines[i] + "\n"
         
-     
+
     
     _file = open(name, 'w')
     lines = _file.writelines(lines)  

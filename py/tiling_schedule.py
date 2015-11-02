@@ -250,7 +250,6 @@ def tile_par2(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
     rs = rbis.intersect(rstar)
     rt_red = rbis.intersect(rplus)
 
-    fs = 1
     if(fs != 1):
 
         if(rucs.is_empty()):
@@ -737,6 +736,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
     #print isl_TILEbis
     srepr,rucs = slicing.Create_Srepr(isl_rel, isl_relclosure)
 
+    fs = 0
 
     ir = isl_rel.domain().union(isl_rel.range()).coalesce()
     ir = ir.insert_dims(isl.dim_type.set, 0, len(sym_exvars))
@@ -805,7 +805,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
     indloop =  iscc.iscc_communicate("L :=" + str(TILE_IND) + "; codegen L;")
 
-    fs = 1
+
     if(TILE_SOUR.lexmax() == TILE_SOUR.lexmin()):
         print "FS"
         fs = 1
@@ -817,7 +817,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
             isl_relclosure = isl_relclosure.union(rucs)
             isl_relplus = isl_relplus.union(rucs)
 
-    #fs = 1
+
 
     rplus = tiling_v3.ExtendMap(isl_relplus, sym_exvars, Extend)
     rstar = tiling_v3.ExtendMap(isl_relclosure, sym_exvars, Extend)
@@ -876,7 +876,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
         TMP2 = TILE_SOUR
 
     
-    #fs = 1
+
     if(fs != 1):
 
 
@@ -914,6 +914,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
                 srepr_loop.insert(i, "#pragma omp parallel for")
                 break
 
+        #print srepr_loop
 
         st_reg = re.compile('\s*\(.*\);')
         vecs = []
