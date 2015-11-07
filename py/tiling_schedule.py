@@ -678,12 +678,12 @@ def get_RTILE(isl_TILEbis, sym_exvars, isl_rel, Extend):
 
     rel_simple = rel_simple.coalesce()
 
-    get_RCYCLE(rel_simple)
+    #get_RCYCLE(rel_simple, 0)
 
     return rel_simple
 
 
-def get_RCYCLE(rel_simple):
+def get_RCYCLE(rel_simple, orig):
 
     #rel_simple = isl.Map("[n] -> {[i,j] -> [i',j'] : 1 <= i <= n && 1 <= j <= n && 1 <= i' <= n && 1 <= j' <= n}")
 
@@ -713,6 +713,9 @@ def get_RCYCLE(rel_simple):
 
     print 'R_CYCLE'
     print r_out
+
+    if orig == 1:
+        print "Oryginal TILES"
 
     print '#nowa prosta implementacja R_CYCLE'
 

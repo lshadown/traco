@@ -1196,9 +1196,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 rtile = tiling_schedule.get_RTILE(z, sym_exvars, isl_rel, Extend)
                 print "RTILE:"
                 print rtile
+                tiling_schedule.get_RCYCLE(rtile, 0)
                 rtileorig = tiling_schedule.get_RTILE(zorig, sym_exvars, isl_rel, Extend)
                 print "RTILE_ORIG:"
                 print rtileorig
+                tiling_schedule.get_RCYCLE(rtileorig, 1)
 
     
 
