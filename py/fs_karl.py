@@ -130,26 +130,26 @@ def FSwithoutRG(r):
 
 
 # -test ----test ---test ---test ---test ---test ---test ---
-r1 = "[n] -> {[i,-1,1] -> [i,1,2] : 1 <= i <= n}"
-r2 = "[n] -> {[i,j,2] -> [i',j,2] : 1 <= i < n && 1 <= j <= n && i' = i+ 1 }"
-r3 = "[n] -> {[i,j,2] -> [i,j',2] : 1 <= i <= n && 1 <= j < n && j'=j+1 }"
+#r1 = "[n] -> {[i,-1,1] -> [i,1,2] : 1 <= i <= n}"
+#r2 = "[n] -> {[i,j,2] -> [i',j,2] : 1 <= i < n && 1 <= j <= n && i' = i+ 1 }"
+#r3 = "[n] -> {[i,j,2] -> [i,j',2] : 1 <= i <= n && 1 <= j < n && j'=j+1 }"
 
-r1 = isl.Map(r1)
-r2 = isl.Map(r2)
-r3 = isl.Map(r3)
+#r1 = isl.Map(r1)
+#r2 = isl.Map(r2)
+#r3 = isl.Map(r3)
 
-r = r1.union(r2).union(r3).coalesce()
+#r = r1.union(r2).union(r3).coalesce()
 
-r = '[n] -> { [i0, 2, i2, 0, 8] -> [i0, 2, 1 + i2, 0, 8] : i0 >= 0 and 16i0 <= -1 + n and i2 >= 0 and ' \
-    '16i2 <= -17 + n; [i0, 2, i2, 0, 8] -> [1 + i0, 2, i2, 0, 8] : i0 >= 0 and 16i0 <= -17 + n and i2 >= 0 ' \
-    'and 16i2 <= -1 + n; [i0, 0, 0, 0, 6] -> [i0, 2, 0, 0, 8] : i0 >= 0 and 16i0 <= -1 + n }'
-r = isl.Map(r)
-FS = FSwithoutRG(r)
+#r = '[n] -> { [i0, 2, i2, 0, 8] -> [i0, 2, 1 + i2, 0, 8] : i0 >= 0 and 16i0 <= -1 + n and i2 >= 0 and ' \
+#    '16i2 <= -17 + n; [i0, 2, i2, 0, 8] -> [1 + i0, 2, i2, 0, 8] : i0 >= 0 and 16i0 <= -17 + n and i2 >= 0 ' \
+#    'and 16i2 <= -1 + n; [i0, 0, 0, 0, 6] -> [i0, 2, 0, 0, 8] : i0 >= 0 and 16i0 <= -1 + n }'
+#r = isl.Map(r)
+#FS = FSwithoutRG(r)
 
-print FS
-print '-----------------------'
-print '-----------------------'
-print iscc.iscc_communicate("L :=" + str(FS) + "; codegen L;")
+#print FS
+#print '-----------------------'
+#print '-----------------------'
+#print iscc.iscc_communicate("L :=" + str(FS) + "; codegen L;")
 # ---------------------------------------------------------
 
 
