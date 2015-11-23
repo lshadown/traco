@@ -43,6 +43,23 @@ void comp_tile(float u[6][DIM1][DIM2][DIM3], float us[DIM1][DIM2][DIM3], float v
 
   register int c0, c1, c2, c3, c4, c5, c6;
 int rho_inv;
+
+#pragma omp parallel for
+for (c0 = 0; c0 <= floord(N1, 16); c0 += 1)
+  for (c1 = 0; c1 <= floord(N2, 16); c1 += 1)
+    for (c2 = 0; c2 <= floord(N3, 16); c2 += 1)
+      for (c3 = 16 * c1; c3 <= min(16 * c1 + 15, N2); c3 += 1)
+        for (c4 = 16 * c2; c4 <= min(16 * c2 + 15, N3); c4 += 1)
+          for (c5 = 16 * c0; c5 <= min(16 * c0 + 15, N1); c5 += 1) {
+            rho_c4nv=1.0/u[1][c4][c3][c5];
+            rho_c5[c5][c4][c3]=rho_c5nv;
+            us[c5][c4][c3]=u[2][c5][c4][c3]*rho_c5nv;
+            vs[c5][c4][c3]=u[3][c5][c4][c3]*rho_c5nv;
+            ws[c5][c4][c3]=u[4][c5][c4][c3]*rho_c5nv;
+            square[c5][c4][c3]=0.5*(u[2][c5][c4][c3]*u[2][c5][c4][c3]+u[3][c5][c4][c3]*u[3][c5][c4][c3]+u[4][c5][c4][c3]*u[4][c5][c4][c3])*rho_c5nv;
+            qs[c5][c4][c3]=square[c5][c4][c3]*rho_c5nv;
+          }
+          /*
 #pragma omp parallel for
 for (c0 = 0; c0 <= N1/16; c0 += 1)
   for (c1 = 0; c1 <= floord(N2, 16); c1 += 1)
@@ -58,7 +75,7 @@ for (c0 = 0; c0 <= N1/16; c0 += 1)
             square[c5][c4][c3]=0.5*(u[2][c5][c4][c3]*u[2][c5][c4][c3]+u[3][c5][c4][c3]*u[3][c5][c4][c3]+u[4][c5][c4][c3]*u[4][c5][c4][c3])*rho_inv;
             qs[c5][c4][c3]=square[c5][c4][c3]*rho_inv;
           }
-
+*/
 
 }
 
