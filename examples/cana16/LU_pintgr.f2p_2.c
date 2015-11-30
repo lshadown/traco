@@ -43,6 +43,18 @@ int c0,c1,c2,c3,gg2;
 #pragma omp parallel for
 for (c0 = 0; c0 <= floord(-N1 + N2, 256); c0 += 1)
   for (c1 = 0; c1 <= floord(-N3 + N4, 256); c1 += 1)
+     for (c3 = N3 + 256 * c1; c3 <= min(N3 + 256 * c1 + 255, N4); c3 += 1)
+    for (c2 = N1 + 256 * c0; c2 <= min(N2, N1 + 256 * c0 + 255); c2 += 1)
+       {
+        k=ki1;
+        phi1[c3][c2]=gg2*(u[5][c3][c2][k]-0.50*(u[2][c3][c2][k]*2+u[3][c3][c2][k]*2+u[4][c3][c2][k]*2)/u[1][c3][c2][k]);
+        k=ki2;
+        phi2[c3][c2]=gg2*(u[5][c3][c2][k]-0.50*(u[2][c3][c2][k]*2+u[3][c3][c2][k]*2+u[4][c3][c2][k]*2)/u[1][c3][c2][k]);
+      }
+
+#pragma omp parallel for
+for (c0 = 0; c0 <= floord(-N1 + N2, 256); c0 += 1)
+  for (c1 = 0; c1 <= floord(-N3 + N4, 256); c1 += 1)
     for (c2 = N1 + 256 * c0; c2 <= min(N2, N1 + 256 * c0 + 255); c2 += 1)
       for (c3 = N3 + 256 * c1; c3 <= min(N3 + 256 * c1 + 255, N4); c3 += 1) {
         k=ki1;
