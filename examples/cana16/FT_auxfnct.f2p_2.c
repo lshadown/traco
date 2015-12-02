@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
   switch(kind)
   {
       case 1 : seq(x, y, twiddle); break;
-      case 2 : comp_traco(x, y, twiddle); break;
+      default : comp_traco(x, y, twiddle); break;
      // case 3 : comp_pluto(x, y, twiddle); break;
   }
 
