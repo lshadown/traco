@@ -37,8 +37,10 @@ void comp_traco(float x[DIM1][DIM2][DIM3], float y[DIM1][DIM2][DIM3], float twid
 int k, i, j, i_tile, q;
 int c0,c1,c2,c3,c4,c5;
 
+int UB = floord(N1 - 1, 16);
+
 #pragma omp parallel for
-for (c0 = 0; c0 <= floord(N1 - 1, 16); c0 += 1)
+for (c0 = 0; c0 <= UB; c0 += 1)
   for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)
     for (c2 = 0; c2 <= floord(N3 - 1, 16); c2 += 1)
       for (c3 = 16 * c1 + 1; c3 <= min(N2, 16 * c1 + 16); c3 += 1)
