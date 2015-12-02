@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
   {
       case 1 : seq(x, y, twiddle); break;
       case 2 : comp_traco(x, y, twiddle); break;
-     # case 3 : comp_pluto(x, y, twiddle); break;
+     // case 3 : comp_pluto(x, y, twiddle); break;
   }
 
   gettimeofday(&f1, NULL);
