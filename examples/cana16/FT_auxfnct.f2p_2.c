@@ -95,8 +95,8 @@ int main(int argc, char *argv[]) {
   struct timeval s1, f1;
   double  duration, duration1;
 
-  //printf("Ilosc procesorow: %i \n\n", num_proc);
-  //omp_set_num_threads(num_proc);
+  printf("Ilosc procesorow: %i \n\n", num_proc);
+  omp_set_num_threads(num_proc);
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // PETLA SEKWENCYJNA
