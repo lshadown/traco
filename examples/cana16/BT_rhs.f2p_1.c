@@ -52,12 +52,12 @@ for (c0 = 0; c0 <= UB1; c0 += 1)
         for (c4 = 16 * c2; c4 <= min(16 * c2 + 15, N3); c4 += 1)
           for (c5 = 16 * c0; c5 <= min(16 * c0 + 15, N1); c5 += 1) {
             rho_inv=1.0/u[1][c4][c3][c5];
-            rho_i[c5][c4][c3]=rho_inv;
-            us[c5][c4][c3]=u[2][c5][c4][c3]*rho_inv;
-            vs[c5][c4][c3]=u[3][c5][c4][c3]*rho_inv;
-            ws[c5][c4][c3]=u[4][c5][c4][c3]*rho_inv;
-            square[c5][c4][c3]=0.5*(u[2][c5][c4][c3]*u[2][c5][c4][c3]+u[3][c5][c4][c3]*u[3][c5][c4][c3]+u[4][c5][c4][c3]*u[4][c5][c4][c3])*rho_inv;
-            qs[c5][c4][c3]=square[c5][c4][c3]*rho_inv;
+            rho_i[c4][c3][c5]=rho_inv;
+            us[c4][c3][c5]=u[2][c4][c3][c5]*rho_inv;
+            vs[c4][c3][c5]=u[3][c4][c3][c5]*rho_inv;
+            ws[c4][c3][c5]=u[4][c4][c3][c5]*rho_inv;
+            square[c4][c3][c5]=0.5*(u[2][c4][c3][c5]*u[2][c4][c3][c5]+u[3][c4][c3][c5]*u[3][c4][c3][c5]+u[4][c4][c3][c5]*u[4][c4][c3][c5])*rho_inv;
+            qs[c4][c3][c5]=square[c4][c3][c5]*rho_inv;
           }
           /*
 #pragma omp parallel for
