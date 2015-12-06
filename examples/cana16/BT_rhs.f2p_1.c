@@ -43,21 +43,21 @@ void comp_tile(float u[6][DIM1][DIM2][DIM3], float us[DIM1][DIM2][DIM3], float v
 
   register int c0, c1, c2, c3, c4, c5, c6;
 int rho_inv;
-
-#pragma omp parallel for
-for (c0 = 0; c0 <= floord(N1, 16); c0 += 1)
+int UB1 = floord(N1, 16);
+#pragma omp parallel for private(rho_inv)
+for (c0 = 0; c0 <= UB1; c0 += 1)
   for (c1 = 0; c1 <= floord(N2, 16); c1 += 1)
     for (c2 = 0; c2 <= floord(N3, 16); c2 += 1)
       for (c3 = 16 * c1; c3 <= min(16 * c1 + 15, N2); c3 += 1)
         for (c4 = 16 * c2; c4 <= min(16 * c2 + 15, N3); c4 += 1)
           for (c5 = 16 * c0; c5 <= min(16 * c0 + 15, N1); c5 += 1) {
-            rho_c4nv=1.0/u[1][c4][c3][c5];
-            rho_c5[c5][c4][c3]=rho_c5nv;
-            us[c5][c4][c3]=u[2][c5][c4][c3]*rho_c5nv;
-            vs[c5][c4][c3]=u[3][c5][c4][c3]*rho_c5nv;
-            ws[c5][c4][c3]=u[4][c5][c4][c3]*rho_c5nv;
-            square[c5][c4][c3]=0.5*(u[2][c5][c4][c3]*u[2][c5][c4][c3]+u[3][c5][c4][c3]*u[3][c5][c4][c3]+u[4][c5][c4][c3]*u[4][c5][c4][c3])*rho_c5nv;
-            qs[c5][c4][c3]=square[c5][c4][c3]*rho_c5nv;
+            rho_inv=1.0/u[1][c4][c3][c5];
+            rho_i[c5][c4][c3]=rho_inv;
+            us[c5][c4][c3]=u[2][c5][c4][c3]*rho_inv;
+            vs[c5][c4][c3]=u[3][c5][c4][c3]*rho_inv;
+            ws[c5][c4][c3]=u[4][c5][c4][c3]*rho_inv;
+            square[c5][c4][c3]=0.5*(u[2][c5][c4][c3]*u[2][c5][c4][c3]+u[3][c5][c4][c3]*u[3][c5][c4][c3]+u[4][c5][c4][c3]*u[4][c5][c4][c3])*rho_inv;
+            qs[c5][c4][c3]=square[c5][c4][c3]*rho_inv;
           }
           /*
 #pragma omp parallel for
@@ -75,38 +75,27 @@ for (c0 = 0; c0 <= N1/16; c0 += 1)
             square[c5][c4][c3]=0.5*(u[2][c5][c4][c3]*u[2][c5][c4][c3]+u[3][c5][c4][c3]*u[3][c5][c4][c3]+u[4][c5][c4][c3]*u[4][c5][c4][c3])*rho_inv;
             qs[c5][c4][c3]=square[c5][c4][c3]*rho_inv;
           }
-*/
 
-}
-
-void comp_pluto(float u[6][DIM1][DIM2][DIM3], float us[DIM1][DIM2][DIM3], float vs[DIM1][DIM2][DIM3], float ws[DIM1][DIM2][DIM3], float qs[DIM1][DIM2][DIM3], float square[DIM1][DIM2][DIM3], float rho_i[DIM1][DIM2][DIM3]) {
-  register int lbv, ubv, lb, ub, lb1, ub1, lb2, ub2;
-  register int c0, c1, c2, c3, c4, c5;
-  int rho_inv;
-
-#pragma scop
-if ((((N1 >= 0) && (N2 >= 0)) && (N3 >= 0))) {
-  for (c0 = 0; c0 <= floord(N1, 16); c0++) {
-    for (c1 = 0; c1 <= floord(N2, 16); c1++) {
-      for (c2 = 0; c2 <= floord(N3, 16); c2++) {
-        for (c3 = (16 * c0); c3 <= min(N1, ((16 * c0) + 15)); c3++) {
-          for (c4 = (16 * c1); c4 <= min(N2, ((16 * c1) + 15)); c4++) {
-            for (c5 = (16 * c2); c5 <= min(N3, ((16 * c2) + 15)); c5++) {
-              rho_inv = 1.0/u[1][c5][c4][c3];
-              square[c5][c4][c3] = 0.5* ( u[2][c5][c4][c3]*u[2][c5][c4][c3] + u[3][c5][c4][c3]*u[3][c5][c4][c3] + u[4][c5][c4][c3]*u[4][c5][c4][c3] ) * rho_inv;
-              qs[c5][c4][c3] = square[c5][c4][c3] * rho_inv;
-              ws[c5][c4][c3] = u[4][c5][c4][c3] * rho_inv;
-              vs[c5][c4][c3] = u[3][c5][c4][c3] * rho_inv;
-              us[c5][c4][c3] = u[2][c5][c4][c3] * rho_inv;
-              rho_i[c5][c4][c3] = rho_inv;
-            }
-          }
-        }
-      }
+#pragma omp parallel for private(rho_inv)
+for(k = 0; k <= N1; k++){
+  for(j = 0; j <= N2; j++){
+    for(i = 0; i <= N3; i++){
+      rho_inv = 1.0/u[1][i][j][k];
+      rho_i[i][j][k] = rho_inv;
+      us[i][j][k] = u[2][i][j][k] * rho_inv;
+      vs[i][j][k] = u[3][i][j][k] * rho_inv;
+      ws[i][j][k] = u[4][i][j][k] * rho_inv;
+      square[i][j][k]     = 0.5* ( u[2][i][j][k]*u[2][i][j][k] + u[3][i][j][k]*u[3][i][j][k] + u[4][i][j][k]*u[4][i][j][k] ) * rho_inv;
+      qs[i][j][k] = square[i][j][k] * rho_inv;
     }
   }
 }
-#pragma endscop
+
+*/
+
+
+
+
 
 }
 
@@ -150,8 +139,8 @@ int main(int argc, char *argv[]) {
   switch(kind)
   {
       case 1 : seq(u, us, vs, ws, qs, square, rho_i); break;
-      case 2 : comp_tile(u, us, vs, ws, qs, square, rho_i); break;
-      case 3 : comp_pluto(u, us, vs, ws, qs, square, rho_i); break;
+      default : comp_tile(u, us, vs, ws, qs, square, rho_i); break;
+
   }
 
   gettimeofday(&f1, NULL);
