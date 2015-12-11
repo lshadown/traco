@@ -1,15 +1,13 @@
-import re
-
 try:
     import islpy as isl
 except ImportError, e:
     print e
     print "pip install ispy"
     sys.exit()
-    ctx = isl.Context()
+
+
 
 line = "i+ii-2*i"
-
 operators = ["i", "ii"]
 
 for w in operators:
@@ -31,9 +29,10 @@ m = isl.Map("{S[i,j]->[i,j]: 0 <= i <= 10 && 0 <= j <= 10}")
 ast = b.ast_from_schedule(m)
 p = isl.Printer.to_str(isl.DEFAULT_CONTEXT)
 p = p.set_output_format(isl.format.C)
-p.flush() 
+p.flush()
 p = p.print_ast_node(ast)
-print(p.get_str()) 
+print(p.get_str())
 
 S = isl.BasicSet("{[i,j]: Exists a: (2*a = i  && 0 <= j <= 10)}")
 print S.get_constraints()
+
