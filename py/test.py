@@ -1,3 +1,4 @@
+import re
 try:
     import islpy as isl
 except ImportError, e:
