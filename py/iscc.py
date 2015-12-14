@@ -46,6 +46,21 @@ def iscc_communicate(text, omega=0):
     stdout_data = p.communicate(input=text)[0]
     return stdout_data
 
+def isl_ast_codegen(S):
+    b = isl.AstBuild.from_context(isl.Set("{:}"))
+
+    m = isl.Map.from_domain_and_range(S, S)
+    m = isl.Map.identity(m.get_space())
+    m = isl.Map.from_domain(S)
+
+    ast = b.ast_from_schedule(m)
+    p = isl.Printer.to_str(isl.DEFAULT_CONTEXT)
+    p = p.set_output_format(isl.format.C)
+    p.flush()
+    p = p.print_ast_node(ast)
+
+    return p.get_str()
+
 def oc_communicate(s):
 
     isl_symb = s.get_var_names(isl.dim_type.param)

@@ -1117,9 +1117,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print "Cloog start..."
         start = time.time()
 
+        isl_ast = True
         barv = 1
         if(barv == 1):
-            loop_x = iscc.iscc_communicate("L :=" + str(z) + "; codegen L;")
+            if(isl_ast):
+                loop_x = iscc.isl_ast_codegen(z)
+            else:
+                loop_x = iscc.iscc_communicate("L :=" + str(z) + "; codegen L;")
+
+
         else:  #cloog
             #loop_x = codegen.tile_gen_short(vars, sym_exvars, symb,z,instrukcje, Extend)
             with open ('loopx', "r") as myfile:
