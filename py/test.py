@@ -26,7 +26,17 @@ printer.print_map(r)
 print(printer.get_str())
 
 b = isl.AstBuild.from_context(isl.Set("{:}"))
-m = isl.Map("{S[i,j]->[i,j]: 0 <= i <= 10 && 0 <= j <= 10}")
+m = isl.Map("[T, N] -> {S[K,t,i,j] -> [K,t,i,j] : 0 <= t <= T-1 && 1 <= i <= N-2 && 1 <= j <= N-2 &&  K= 2*t + i -1 }")
+s = isl.Set("[T, N] -> {[K,t,i,j] : 0 <= t <= T-1 && 1 <= i <= N-2 && 1 <= j <= N-2 &&  K= 2*t + i -1 }");
+
+m = isl.Map.from_domain_and_range(s,s)
+m = isl.Map.identity(m.get_space())
+m = isl.Map.from_domain(s)
+
+print '----'
+print m
+print '----'
+
 ast = b.ast_from_schedule(m)
 p = isl.Printer.to_str(isl.DEFAULT_CONTEXT)
 p = p.set_output_format(isl.format.C)
