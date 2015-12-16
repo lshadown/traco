@@ -32,26 +32,45 @@ for(col = 2; col <= N1; col++){
 
 
 void comp(float tmp[DIM1][DIM2], float tmor[DIM1][DIM2], float qbnew[DIM1][DIM2][2], float temp[DIM1][DIM2]) {
-int c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c11;
-if (N3 >= 18 && N1 >= 18)
-  for (c0 = 0; c0 <= min((N1 - 2) / 16, (N3 - 2) / 16); c0 += 1)
-    if (c0 >= 1) {
-#pragma omp parallel for
-      for (c3 = 0; c3 <= min(floord(N2 - 1, 16), (N1 - 1) / 16); c3 += 1)
-        for (c5 = 0; c5 <= min((N3 - 2) / 16, floord(N2 - 2, 16)); c5 += 1)
-          for (c7 = 16 * c3 + 1; c7 <= min(N2, 16 * c3 + 16); c7 += 1)
-            for (c9 = 16 * c5 + 2; c9 <= min(16 * c5 + 17, N3); c9 += 1)
-              for (c11 = 16 * c0 + 2; c11 <= min(N1, 16 * c0 + 17); c11 += 1)
-                tmor[c7][c11]=tmor[c7][c11]+qbnew[c9-1][c7][1]*temp[c9][c11];
-    } else
-#pragma omp parallel for
-      for (c3 = 0; c3 <= min((N1 - 1) / 16, floord(N2 - 1, 16)); c3 += 1)
-        for (c5 = 0; c5 <= min((N3 - 2) / 16, floord(N2 - 2, 16)); c5 += 1)
-          for (c7 = 16 * c3 + 1; c7 <= min(16 * c3 + 16, N2); c7 += 1)
-            for (c9 = 16 * c5 + 2; c9 <= min(N3, 16 * c5 + 17); c9 += 1)
-              for (c11 = 2; c11 <= 17; c11 += 1)
-                tmor[c7][c11]=tmor[c7][c11]+qbnew[c9-1][c7][1]*temp[c9][c11];
 
+int col, j, i;
+int c0, c2,c4,c6,c8,c10;
+int UB = floord(N1 - 2, 16);
+#pragma omp parallel for
+for (c0 = 0; c0 <= UB; c0 += 1) {
+  for (c6 = 16 * c0 + 2; c6 <= min(16 * c0 + 17, N1); c6 += 1)
+    tmor[1][c6]=tmor[1][c6]+temp[1][c6];
+  for (c2 = 0; c2 <= floord(N2 - 1, 16); c2 += 1)
+    for (c4 = 0; c4 <= floord(N3 - 2, 16); c4 += 1)
+      for (c6 = 16 * c2 + 1; c6 <= min(16 * c2 + 16, N2); c6 += 1)
+        for (c8 = 16 * c4 + 2; c8 <= min(16 * c4 + 17, N3); c8 += 1)
+          for (c10 = 16 * c0 + 2; c10 <= min(16 * c0 + 17, N1); c10 += 1)
+            tmor[c6][c10]=tmor[c6][c10]+qbnew[c8-1][c6][1]*temp[c8][c10];
+
+/*
+
+#pragma omp parallel for
+for (c0 = 0; c0 <= UB; c0 += 1) {
+  for (c6 = 16 * c0 + 2; c6 <= min(16 * c0 + 17, N1); c6 += 1)
+    tmor[1][c6]=tmor[1][c6]+temp[1][c6];
+  for (c2 = 0; c2 <= floord(N2 - 1, 16); c2 += 1)
+    for (c4 = 0; c4 <= floord(N3 - 2, 16); c4 += 1)
+      for (c6 = 16 * c0 + 2; c6 <= min(16 * c0 + 17, N1); c6 += 1)
+        for (c8 = 16 * c2 + 1; c8 <= min(16 * c2 + 16, N2); c8 += 1)
+          for (c10 = 16 * c4 + 2; c10 <= min(16 * c4 + 17, N3); c10 += 1)
+            tmor[c8][c6]=tmor[c8][c6]+qbnew[c10-1][c8][1]*temp[c10][c6];
+}
+/*
+for(col = 2; col <= N1; col++){
+  tmor[1][col]=tmor[1][col]+temp[1][col];
+  for(j = 1; j <= N2; j++){
+    for(i = 2; i <= N3; i++){
+      tmor[j][col] = tmor[j][col] + qbnew[i-1][j][1] *temp[i][col];
+    }
+  }
+}
+*/
+}
 }
 
 
