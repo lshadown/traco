@@ -36,8 +36,8 @@ void comp(float wdtdr[DIM1][DIM2], float wxm1[DIM1], float dxm1[DIM1][DIM2]) {
 int c0, c1, c3;
 
 if (N3 >= 2)
-  for (c0 = 0; c0 < N3; c0 += 1)
 #pragma omp parallel for
+  for (c0 = 0; c0 < N3; c0 += 1)
     for (c1 = 1; c1 <= N1; c1 += 1)
       for (c3 = 1; c3 <= N2; c3 += 1)
         if (c0 >= 1) {
@@ -53,22 +53,34 @@ int ip, j, i, i_tile,j_tile,ip_tile;
   int t1, t2, t3, t4, t5, t6;
 
  register int lbv, ubv, lbv2, ubv2;
-
+int UB = floord(N1 - 1, 16);
 
 
 int c0, c1, c2, c3, c4, c5,c6;
 
 #pragma omp parallel for
-for (c0 = 0; c0 <= floord(N1 - 1, 16); c0 += 1)
+for (c0 = 0; c0 <= UB; c0 += 1)
   for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)
     for (c2 = 0; c2 <= floord(N3 - 1, 16); c2 += 1)
       for (c3 = 16 * c0 + 1; c3 <= min(N1, 16 * c0 + 16); c3 += 1)
         for (c4 = 16 * c2 + 1; c4 <= min(N3, 16 * c2 + 16); c4 += 1)
           for (c5 = 16 * c1 + 1; c5 <= min(N2, 16 * c1 + 16); c5 += 1)
-            wdtdr[c3][c5]=wdtdr[c3][c5]+wxm1[c3p]*dxm1[c3p][c3]*dxm1[c3p][c5];
+            wdtdr[c3][c5]=wdtdr[c3][c5]+wxm1[c3]*dxm1[c3][c3]*dxm1[c3][c5];
 
 
+/*
 
+#pragma omp parallel for
+for (c0 = 0; c0 <= floord(N1 - 1, 16); c0 += 1)
+  for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)
+    for (c2 = 0; c2 <= floord(N3 - 1, 16); c2 += 1)
+      for (c3 = 16 * c0 + 1; c3 <= min(16 * c0 + 16, N1); c3 += 1)
+        for (c4 = 16 * c1 + 1; c4 <= min(16 * c1 + 16, N2); c4 += 1)
+          for (c5 = 16 * c2 + 1; c5 <= min(16 * c2 + 16, N3); c5 += 1)
+            wdtdr[c3][c4]=wdtdr[c3][c4]+wxm1[c3]*dxm1[c3][c3]*dxm1[c3][c4];
+
+
+*/
 }
 
 
@@ -104,10 +116,10 @@ int main(int argc, char *argv[]) {
 
   if(num_proc==1)
     seq(wdtdr, wxm1, dxm1);
-  else  if(num_proc==2)
+  else  //(num_proc==2)
     comp_tile(wdtdr, wxm1, dxm1);
-    else
-    comp(wdtdr, wxm1, dxm1);
+    //else
+    //comp(wdtdr, wxm1, dxm1);
 
   gettimeofday(&f1, NULL);
 
@@ -120,17 +132,5 @@ int main(int argc, char *argv[]) {
 
 }
 
-/*
 
-#pragma omp parallel for
-for (c0 = 0; c0 <= floord(N1 - 1, 16); c0 += 1)
-  for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)
-    for (c2 = 0; c2 <= floord(N3 - 1, 16); c2 += 1)
-      for (c3 = 16 * c0 + 1; c3 <= min(16 * c0 + 16, N1); c3 += 1)
-        for (c4 = 16 * c1 + 1; c4 <= min(16 * c1 + 16, N2); c4 += 1)
-          for (c5 = 16 * c2 + 1; c5 <= min(16 * c2 + 16, N3); c5 += 1)
-            wdtdr[c3][c4]=wdtdr[c3][c4]+wxm1[c3p]*dxm1[c3p][c3]*dxm1[c3p][c4];
-
-
-*/
 
