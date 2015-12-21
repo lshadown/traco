@@ -41,39 +41,6 @@ for(k = 1; k <= N1; k++){
 }
 
 
-void comp_pluto(float rhs[6][DIM1][DIM2][DIM3]) {
-
-  int r1,r2,r3,r4,r5,t1,t2,bt;
-
-  register int lbv, ubv, lb, ub, lb1, ub1, lb2, ub2;
-  register int c1, c2, c3, c4, c5, c6,c0;
-  int UB = floord(N1 - 1, 16);
-
-
-#pragma omp parallel for
-for (c0 = 0; c0 <= UB; c0 += 1)
-  for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)
-    for (c2 = 0; c2 <= floord(N3 - 1, 16); c2 += 1)
-      for (c3 = 16 * c1 + 1; c3 <= min(16 * c1 + 16, N2); c3 += 1)
-        for (c4 = 16 * c2 + 1; c4 <= min(16 * c2 + 16, N3); c4 += 1)
-          for (c5 = 16 * c0 + 1; c5 <= min(16 * c0 + 16, N1); c5 += 1) {
-            r1=rhs[1][c4][c3][c5];
-            r2=rhs[2][c4][c3][c5];
-            r3=rhs[3][c4][c3][c5];
-            r4=rhs[4][c4][c3][c5];
-            r5=rhs[5][c4][c3][c5];
-            t1=bt*r3;
-            t2=0.5*(r4+r5);
-            rhs[1][c4][c3][c5]=-r2;
-            rhs[2][c4][c3][c5]=r1;
-            rhs[3][c4][c3][c5]=bt*(r4-r5);
-            rhs[4][c4][c3][c5]=-t1+t2;
-            rhs[5][c4][c3][c5]=t1+t2;
-          }
-
-
-
-}
 
 
 void comp_tile(float rhs[6][DIM1][DIM2][DIM3]) {
