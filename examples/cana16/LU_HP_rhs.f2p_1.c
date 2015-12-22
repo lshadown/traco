@@ -39,7 +39,7 @@ void comp(float rsd[6][DIM1][DIM2][DIM3], float u[6][DIM1][DIM2][DIM3], float rh
 int k, m, i, j,tmp;
 int c0, c2, c4, c8, c10, c12, c14;
 int UB = floord(N1 - 1, 16);
-
+/*
 #pragma omp parallel for private(k,i,j,m, tmp)
    for(k = 1; k <= N1; k += 1)
       for(j = 1; j <= N2; j += 1)
@@ -51,9 +51,20 @@ int UB = floord(N1 - 1, 16);
             qs[i][j][k] = 0.5*(u[2][i][j][k]*u[2][i][j][k]+u[3][i][j][k]*u[3][i][j][k]+u[4][i][j][k]*u[4][i][j][k])*tmp;
          }
 
+#pragma omp parallel for
+for (c0 = 0; c0 < N1; c0 += 1)
+  for (c2 = 0; c2 < N2; c2 += 1)
+    for (c4 = 0; c4 < N3; c4 += 1) {
+      for (c6 = 0; c6 <= 4; c6 += 1)
+        rsd[c6+1][c4+1][c2+1][c0+1]=-frct[c6+1][c4+1][c2+1][c0+1];
+      tmp[c4+1][c2+1][c0+1]=1.0/u[1][c4+1][c2+1][c0+1];
+      rho_c4+1[c4+1][c2+1][c0+1]=tmp[c4+1][c2+1][c0+1];
+      qs[c4+1][c2+1][c0+1]=0.5*(u[2][c4+1][c2+1][c0+1]*u[2][c4+1][c2+1][c0+1]+u[3][c4+1][c2+1][c0+1]*u[3][c4+1][c2+1][c0+1]+u[4][c4+1][c2+1][c0+1]*u[4][c4+1][c2+1][c0+1])*tmp[c4+1][c2+1][c0+1];
+    }
 
 
 
+*/
 
 #pragma omp parallel for private(tmp)
 for (c0 = 0; c0 <= UB; c0 += 1)
@@ -73,7 +84,7 @@ for (c0 = 0; c0 <= UB; c0 += 1)
           }
     }
 
-    #pragma omp parallel for  private(tmp)
+  /*  #pragma omp parallel for  private(tmp)
 for (c0 = 0; c0 <= UB; c0 += 1)
   for (c2 = 0; c2 <= floord(N2 - 1, 16); c2 += 1)
     for (c4 = 0; c4 <= floord(N3 - 1, 16); c4 += 1) {
@@ -92,7 +103,7 @@ for (c0 = 0; c0 <= UB; c0 += 1)
           }
     }
 
-
+*/
 }
 
 
