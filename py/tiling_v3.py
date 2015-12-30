@@ -329,6 +329,8 @@ def GetRapply(vars, sym_exvars, _SYM):
 
 
 def GetRapply2(vars, sym_exvars, _SYM, instrukcje, i):
+
+
     R = "{["
     for s in sym_exvars:
         R = R + s + ","
@@ -372,6 +374,50 @@ def GetRapply2(vars, sym_exvars, _SYM, instrukcje, i):
             z = z[:-4] + ") or "
             
         
+    R = R + z[:-3] + ")}"
+    isl_Rapply = isl.Map(R)
+    return isl_Rapply
+
+
+# poprawiona wersja  nest na kafel, nest kazdej instrukcji
+
+def GetRapply3(vars, sym_exvars, _SYM, instrukcje, i):
+
+
+
+    R = "{["
+    for s in sym_exvars:
+        R = R + s + ","
+    for s in vars:
+        R = R + s + ","
+    R = R + "v] -> ["
+    for s in sym_exvars:
+        R = R + s + "p," + s + ","
+    for s in vars:
+        R = R + s +  "v," + s + ","
+    R = R + "v] : "
+
+
+    z = ""
+
+    j = 0
+    for s in sym_exvars:
+        z = z + s + "p = " + str(instrukcje[i]['path'][j]) + " and "
+        j = j + 1
+
+    z = z + "("
+
+
+    for l in range(0, i+1):
+        for st in instrukcje[l]['st']:
+            z = z + " (v = " + str(st) + " and "
+            j = 0
+            for s in vars:
+                z = z + s + "v = " + str(instrukcje[l]['path'][j]) + " and "
+                j = j + 1
+            z = z[:-4] + ") or "
+
+
     R = R + z[:-3] + ")}"
     isl_Rapply = isl.Map(R)
     return isl_Rapply
@@ -818,6 +864,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     
 
     Rapply = GetRapply(vars, sym_exvars, _SYM)
+
     
     isl_TILE = []
     isl_TILE_LT = []
@@ -1037,7 +1084,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #print imperf
     #sys.exit(0);
 
-    _rap =  GetRapply2(vars, sym_exvars, _SYM, instrukcje, 0)
+    _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, 0)
+
+    print _rap
     
     if(Extend):
         z = isl_TILEbis[0].apply(_rap)
@@ -1045,11 +1094,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         z = isl_TILEbis[0]
     
     for j in range(1, len(isl_TILEbis)):
-        _rap =  GetRapply2(vars, sym_exvars, _SYM, instrukcje, j)
+        _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, j)
+        print _rap
         if(Extend):
             z = z.union(isl_TILEbis[j].apply(_rap))
         else:
             z = z.union(isl_TILEbis[j])
+
 
 
     # -----------------------------------------------------------------
@@ -1113,12 +1164,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
+
     if(not schedule_mode or par_tiled):
         print "Cloog start..."
         start = time.time()
 
         isl_ast = True
         barv = 1
+
         if(barv == 1):
             if(isl_ast):
                 loop_x = iscc.isl_ast_codegen(z)
@@ -1139,7 +1192,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         elapsed = end - start
         print "Code generation: time taken: ", elapsed, "seconds."
 
-        #print loop_x
+
 
         ########################################################################
 
@@ -1149,6 +1202,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
         lines = loop.split('\n')
+
+        print loop
 
         loop = imperf_tile.RestoreStatements(lines, LPetit, dane,  maxl, step, permutate_list)
 
