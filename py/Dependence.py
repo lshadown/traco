@@ -386,8 +386,12 @@ def Create_LD_petit(L, petit_loop):
     LD_inp = "tmp/LD_petit_loop_" + L + ".t"
     dane2 = gen.RelPrint(LD_inp,1)
     dane2 = dane2.split("#")
+
     rel2 = dane2[0]
-    isl_rel2 = isl.Map(str(rel2))
+    if rel2 != '':
+        isl_rel2 = isl.Map(str(rel2))
+    else:
+        isl_rel2 = None
     return isl_rel2
 
 
