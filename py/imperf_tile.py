@@ -122,12 +122,14 @@ def RestoreStatements(lines, petit_file, dane, shift, step, permutate_list, shif
             for v in vec:
                 v = '\\b' + v + '\\b'
 
-            rdict = dict(zip(vec, vec_new))
-            robj = re.compile('|'.join(rdict.keys()))
-            st2 = robj.sub(lambda m: rdict[m.group(0)], st2)
+            #rdict = dict(zip(vec, vec_new))
+            #print rdict
+            #sys.exit()
+            #robj = re.compile('|'.join(rdict.keys()))
+            #st2 = robj.sub(lambda m: rdict[m.group(0)], st2)
 
-            #for i in range(0, len(vec)):
-            #    st2 = re.sub('\\b'+vec[i]+'\\b', vec_new[i], st2)
+            for i in range(0, len(vec)):
+                st2 = re.sub('\\b'+vec[i]+'\\b', vec_new[i], st2)
 
 
 
