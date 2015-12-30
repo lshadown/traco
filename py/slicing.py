@@ -343,18 +343,10 @@ def GetRapply(vars, instrukcje, i):
         R = R + s + ","
     R = R + "v] -> ["
     for s in vars:
-        R = R + s + "," + s + "v,"
+        R = R +  s + "v," + s + ","
     R = R + "v] : "
 
     z = ""
-
-    pos = codegen.calculate_position2(i, instrukcje, len(vars))
-
-
-    #j = 0
-    #for s in sym_exvars:
-    #    z = z + s + "p = " + str(pos[j]) + " and "
-    #    j = j + 1
 
     z = z + "("
 
@@ -364,7 +356,7 @@ def GetRapply(vars, instrukcje, i):
             z = z + " (v = " + str(st) + " and "
             j = 0
             for s in vars:
-                z = z + s + "v = " + str(pos[j]) + " and "
+                z = z + s + "v = " + str(instrukcje[l]['path'][j]) + " and "
                 j = j + 1
             z = z[:-4] + ") or "
 
