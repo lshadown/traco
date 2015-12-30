@@ -8,7 +8,7 @@ try:
     import islpy as isl
 except ImportError, e:
     print e
-    print "pip install ispy"
+    print "pip install islpy"
     sys.exit()
 
 #---------------------------------------------------------
@@ -352,5 +352,11 @@ for line in lines:
             un = un.union(r)
 print '---'
 print un
+
+IS =  isl.Set(cl.statements[0].domain_map).coalesce()
+RS =  un.domain().union(un.range()).coalesce()
+
+IND = IS.subtract(RS).coalesce()
+print IND
 
 
