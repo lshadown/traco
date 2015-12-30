@@ -1105,13 +1105,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # -----------------------------------------------------------------
 
+    _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, 0)
+
     if(Extend):
         zorig = isl_TILEorig[0].apply(_rap)
     else:
         zorig = isl_TILEorig[0]
 
     for j in range(1, len(isl_TILEorig)):
-        _rap =  GetRapply2(vars, sym_exvars, _SYM, instrukcje, j)
+        _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, j)
         if(Extend):
             zorig = zorig.union(isl_TILEorig[j].apply(_rap))
         else:
