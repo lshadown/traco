@@ -106,7 +106,12 @@ def Constraint(vars, sym_exvars, stuff, BLOCK, dane,par_vars,par_tiling):
         l = dane['path'][i]
 
 #par vars zle
-#
+
+        l = i
+
+        # PORAWKA EKSPERYMENTALNA l = i zamiast dane[path][i]
+
+        print par_vars
         s = s + Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i])
         # i przedostatni element
         #
@@ -155,7 +160,8 @@ def MakeBij(_SYM, vars, sym_exvars, par_vars, stuff, BLOCK, dane, par_tiling):
     
     #eksperymentalnie gorna granica zawsze wieksza od dolnej   
     for i in range(0,len(dane['path'])):  #
-        l = dane['path'][i]
+        #l = dane['path'][i]
+        l = i
         Bij = Bij + stuff[l]['lb'] + ' <= ' + stuff[l]['ub'] + ' && '
         
     Bij = Bij + "("
@@ -194,15 +200,18 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
     if(dane["nest_id"] == dane2["nest_id"]):  # ta sama petla licz stara metoda
         for i in range(n-1,n):    # od 0 ????????????????????????????????????????????????????????
             for j in range(0,i):
-                l = dane['path'][j]
+                #l = dane['path'][j]
+                l = j
                 tmp = Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, j, par_vars[l], dane['path'][j])
                 BLT = BLT + tmp
                 BGT = BGT + tmp
             l = dane['path'][i]
+            l = i
             BLT = BLT + Constr_Przed(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i])
             BGT = BGT + Constr_Za(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i]) 
             for j in range(i+1,n):
-                l = dane['path'][j]
+                #l = dane['path'][j]
+                l = j
                 tmp = Constr_Dowolny(vars, sym_exvars, stuff, BLOCK, j, par_vars[l], dane['path'][j])
                 BLT = BLT + tmp
                 BGT = BGT + tmp
@@ -213,7 +222,8 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
                 BGT = BGT + " or ("
     else:
         for i in range(min_nest-1,min_nest):   # od 0 ????????????????????????????????????????????????????????
-            l = dane['path'][i]
+            #l = dane['path'][i]
+            l = i
             tmp = Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i])
             tmp = tmp[:-3] + " or "
             if(dane2["nest_id"] > dane["nest_id"]):
@@ -235,7 +245,8 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
 
     varcon = ") && ("
     for i in range(0, dane["nest"]):
-        l = dane['path'][i]
+        #l = dane['path'][i]
+        l = i
         varcon = varcon + sym_exvars[i] + ">=0 && "
         if(par_tiling):
             varcon = varcon + par_vars[l] + "<=" + stuff[l]['ub'] +" && "
@@ -256,7 +267,8 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
             varcon = varcon + " && " + vars[i] + " = -1 " 
         else:
             if m < i+1:  # granice
-                l = dane['path'][i]
+                #l = dane['path'][i]
+                l = i
                 varcon = varcon + "&& " + Constr_Dowolny(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i]) + sym_exvars[i] + " >= 0 && " 
                 varcon = varcon + Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i])
                 varcon = varcon[:-3]   
@@ -813,11 +825,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     for s in stuff:
-        i = vars.index(s['var'])
-        if par_tiling:
-            im_par_vars.append(s['var']*2+'b'+'+'+s['lb'])
-        else:
-            im_par_vars.append(s['var']*2 + "*" + BLOCK[i]+'+'+s['lb'])
+        if s['var'] in vars:
+            i = vars.index(s['var'])
+            if par_tiling:
+                im_par_vars.append(s['var']*2+'b'+'+'+s['lb'])
+            else:
+                im_par_vars.append(s['var']*2 + "*" + BLOCK[i]+'+'+s['lb'])
 
 
     _SYM = ""
