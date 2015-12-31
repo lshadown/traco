@@ -1041,6 +1041,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         if simpl_ub:
 
+
             cor_set = ''
             if(len(symb) > 0):
                 cor_set = '[' + ','.join(symb)  + '] -> '
@@ -1051,7 +1052,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             cor_set = cor_set + '{[' +  ','.join(sym_exvars) + ','  +  ','.join(vars) + ',' + 'v] : '
 
             for j in range(0, len(instrukcje[i]['path'])):
-                cor_set = cor_set +  vars[j]  + " <= " + stuff_reduced[instrukcje[i]['path'][j]]['ub'] + " - " + BLOCK[j] + " && "
+                cor_set = cor_set +  vars[j]  + " <= " + stuff[instrukcje[i]['path'][j]]['ub'] + " - " + BLOCK[j] + " && "
 
             cor_set = cor_set + "("
             for v in instrukcje[i]['st']:
@@ -1205,7 +1206,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         lines = loop.split('\n')
 
-        print loop
 
         loop = imperf_tile.RestoreStatements(lines, LPetit, dane,  maxl, step, permutate_list)
 
