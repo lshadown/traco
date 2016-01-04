@@ -1115,7 +1115,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #print imperf
     #sys.exit(0);
 
-    _rap =  GetRapply2(vars, sym_exvars, _SYM, instrukcje, 0)
+    _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, 0)
 
     print _rap
     
@@ -1125,7 +1125,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         z = isl_TILEbis[0]
     
     for j in range(1, len(isl_TILEbis)):
-        _rap =  GetRapply2(vars, sym_exvars, _SYM, instrukcje, j)
+        _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, j)
         print _rap
         if(Extend):
             z = z.union(isl_TILEbis[j].apply(_rap))

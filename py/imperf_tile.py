@@ -90,9 +90,16 @@ def RestoreStatements(lines, petit_file, dane, shift, step, permutate_list, shif
 
             vec_new = vec_new[(shift - shift_first):]
 
-            if(step == 1):  # usun co drugi element
+
+            if(step >= 1):  # usun co drugi element
+                #print vec_new
+
                 vec_new = vec_new[shift:]
-                vec_new = vec_new[0:][::2]
+
+                vec_new = vec_new[1:][::2]
+
+                #print vec_new
+                #sys.exit(0)
 
 
 

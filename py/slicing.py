@@ -151,16 +151,16 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
 
 
     # Create LD
-    isl_rel2 = Dependence.Create_LD_petit(str(L), petit_loop)
-    ld_rel = isl_rel2.identity(isl_rel2.get_space())
-    s1 = isl_rel2.domain()
-    s2 = isl_rel2.range()
-    s_all = s1.union(s2).coalesce()
-    s1 = isl_rel.domain()
-    s2 = isl_rel.range()
-    s_rel = s1.union(s2).coalesce()
-    ind = s_all.subtract(s_rel).coalesce()
-    print ind
+#    isl_rel2 = Dependence.Create_LD_petit(str(L), petit_loop)
+#    ld_rel = isl_rel2.identity(isl_rel2.get_space())
+#    s1 = isl_rel2.domain()
+#    s2 = isl_rel2.range()
+#    s_all = s1.union(s2).coalesce()
+#    s1 = isl_rel.domain()
+#    s2 = isl_rel.range()
+#    s_rel = s1.union(s2).coalesce()
+#    ind = s_all.subtract(s_rel).coalesce()
+#    print ind
 
 
     #sys.exit(0)
@@ -219,7 +219,7 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
 
     #experimetnal
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    srepr = srepr.union(ind).coalesce()
+#    srepr = srepr.union(ind).coalesce()
 
 
 
@@ -317,7 +317,7 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
         lines = openacc.CreateACCCode(lines, loop.var_st)
 
 
-    loop = imperf_tile.RestoreStatements(lines, LPetit, dane, 0, 1, [])
+    loop = imperf_tile.RestoreStatements(lines, LPetit, dane, 0, 2, [])
 
 
     for i in range(0, 5):
@@ -351,12 +351,18 @@ def GetRapply(vars, instrukcje, i):
     z = z + "("
 
     for l in range(0, i+1):
-        pos = codegen.calculate_position(l, instrukcje, len(vars))
         for st in instrukcje[l]['st']:
             z = z + " (v = " + str(st) + " and "
             j = 0
             for s in vars:
-                z = z + s + "v = " + str(instrukcje[l]['path'][j]) + " and "
+                pos = -1
+                if j < len(instrukcje[l]['path']):  #poprawka bo niektore nie maja max zagniezdzen
+                    pos = instrukcje[l]['path'][j]
+                else:
+                    codegen.calculate_position2(l, instrukcje, len(vars))[j]
+
+
+                z = z + s + "v = " + str(pos) + " and "
                 j = j + 1
             z = z[:-4] + ") or "
 
