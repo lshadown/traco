@@ -17,7 +17,7 @@ from CPython import codegen
 import openacc
 
 import fs_rk
-
+import fs_new
 
 
 try:
@@ -188,7 +188,7 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
         #c= isl.Constraint.eq_from_names(isl_rel.get_space(), {"i": 1, "i'":-1})
         #isl_rel = isl_rel.add_constraint(c).coalesce()
 
-    print isl_rel
+    #print isl_rel
 
 
 
@@ -210,6 +210,11 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
 
     if(fs == 1):
         fs_rk.fs_rk(isl_rel, isl_relplus, Create_UDS(isl_rel), LPetit, dane, plik, SIMPLIFY, rap, acc, loop)
+        sys.exit()
+
+
+    if(fs == 2):  # na samym R+
+        fs_new.fs_new(isl_rel, isl_relplus, Create_UDS(isl_rel), LPetit, dane, plik, SIMPLIFY, rap, acc, loop)
         sys.exit()
 
 

@@ -96,7 +96,7 @@ class Kernel_Loop:
         for i in range(0, len(lines),4):
             dep = Dependence()
             info = lines[i].split()
-            print lines[i]
+            #print lines[i]
             dep.kind = info[0]
             dep.var_in = info[2]
             #print info
@@ -149,7 +149,7 @@ class Kernel_Loop:
 
         ii = 1
         for dep in self.Deps:
-            print dep.Relation
+            #print dep.Relation
             in_size = dep.Relation.dim(isl.dim_type.in_)
             out_size = dep.Relation.dim(isl.dim_type.out)
 

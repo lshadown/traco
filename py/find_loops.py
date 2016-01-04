@@ -131,9 +131,16 @@ if len(sys.argv) > 3:
             slicing.sfs(sys.argv[1],0, SIMPLIFY, 0, acc)
             sys.exit()
 
+        # fs bez rk
+        if('--fsnew' in sys.argv[3]):
+            slicing.sfs(sys.argv[1],0, SIMPLIFY, 2, acc)
+            sys.exit()
+
         if('--fs' in sys.argv[3]):
             slicing.sfs(sys.argv[1],0, SIMPLIFY, 1, acc)
             sys.exit()
+
+
         
         if('--tiling' in sys.argv[3]):
             tiling.tile(sys.argv[1], block)
