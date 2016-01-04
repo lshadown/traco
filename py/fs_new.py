@@ -32,3 +32,5 @@ def fs_new(rel, rel_plus, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
     cl.loop_path = plik
     cl.Load()
     cl.RunCandl()
+
+    print isl.Set(cl.statements[0].domain_map).coalesce()
