@@ -329,6 +329,8 @@ class BuildRelation:
 
 # ---------------------------------------------------------------------------------------------------------------------------------
 
+'''
+
 
 plik = sys.argv[1]
 cl = ClanPy()
@@ -359,4 +361,4 @@ RS =  un.domain().union(un.range()).coalesce()
 IND = IS.subtract(RS).coalesce()
 print IND
 
-
+'''
