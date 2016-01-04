@@ -317,7 +317,7 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
         lines = openacc.CreateACCCode(lines, loop.var_st)
 
 
-    loop = imperf_tile.RestoreStatements(lines, LPetit, dane, 0, 2, [])
+    loop = imperf_tile.RestoreStatements(lines, LPetit, dane, 0, 1, [])
 
 
     for i in range(0, 5):
