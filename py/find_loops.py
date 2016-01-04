@@ -60,7 +60,6 @@ if not os.path.exists(sys.argv[1]):
 
 
 
-
 linestring = open(sys.argv[1], 'r').read()
 
 rpath = sys.argv[2]

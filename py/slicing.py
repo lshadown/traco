@@ -104,7 +104,7 @@ def Create_Srepr(isl_rel, isl_relclosure):
 
 
 def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
-    
+
     LPetit = "tmp/tmp_petit"+str(L)+".t"
     LDeps = "tmp/deps"+str(L)+".txt"
     
@@ -119,6 +119,8 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
     for line in petit_loop:
         file.write(line + '\n')
     file.close()
+
+
 
     loop = Dependence.Kernel_Loop(LPetit)
 
@@ -188,7 +190,7 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
         #c= isl.Constraint.eq_from_names(isl_rel.get_space(), {"i": 1, "i'":-1})
         #isl_rel = isl_rel.add_constraint(c).coalesce()
 
-    #print isl_rel
+
 
 
 
