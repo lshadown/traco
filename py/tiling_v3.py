@@ -366,7 +366,7 @@ def GetRapply2(vars, sym_exvars, _SYM, instrukcje, i):
     #for l in range(len(instrukcje[i]['path']), len(sym_exvars)):
     #    pos.append(-1)
         
-    print pos
+    #print pos
 
     j = 0
     for s in sym_exvars:
@@ -412,9 +412,17 @@ def GetRapply3(vars, sym_exvars, _SYM, instrukcje, i):
 
     z = ""
 
+    print '--------------------------------------------------------------'
+    print instrukcje[i]['path']
+
     j = 0
     for s in sym_exvars:
-        z = z + s + "p = " + str(instrukcje[i]['path'][j]) + " and "
+        pos = -1
+        if j < len(instrukcje[i]['path']):  #poprawka bo niektore nie maja max zagniezdzen
+            pos = instrukcje[i]['path'][j]
+        else:
+            pos = codegen.calculate_position2(i, instrukcje, len(sym_exvars))[j]  #pobierz tab[j]
+        z = z + s + "p = " + str(pos) + " and "
         j = j + 1
 
     z = z + "("
@@ -425,13 +433,22 @@ def GetRapply3(vars, sym_exvars, _SYM, instrukcje, i):
             z = z + " (v = " + str(st) + " and "
             j = 0
             for s in vars:
-                z = z + s + "v = " + str(instrukcje[l]['path'][j]) + " and "
+                pos = -1
+                if j < len(instrukcje[l]['path']):  #poprawka bo niektore nie maja max zagniezdzen
+                    pos = instrukcje[l]['path'][j]
+                else:
+                    pos = codegen.calculate_position2(l, instrukcje, len(sym_exvars))[j]   #pobierz tab[j]
+                z = z + s + "v = " + str(pos) + " and "
                 j = j + 1
             z = z[:-4] + ") or "
 
 
     R = R + z[:-3] + ")}"
+
+
     isl_Rapply = isl.Map(R)
+
+
     return isl_Rapply
 
 def ExtendMap(R, sym_exvars, Extend = False):
@@ -1098,7 +1115,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #print imperf
     #sys.exit(0);
 
-    _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, 0)
+    _rap =  GetRapply2(vars, sym_exvars, _SYM, instrukcje, 0)
 
     print _rap
     
@@ -1108,7 +1125,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         z = isl_TILEbis[0]
     
     for j in range(1, len(isl_TILEbis)):
-        _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, j)
+        _rap =  GetRapply2(vars, sym_exvars, _SYM, instrukcje, j)
         print _rap
         if(Extend):
             z = z.union(isl_TILEbis[j].apply(_rap))
