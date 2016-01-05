@@ -34,3 +34,17 @@ def fs_new(rel, rel_plus, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
     cl.RunCandl()
 
     print isl.Set(cl.statements[0].domain_map).coalesce()
+
+    n = rel.dim(isl.dim_type.in_)
+
+    inp = []
+    outp = []
+    for i in range(0,n):
+        inp.append("i" + str(i))
+        outp.append("o" + str(i))
+
+
+    # Rlex
+    rlex = "{[" + ",".join(inp) + "] -> [" + ",".join(outp) + "] : " + tiling_v3.CreateLex(outp, inp) + "}"
+    rlex = isl.Map(rlex)
+
