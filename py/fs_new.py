@@ -18,7 +18,7 @@ import openacc
 import clanpy
 
 
-def fs_new(rel, rel_plus, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
+def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
 
 
 
@@ -62,7 +62,7 @@ def fs_new(rel, rel_plus, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
 
     #print re
 
-    print "###RE"
+    print "### RE"
 
     re_rel = re_rel.intersect(rlex.subtract(rel_plus).subtract(rip)).coalesce()
 
@@ -73,7 +73,7 @@ def fs_new(rel, rel_plus, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
 
     REPR = D.union(IS.subtract(W)).coalesce()
 
-    print "REPR"
+    print "### REPR"
     print REPR
 
     rel_inv = rel.fixed_power_val(-1)
@@ -86,8 +86,38 @@ def fs_new(rel, rel_plus, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
 
     RR = rel.apply_range(rel_inv)
 
-    print "RR"
+    print "### RR"
     print RR
+
+    UDS_lexmin = D.lexmin()
+
+    print UDS_lexmin
+    print D
+    R2 = isl.Map.from_domain_and_range(UDS_lexmin, D).coalesce()
+
+
+    RRstar = RR.transitive_closure()[0].coalesce()
+    RR_ident = RR.identity(RR.get_space())
+    RRstar = RRstar.union(RR_ident).coalesce()  # R* = R+ u I
+
+    R1 = RRstar.intersect_domain(REPR)
+
+    print R1
+    print R2
+
+
+    RSCHED = R1.union(R2).coalesce()
+
+    print "### RSCHED"
+    print RSCHED
+
+    print "### Check "
+    Check_set = RSCHED.domain().union(RSCHED.range()).subtract(IS).coalesce()
+
+    if Check_set.is_empty():
+        print "OK"
+    else:
+        print Check_set
 
 
 

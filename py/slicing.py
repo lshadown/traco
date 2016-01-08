@@ -216,7 +216,7 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
 
 
     if(fs == 2):  # na samym R+
-        fs_new.fs_new(isl_rel, isl_relplus, Create_UDS(isl_rel), LPetit, dane, plik, SIMPLIFY, rap, acc, loop)
+        fs_new.fs_new(isl_rel, isl_relplus, isl_relclosure, Create_UDS(isl_rel), LPetit, dane, plik, SIMPLIFY, rap, acc, loop)
         sys.exit()
 
 
