@@ -16,7 +16,9 @@ import tiling_v3
 import tiling_schedule
 import openacc
 import clanpy
-
+import iscc
+import imperf_tile
+import re
 
 def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
 
@@ -24,10 +26,15 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     # R = R - R+ compose R
 
-    rel = rel.subtract(rel_plus.apply_range(rel))
+    print '## R'
+    print rel
+
+    rel = rel.subtract(rel.apply_range(rel_plus))
 
     print '### R = R - R+ compose R'
     print rel
+
+    UDS = rel.domain().subtract(rel.range()).coalesce()
 
     cl = clanpy.ClanPy()
     cl.loop_path = plik
@@ -71,10 +78,11 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     W = re_rel.domain().union(re_rel.range()).coalesce()
     D = re_rel.domain().subtract(re_rel.range()).coalesce()
 
-    REPR = D.union(IS.subtract(W)).coalesce()
+    REPR = D #.union(IS.subtract(W)).coalesce()
 
     print "### REPR"
     print REPR
+
 
     rel_inv = rel.fixed_power_val(-1)
 
@@ -84,21 +92,26 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     # R = R compose RINV
 
-    RR = rel.apply_range(rel_inv)
+    RR = rel_inv.apply_range(rel)
 
     print "### RR"
     print RR
 
-    UDS_lexmin = D.lexmin()
+    UDS_lexmin = UDS.lexmin()
 
     print UDS_lexmin
-    print D
+
+
     R2 = isl.Map.from_domain_and_range(UDS_lexmin, D).coalesce()
 
 
     RRstar = RR.transitive_closure()[0].coalesce()
     RR_ident = RR.identity(RR.get_space())
     RRstar = RRstar.union(RR_ident).coalesce()  # R* = R+ u I
+
+
+    print "### Rstar"
+    print RRstar
 
     R1 = RRstar.intersect_domain(REPR)
 
@@ -132,6 +145,74 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     else:
         print Check_set
 
+
+    # generowanie kodu
+
+    D = RSCHED.domain()
+
+    D =  imperf_tile.SimplifySlice(D)
+
+    print "# DOMAIN RSCHED"
+    print D
+
+    looprepr = iscc.isl_ast_codegen(D)
+    print looprepr
+    looprepr  = looprepr.split('\n')
+
+
+
+
+
+    st_reg = re.compile('\s*\(.*\);')
+    vecs = []
+    taby = []
+    for line in looprepr:
+        if(st_reg.match(line)):
+            vecs.append(isl.Set(iscc.s1_to_vec2(line, len(vecs))))
+            taby.append(iscc.correct.whites(line))
+
+
+    slices = []
+    for vec in vecs:
+        slice = vec
+        if(not RSCHED.is_empty()):
+            slice_ = slice.apply(RSCHED)
+            slice = slice.union(slice_).coalesce()
+            slice = slice_
+
+
+        if(SIMPLIFY):
+            slice = imperf_tile.SimplifySlice(slice)
+
+
+        #slice = slice.apply(rap)
+
+
+        slices.append(slice.coalesce())
+
+    print slices
+
+    new_loop = []
+    i=0
+    for line in looprepr:
+        if(st_reg.match(line)):
+            petla = iscc.isl_ast_codegen(slices[i]).split('\n')
+            for s in petla:
+                new_loop.append(taby[i] + s)
+            i = i + 1
+        else:
+            new_loop.append(line)
+
+
+    nloop = ""
+    for line in new_loop:
+        if line != '':
+            nloop = nloop + line + "\n"
+    nloop = nloop[:-1]
+    nloop = nloop.split('\n')
+
+    nloop = tiling_v3.postprocess_loop(nloop)
+    print nloop
 
 
 
