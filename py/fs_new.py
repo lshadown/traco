@@ -122,7 +122,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     R1 = RRstar.intersect_domain(REPR.coalesce())
-    R1 = RRstar
+
+    #R1 = RRstar   ?? czy kod jest taki sam
 
     R3 = RR_ident.intersect_domain(UDD)
 
