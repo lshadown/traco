@@ -29,7 +29,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print '## R'
     print rel
 
-    rel = rel.subtract(rel.apply_range(rel_plus))
+    rel = rel.subtract(rel_plus.apply_range(rel))
 
     print '### R = R - R+ compose R'
     print rel
@@ -96,7 +96,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     # R = R compose RINV
 
-    RR = rel_inv.apply_range(rel)
+    RR = rel.apply_range(rel_inv)
 
     print "### RR"
     print RR
