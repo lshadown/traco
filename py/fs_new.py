@@ -35,6 +35,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print rel
 
     UDS = rel.domain().subtract(rel.range()).coalesce()
+    UDD = rel.range().subtract(rel.domain()).coalesce()
 
     cl = clanpy.ClanPy()
     cl.loop_path = plik
@@ -77,8 +78,11 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     W = re_rel.domain().union(re_rel.range()).coalesce()
     D = re_rel.domain().subtract(re_rel.range()).coalesce()
+    print D
 
-    REPR = D #.union(IS.subtract(W)).coalesce()
+
+
+    REPR = D#.union(IS.subtract(W)).coalesce()
 
     print "### REPR"
     print REPR
@@ -102,24 +106,38 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print UDS_lexmin
 
 
-    R2 = isl.Map.from_domain_and_range(UDS_lexmin, D).coalesce()
+    R2 = isl.Map.from_domain_and_range(UDS_lexmin, UDS).coalesce()
 
 
     RRstar = RR.transitive_closure()[0].coalesce()
     RR_ident = RR.identity(RR.get_space())
-    RRstar = RRstar.union(RR_ident).coalesce()  # R* = R+ u I
+    #RRstar = RRstar.union(RR_ident).coalesce()  # R* = R+ u I
 
 
     print "### Rstar"
     print RRstar
 
-    R1 = RRstar.intersect_domain(REPR)
 
-    print R1
-    print R2
+    # tu blad
 
 
-    RSCHED = R1.union(R2).coalesce()
+    R1 = RRstar.intersect_domain(REPR.coalesce())
+    R1 = RRstar
+
+    R3 = RR_ident.intersect_domain(UDD)
+
+
+
+    #print R1
+    #print R2
+    #print R3
+
+
+
+
+    RSCHED = R1.union(R2).union(R3).coalesce()
+
+    print RSCHED
 
 
 
@@ -129,6 +147,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     if (Rtmp.subtract(RSCHED).coalesce().is_empty() and RSCHED.subtract(Rtmp).coalesce().is_empty()):
         print "upraszczanie"
         Rtmp = RSCHED
+
+
+
 
 
     print "### RSCHED"
@@ -154,6 +175,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     print "# DOMAIN RSCHED"
     print D
+
+
 
     looprepr = iscc.isl_ast_codegen(D)
     print looprepr
