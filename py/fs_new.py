@@ -147,7 +147,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     Rtmp = RSCHED.polyhedral_hull()
     if (Rtmp.subtract(RSCHED).coalesce().is_empty() and RSCHED.subtract(Rtmp).coalesce().is_empty()):
         print "upraszczanie"
-        Rtmp = RSCHED
+        RSCHED = Rtmp
 
 
 
