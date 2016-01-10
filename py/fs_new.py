@@ -129,8 +129,10 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     print 'RSCHED obliczanie :'
     print R1
+    print "IND0->IND"
     print R2
     #print R3
+    print "i razem"
 
 
 
