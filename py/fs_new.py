@@ -36,6 +36,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     UDS = rel.domain().subtract(rel.range()).coalesce()
     UDD = rel.range().subtract(rel.domain()).coalesce()
+    DOM_RAN = rel.range().union(rel.domain()).coalesce()
 
     cl = clanpy.ClanPy()
     cl.loop_path = plik
@@ -50,6 +51,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     c= isl.Constraint.eq_from_names(IS.get_space(), {"v": -1, 1:int(dane[0])})
     IS = IS.add_constraint(c).coalesce()
+
+    IND = IS.subtract(DOM_RAN).coalesce()
 
     n = rel.dim(isl.dim_type.in_)
 
@@ -78,11 +81,13 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     W = re_rel.domain().union(re_rel.range()).coalesce()
     D = re_rel.domain().subtract(re_rel.range()).coalesce()
+
+
     print D
 
 
 
-    REPR = D#.union(IS.subtract(W)).coalesce()
+    REPR = D.union(DOM_RAN.subtract(W)).coalesce()
 
     print "### REPR"
     print REPR
@@ -97,21 +102,20 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     # R = R compose RINV
 
     RR = rel.apply_range(rel_inv)
+    RR = RR.intersect(rlex).coalesce()
 
     print "### RR"
     print RR
 
-    UDS_lexmin = UDS.lexmin()
-
-    print UDS_lexmin
+    IND_lexmin = IND.lexmin()
 
 
-    R2 = isl.Map.from_domain_and_range(UDS_lexmin, UDS).coalesce()
+    R2 = isl.Map.from_domain_and_range(IND_lexmin, IND).coalesce()
 
 
     RRstar = RR.transitive_closure()[0].coalesce()
     RR_ident = RR.identity(RR.get_space())
-    #RRstar = RRstar.union(RR_ident).coalesce()  # R* = R+ u I
+    RRstar = RRstar.union(RR_ident).coalesce()  # R* = R+ u I
 
 
     print "### Rstar"
@@ -123,20 +127,15 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     R1 = RRstar.intersect_domain(REPR.coalesce())
 
-    #R1 = RRstar   ?? czy kod jest taki sam
-
-    R3 = RR_ident.intersect_domain(UDD)
-
-
-
-    #print R1
-    #print R2
+    print 'RSCHED obliczanie :'
+    print R1
+    print R2
     #print R3
 
 
 
 
-    RSCHED = R1.union(R2).union(R3).coalesce()
+    RSCHED = R1.union(R2).coalesce()
 
     print RSCHED
 
@@ -165,7 +164,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     if Check_set.is_empty():
         print "OK"
     else:
-        print Check_set
+        print "ERROR ! " + Check_set
+        sys.exit(0)
 
 
     # generowanie kodu
