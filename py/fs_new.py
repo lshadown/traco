@@ -144,11 +144,11 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     #upraszczanie
-
-    Rtmp = RSCHED.polyhedral_hull()
-    if (Rtmp.subtract(RSCHED).coalesce().is_empty() and RSCHED.subtract(Rtmp).coalesce().is_empty()):
-        print "upraszczanie"
-        RSCHED = Rtmp
+    if(SIMPLIFY):
+        Rtmp = RSCHED.polyhedral_hull()
+        if (Rtmp.subtract(RSCHED).coalesce().is_empty() and RSCHED.subtract(Rtmp).coalesce().is_empty()):
+            print "upraszczanie"
+            RSCHED = Rtmp
 
 
 
@@ -174,7 +174,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     D = RSCHED.domain()
 
-    D =  imperf_tile.SimplifySlice(D)
+    if(SIMPLIFY):
+        D =  imperf_tile.SimplifySlice(D)
 
     print "# DOMAIN RSCHED"
     print D
@@ -182,8 +183,13 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     looprepr = iscc.isl_ast_codegen(D)
+
+    for i in range(0,20):
+        looprepr = re.sub('\\b'+'c' + str(i) +'\\b', 't' + str(i), looprepr)
+
     print looprepr
     looprepr  = looprepr.split('\n')
+
 
 
 
