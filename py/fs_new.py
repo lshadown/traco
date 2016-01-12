@@ -180,12 +180,13 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     print "### Check "
-    Check_set = RSCHED.domain().union(RSCHED.range()).subtract(IS).coalesce()
+    Check_set = RSCHED.domain().union(RSCHED.range()).coalesce()
+    Check_set = IS.subtract(Check_set).coalesce()
 
     if Check_set.is_empty():
         print "OK"
     else:
-        print "ERROR ! " + Check_set
+        print "ERROR ! " + str(Check_set)
         sys.exit(0)
 
 
