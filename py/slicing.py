@@ -191,9 +191,10 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
         #isl_rel = isl_rel.add_constraint(c).coalesce()
 
 
+    #rel_= isl.Map(str('{[i,j,k,v]->[i,jj,kk,v]}'))
+    #isl_rel = isl_rel.intersect(rel_).coalesce()
 
-
-
+    print isl_rel
     isl_relclosure = isl_rel.transitive_closure()
     print isl_relclosure
     exact = isl_relclosure[1]

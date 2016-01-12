@@ -123,7 +123,14 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     R2 = isl.Map.from_domain_and_range(IND_lexmin, IND).coalesce()
 
 
+    RRstar = RR.transitive_closure()
+    if not RRstar[1]:
+        print 'RR* not exact'
+        sys.exit(0)
+
     RRstar = RR.transitive_closure()[0].coalesce()
+
+
     RR_ident = RR.identity(RR.get_space())
     RRstar = RRstar.union(RR_ident).coalesce()  # R* = R+ u I
 
@@ -160,6 +167,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
             print "upraszczanie"
             RSCHED = Rtmp
 
+    #RSCHED = imperf_tile.SimplifyMap(RSCHED)
+
 
 
 
@@ -184,8 +193,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     D = RSCHED.domain()
 
-    if(SIMPLIFY):
-        D =  imperf_tile.SimplifySlice(D)
+    #if(SIMPLIFY):
+    D =  imperf_tile.SimplifySlice(D)
 
     print "# DOMAIN RSCHED"
     print D
