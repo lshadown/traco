@@ -194,7 +194,10 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
 
 
 
-    isl_relclosure = isl_rel.transitive_closure()[0].coalesce()
+    isl_relclosure = isl_rel.transitive_closure()
+    print isl_relclosure
+    exact = isl_relclosure[1]
+    isl_relclosure = isl_relclosure[0]
     isl_relplus = isl_relclosure
     isl_ident = isl_rel.identity(isl_rel.get_space())
     isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
@@ -216,7 +219,7 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
 
 
     if(fs == 2):  # na samym R+
-        fs_new.fs_new(isl_rel, isl_relplus, isl_relclosure, Create_UDS(isl_rel), LPetit, dane, plik, SIMPLIFY, rap, acc, loop)
+        fs_new.fs_new(isl_rel, isl_relplus, isl_relclosure, Create_UDS(isl_rel), LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact)
         sys.exit()
 
 

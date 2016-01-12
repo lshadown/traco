@@ -20,13 +20,23 @@ import iscc
 import imperf_tile
 import re
 
-def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
+def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact):
 
-
+    #floyd
+    #rel_ = isl.Map(str('{[i,j,k,v]->[i,jj,kk,v]}'))
+    #rel = rel.intersect(rel_).coalesce()
 
     # R = R - R+ compose R
 
+    if(exact):
+        print 'R+ exact!'
+    else:
+        print 'R+ approximated. Exit!'
+        sys.exit(0);
+
     print '## R'
+
+
     print rel
 
     rel = rel.subtract(rel_plus.apply_range(rel))
