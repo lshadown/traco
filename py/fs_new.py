@@ -32,7 +32,11 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
         print 'R+ exact!'
     else:
         print 'R+ approximated. Exit!'
-        sys.exit(0);
+        file = open('lu_rplus.txt', 'r')
+        isl_relclosure = isl.Map(file.read())
+        print isl_relclosure
+
+
 
     print '## R'
 
@@ -44,6 +48,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print '### R = R - R+ compose R'
     print rel
 
+    global_size = rel.dim(isl.dim_type.in_)
+
     UDS = rel.domain().subtract(rel.range()).coalesce()
     UDD = rel.range().subtract(rel.domain()).coalesce()
     DOM_RAN = rel.range().union(rel.domain()).coalesce()
@@ -53,14 +59,35 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     cl.Load()
     cl.RunCandl()
 
-    IS =  isl.Set(cl.statements[0].domain_map).coalesce()
+    IS = DOM_RAN
+    for i in range(0, len(cl.statements)):
+        IS_ =  isl.Set(cl.statements[i].domain_map).coalesce()
 
-    set_size = IS.dim(isl.dim_type.set)
-    IS = IS.insert_dims(isl.dim_type.set, set_size, 1)
-    IS = IS.set_dim_name(isl.dim_type.set, set_size, "v")
+        set_size = IS_.dim(isl.dim_type.set)
 
-    c= isl.Constraint.eq_from_names(IS.get_space(), {"v": -1, 1:int(dane[0])})
-    IS = IS.add_constraint(c).coalesce()
+        for j in range(set_size, global_size-1):
+            IS_ = IS_.insert_dims(isl.dim_type.set, j, 1)
+            IS_ = IS_.set_dim_name(isl.dim_type.set, j, 'i' + str(j))
+            c= isl.Constraint.eq_from_names(IS_.get_space(), {IS_.get_dim_name(isl.dim_type.set, j): -1, 1:-1})
+            IS_ = IS_.add_constraint(c).coalesce()
+
+        set_size = IS_.dim(isl.dim_type.set)
+
+        IS_= IS_.insert_dims(isl.dim_type.set, set_size, 1)
+        IS_ = IS_.set_dim_name(isl.dim_type.set, set_size, "v")
+
+        c= isl.Constraint.eq_from_names(IS_.get_space(), {"v": -1, 1:int(dane[i])})
+        IS_ = IS_.add_constraint(c).coalesce()
+
+
+
+        if i == 0:
+            IS = IS_
+        else:
+            IS = IS.union(IS_).coalesce()
+
+    print "IS"
+    print IS
 
     IND = IS.subtract(DOM_RAN).coalesce()
 
