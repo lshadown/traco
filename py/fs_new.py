@@ -156,6 +156,11 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print "### REPR"
     print REPR
 
+    if(1==0):
+        Rtmp = REPR.polyhedral_hull()
+        if (Rtmp.subtract(REPR).coalesce().is_empty() and REPR.subtract(Rtmp).coalesce().is_empty()):
+            print "upraszczanie"
+            REPR = Rtmp
 
     R1 = RRstar.intersect_domain(REPR.coalesce())
 
