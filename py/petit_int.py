@@ -42,7 +42,9 @@ def Dep_Analysis(LPetit ):
 
 
     for d in loop.Deps:
-        print d.Relation
+        print d.delta
+        print d.from_
+        print d.to
 
         if un is None:
             un = isl.UnionMap(str(d.Relation))

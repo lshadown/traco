@@ -277,8 +277,8 @@ def SimplifySlice(slice):
                     print "i j " + str(i) + " " + str(j) + "joinable"
                     sets[i] = tmp2
                     sets[j] = tmp2
-                #else:
-                    #print "i j " + str(i) + " " + str(j) + "--"
+                else:
+                    print "i j " + str(i) + " " + str(j) + "--"
 
     slice = sets[0]
     for i in range(1, len(sets)):
