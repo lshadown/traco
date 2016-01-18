@@ -28,6 +28,18 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     # R = R - R+ compose R
 
+    #print '#RAP'
+    #print rap
+
+
+    # do zrobienia
+    # 1. restore statements
+    # 2. poprawic was_par   ok
+    # 3. wczytanie R+
+    # 4. perf imperf rozroznic
+
+
+
     if(exact):
         print 'R+ exact!'
     else:
@@ -247,7 +259,12 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     D =  imperf_tile.SimplifySlice(D)
 
     print "# DOMAIN RSCHED"
+
+
+
     print D
+
+    D = D.apply(rap)
 
 
 
@@ -269,7 +286,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     taby = []
     for line in looprepr:
         if(st_reg.match(line)):
-            vecs.append(isl.Set(iscc.s1_to_vec2(line, len(vecs))))
+            vecs.append(isl.Set(iscc.s1_to_vec3(line, len(vecs))))
             taby.append(iscc.correct.whites(line))
 
 
@@ -286,7 +303,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
         #slice = imperf_tile.SimplifySlice(slice)
 
 
-        #slice = slice.apply(rap)
+        slice = slice.apply(rap)
 
 
         slices.append(slice.coalesce())
@@ -298,8 +315,19 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     for line in looprepr:
         if(st_reg.match(line)):
             petla = iscc.isl_ast_codegen(slices[i]).split('\n')
+            was_par = 0              # poprawic jak sie koncza petle i sa nowe
             for s in petla:
+                if 'for (int c' in s and was_par == 0:
+                    new_loop.append(taby[i] + imperf_tile.get_tab(s) + '#pragma omp parallel for')
+                    if "{" in s:
+                        was_par = 1
                 new_loop.append(taby[i] + s)
+
+                if was_par > 0:
+                    if "{" in s:
+                        was_par = was_par + 1
+                    if "}" in s:
+                        was_par = was_par - 1
             i = i + 1
         else:
             new_loop.append(line)
@@ -308,8 +336,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     nloop = ""
     for line in new_loop:
         if line != '':
-            if 'for (int c0' in line:
-                line = imperf_tile.get_tab(line) + "#pragma omp parallel for\n" +line
+#            if 'for (int c1' in line:   # c0 przy perf,  c1 przy imperf
+#                line = imperf_tile.get_tab(line) + "#pragma omp parallel for\n" +line
             nloop = nloop + line + "\n"
 
 
