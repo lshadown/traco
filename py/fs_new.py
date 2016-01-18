@@ -112,6 +112,19 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     # R = R compose RINV
 
     RR = rel.apply_range(rel_inv)
+
+
+    # ------ Jesli RCHECK ----------
+
+    if(1==0):
+        RRR1 = rel.fixed_power_val(2)
+        RRR2 = rel_inv.fixed_power_val(2)
+
+        RRR = RRR1.union(RRR2).coalesce()
+        RR = RR.union(RRR).coalesce()
+
+    # ------------------------------
+
     RR = RR.intersect(rlex).coalesce()
 
     print "### RR"
@@ -126,7 +139,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     RRstar = RR.transitive_closure()
     if not RRstar[1]:
         print 'RR* not exact'
-        sys.exit(0)
+    #    sys.exit(0)
 
     RRstar = RR.transitive_closure()[0].coalesce()
 
