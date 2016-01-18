@@ -93,15 +93,6 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     D = re_rel.domain().subtract(re_rel.range()).coalesce()
 
 
-    print D
-
-
-
-    REPR = D.union(DOM_RAN.subtract(W)).coalesce()
-
-    print "### REPR"
-    print REPR
-
 
     rel_inv = rel.fixed_power_val(-1)
 
@@ -119,7 +110,6 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     if(1==0):
         RRR1 = rel.fixed_power_val(2)
         RRR2 = rel_inv.fixed_power_val(2)
-
         RRR = RRR1.union(RRR2).coalesce()
         RR = RR.union(RRR).coalesce()
 
@@ -141,6 +131,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
         print 'RR* not exact'
     #    sys.exit(0)
 
+
+
     RRstar = RR.transitive_closure()[0].coalesce()
 
 
@@ -151,11 +143,23 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print "### Rstar"
     print RRstar
 
+    REPR = D # .union(DOM_RAN.subtract(W)).coalesce()
 
-    # tu blad
+    # poprawka
+
+    tmp = REPR.apply(RRstar).coalesce()
+    REPR2 = DOM_RAN.subtract(tmp).coalesce()
+    REPR = REPR.union(REPR2).coalesce()
+
+    REPR =imperf_tile.SimplifySlice(REPR)
+
+    print "### REPR"
+    print REPR
 
 
     R1 = RRstar.intersect_domain(REPR.coalesce())
+
+
 
     print 'RSCHED obliczanie :'
     print R1
