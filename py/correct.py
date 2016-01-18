@@ -16,9 +16,11 @@ def isl_tab(lines):
             tab = whites(line)
     return lines2
 
-def Korekta(plik):
-    linestring = open(plik, 'r').read()
-    lines = linestring.split('\n')
+def Korekta(plik, lines = []):
+
+    if(len(lines) == 0):
+        linestring = open(plik, 'r').read()
+        lines = linestring.split('\n')
     tab = ''
     lines2 = []
     bloki = []

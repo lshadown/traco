@@ -19,6 +19,7 @@ import clanpy
 import iscc
 import imperf_tile
 import re
+import correct
 
 def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact):
 
@@ -33,7 +34,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     # do zrobienia
-    # 1. restore statements
+    # 1. restore statements, zapis do pliku
     # 2. poprawic was_par   ok
     # 3. wczytanie R+
     # 4. perf imperf rozroznic
@@ -315,6 +316,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     for line in looprepr:
         if(st_reg.match(line)):
             petla = iscc.isl_ast_codegen(slices[i]).split('\n')
+            petla = correct.Korekta('', petla) # dodaj { } do for
             was_par = 0              # poprawic jak sie koncza petle i sa nowe
             for s in petla:
                 if 'for (int c' in s and was_par == 0:
@@ -346,9 +348,15 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     nloop = nloop.split('\n')
 
     nloop = tiling_v3.postprocess_loop(nloop)
+    lines = nloop.split('\n')
+
+
+
+    loop = imperf_tile.RestoreStatements(lines, LPetit, dane, 0, 1, [])
+
     print "=========================="
     print "OUTPUT CODE"
-    print nloop
+    print loop
 
 
 
