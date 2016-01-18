@@ -250,8 +250,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
             slice = slice_
 
 
-        if(SIMPLIFY):
-            slice = imperf_tile.SimplifySlice(slice)
+        #if(SIMPLIFY):
+        #slice = imperf_tile.SimplifySlice(slice)
 
 
         #slice = slice.apply(rap)
@@ -259,7 +259,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
         slices.append(slice.coalesce())
 
-    print slices
+    #print slices
 
     new_loop = []
     i=0
@@ -276,11 +276,18 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     nloop = ""
     for line in new_loop:
         if line != '':
+            if 'for (int c0' in line:
+                line = imperf_tile.get_tab(line) + "#pragma omp parallel for\n" +line
             nloop = nloop + line + "\n"
+
+
+
     nloop = nloop[:-1]
     nloop = nloop.split('\n')
 
     nloop = tiling_v3.postprocess_loop(nloop)
+    print "=========================="
+    print "OUTPUT CODE"
     print nloop
 
 
