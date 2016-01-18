@@ -44,6 +44,9 @@ void comp_tile(float u[6][DIM1][DIM2][DIM3], float us[DIM1][DIM2][DIM3], float v
   register int c0, c1, c2, c3, c4, c5, c6;
 int rho_inv;
 int UB1 = floord(N1, 16);
+
+// Tiling with permuatiation
+
 #pragma omp parallel for private(rho_inv)
 for (c0 = 0; c0 <= UB1; c0 += 1)
   for (c1 = 0; c1 <= floord(N2, 16); c1 += 1)
@@ -59,6 +62,10 @@ for (c0 = 0; c0 <= UB1; c0 += 1)
             square[c4][c3][c5]=0.5*(u[2][c4][c3][c5]*u[2][c4][c3][c5]+u[3][c4][c3][c5]*u[3][c4][c3][c5]+u[4][c4][c3][c5]*u[4][c4][c3][c5])*rho_inv;
             qs[c4][c3][c5]=square[c4][c3][c5]*rho_inv;
           }
+
+
+// Tiling without permuatiation
+
           /*
 #pragma omp parallel for
 for (c0 = 0; c0 <= N1/16; c0 += 1)
@@ -75,21 +82,6 @@ for (c0 = 0; c0 <= N1/16; c0 += 1)
             square[c5][c4][c3]=0.5*(u[2][c5][c4][c3]*u[2][c5][c4][c3]+u[3][c5][c4][c3]*u[3][c5][c4][c3]+u[4][c5][c4][c3]*u[4][c5][c4][c3])*rho_inv;
             qs[c5][c4][c3]=square[c5][c4][c3]*rho_inv;
           }
-
-#pragma omp parallel for private(rho_inv)
-for(k = 0; k <= N1; k++){
-  for(j = 0; j <= N2; j++){
-    for(i = 0; i <= N3; i++){
-      rho_inv = 1.0/u[1][i][j][k];
-      rho_i[i][j][k] = rho_inv;
-      us[i][j][k] = u[2][i][j][k] * rho_inv;
-      vs[i][j][k] = u[3][i][j][k] * rho_inv;
-      ws[i][j][k] = u[4][i][j][k] * rho_inv;
-      square[i][j][k]     = 0.5* ( u[2][i][j][k]*u[2][i][j][k] + u[3][i][j][k]*u[3][i][j][k] + u[4][i][j][k]*u[4][i][j][k] ) * rho_inv;
-      qs[i][j][k] = square[i][j][k] * rho_inv;
-    }
-  }
-}
 
 */
 
