@@ -124,6 +124,39 @@ def s1_to_vec2(line,i):
     tmp = "["+symb_var+"] -> {" + tmp + "};"
     return tmp
 
+# for rap
+def s1_to_vec3(line,i):
+
+    newline = line.replace(" ", "");
+    newline = newline.replace("(", "");
+    newline = newline.replace(")", "");
+    newline = newline.replace(";", "");
+    #print newline
+
+    dims = newline.split(',')
+    #print dims
+    dims2 = []
+    for i in range(0, len(dims)):
+        if ((i % 2 == 1) or (i == len(dims)-1)):
+            dims2.append(dims[i])
+
+    #print dims2
+    tmp2 = ','.join(dims2)
+
+    reg = re.compile('[a-zA-Z]\w*')
+    symb = re.findall(reg, line)
+
+    #print symb
+
+    symb = list(set(symb))
+    symb_var = ""
+    for s in symb:
+        symb_var = symb_var + s + ","
+    symb_var = symb_var[:-1]
+
+    tmp = "["+symb_var+"] -> {[" + tmp2 + "]};"
+
+    return tmp
 
 def RelationExists(rel, n, symb):
 
