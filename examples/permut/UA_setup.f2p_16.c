@@ -32,20 +32,7 @@ int ip, j, i;
 }
 
 
-void comp(float wdtdr[DIM1][DIM2], float wxm1[DIM1], float dxm1[DIM1][DIM2]) {
-int c0, c1, c3;
 
-if (N3 >= 2)
-#pragma omp parallel for
-  for (c0 = 0; c0 < N3; c0 += 1)
-    for (c1 = 1; c1 <= N1; c1 += 1)
-      for (c3 = 1; c3 <= N2; c3 += 1)
-        if (c0 >= 1) {
-          wdtdr[c1][c3]=wdtdr[c1][c3]+wxm1[c1]*dxm1[c1][c1]*dxm1[c1][c3];
-        } else
-          wdtdr[c1][c3]=wdtdr[c1][c3]+wxm1[c1]*dxm1[c1][c1]*dxm1[c1][c3];
-
-}
 
 void comp_tile(float wdtdr[DIM1][DIM2], float wxm1[DIM1], float dxm1[DIM1][DIM2]) {
 int ip, j, i, i_tile,j_tile,ip_tile;
@@ -58,6 +45,7 @@ int UB = floord(N1 - 1, 16);
 
 int c0, c1, c2, c3, c4, c5,c6;
 
+// Tiling with permutation
 #pragma omp parallel for
 for (c0 = 0; c0 <= UB; c0 += 1)
   for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)
@@ -69,7 +57,7 @@ for (c0 = 0; c0 <= UB; c0 += 1)
 
 
 /*
-
+// Tiling without permutation
 #pragma omp parallel for
 for (c0 = 0; c0 <= floord(N1 - 1, 16); c0 += 1)
   for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)

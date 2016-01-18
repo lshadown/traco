@@ -41,6 +41,7 @@ int c0,c1,c2,c3,c4,c5,c6,c7,c8;
 int UB = min(floord(N2 - 1, 16) + 1, floord(N4 - 1, 16));
 int UB2 = floord(N2 - 1, 16);
 
+// Tiling with permutation
 if (N1 >= 1)
 #pragma omp parallel for
   for (c1 = 0; c1 <= UB; c1 += 1)
@@ -56,7 +57,7 @@ if (N1 >= 1)
 
 /*
 
-
+// Tiling without permutation
 #pragma omp parallel for
   for (c1 = 0; c1 <= UB2; c1 += 1)
     for (c2 = 0; c2 <= floord(N3 - 1, 16); c2 += 1)
@@ -69,16 +70,6 @@ if (N1 >= 1)
                     r[c7][c6][c5]=r[c7][c6][c5]+u[c7][c6][c4]*wdtdr[c4][c5];
 
 
-#pragma omp parallel for
-    for(k = 1; k <= N1; k++){
-          for(i = 1; i <= N4; i++){
-            for(j = 1; j <= N3; j++){
-              for(iz = 1; iz <= N2; iz++){
-              r[i][j][iz] = r[i][j][iz]+u[i][j][k]*wdtdr[k][iz];
-          }
-        }
-      }
-    }
 */
 }
 

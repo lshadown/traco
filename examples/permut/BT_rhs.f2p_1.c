@@ -45,7 +45,7 @@ void comp_tile(float u[6][DIM1][DIM2][DIM3], float us[DIM1][DIM2][DIM3], float v
 int rho_inv;
 int UB1 = floord(N1, 16);
 
-// Tiling with permuatiation
+// Tiling with permutation
 
 #pragma omp parallel for private(rho_inv)
 for (c0 = 0; c0 <= UB1; c0 += 1)
@@ -64,7 +64,7 @@ for (c0 = 0; c0 <= UB1; c0 += 1)
           }
 
 
-// Tiling without permuatiation
+// Tiling without permutation
 
           /*
 #pragma omp parallel for

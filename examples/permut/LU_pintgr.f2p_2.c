@@ -40,6 +40,8 @@ void comp_tile(float u[6][DIM1][DIM2][2], float phi1[DIM1][DIM2], float phi2[DIM
 int k=1,ki1=1,ki2=1;
 int c0,c1,c2,c3,gg2;
 
+// Tiling with permutation
+
 #pragma omp parallel for
 for (c0 = 0; c0 <= floord(-N1 + N2, 256); c0 += 1)
   for (c1 = 0; c1 <= floord(-N3 + N4, 256); c1 += 1)
@@ -51,6 +53,8 @@ for (c0 = 0; c0 <= floord(-N1 + N2, 256); c0 += 1)
         k=ki2;
         phi2[c3][c2]=gg2*(u[5][c3][c2][k]-0.50*(u[2][c3][c2][k]*2+u[3][c3][c2][k]*2+u[4][c3][c2][k]*2)/u[1][c3][c2][k]);
       }
+
+// Tiling without permutation
 /*
 #pragma omp parallel for
 for (c0 = 0; c0 <= floord(-N1 + N2, 256); c0 += 1)
@@ -63,16 +67,6 @@ for (c0 = 0; c0 <= floord(-N1 + N2, 256); c0 += 1)
         phi2[c3][c2]=gg2*(u[5][c3][c2][k]-0.50*(u[2][c3][c2][k]*2+u[3][c3][c2][k]*2+u[4][c3][c2][k]*2)/u[1][c3][c2][k]);
       }
 
-#pragma omp parallel for
-  for(i = N3; i <= N4; i++){
-for(j = N1; j <= N2; j++){
-
-    k = ki1;
-    phi1[i][j] = c2*(  u[5][i][j][k] - 0.50 * (  u[2][i][j][k] * 2 + u[3][i][j][k] * 2 + u[4][i][j][k] * 2 ) / u[1][i][j][k] );
-    k = ki2;
-    phi2[i][j] = c2*(  u[5][i][j][k] - 0.50 * (  u[2][i][j][k] * 2 + u[3][i][j][k] * 2 + u[4][i][j][k] * 2 ) / u[1][i][j][k] );
-  }
-}
 */
 }
 

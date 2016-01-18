@@ -48,6 +48,7 @@ int c0,c1,c2,c3,c4,c5,c6,c7;
 int r1,r2,r3,r4,r5,t1,t2,bt;
 int UB = floord(N1 - 1, 16);
 
+// Tiling with permutation
 #pragma omp parallel for private(r1,r2,r3,r4,r5,t1,t2)
 for (c0 = 0; c0 <= UB; c0 += 1)
   for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)
@@ -71,7 +72,7 @@ for (c0 = 0; c0 <= UB; c0 += 1)
 
 /*
 
-
+// Tiling without permutation
 #pragma omp parallel for
 for (c0 = 0; c0 <= floord(N1 - 1, 16); c0 += 1)
   for (c1 = 0; c1 <= floord(N2 - 1, 16); c1 += 1)
@@ -94,29 +95,7 @@ for (c0 = 0; c0 <= floord(N1 - 1, 16); c0 += 1)
           }
 
 */
-/*
-#pragma omp parallel for private(r1,r2,r3,r4,r5,t1,t2)
 
-
-for(i = 1; i <= N3; i++){
- for(j = 1; j <= N2; j++){
-  for(k = 1; k <= N1; k++){
-      r1 = rhs[1][i][j][k];
-      r2 = rhs[2][i][j][k];
-      r3 = rhs[3][i][j][k];
-      r4 = rhs[4][i][j][k];
-      r5 = rhs[5][i][j][k];
-      t1 = bt * r3;
-      t2 = 0.5 * ( r4 + r5 );
-      rhs[1][i][j][k] = -r2;
-      rhs[2][i][j][k] =  r1;
-      rhs[3][i][j][k] = bt * ( r4 - r5 );
-      rhs[4][i][j][k] = -t1 + t2;
-      rhs[5][i][j][k] =  t1 + t2;
-    }
-  }
-}
-*/
 }
 
 

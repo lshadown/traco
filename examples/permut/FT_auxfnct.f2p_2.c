@@ -39,7 +39,7 @@ int c0,c1,c2,c3,c4,c5;
 
 int UB = floord(N1 - 1, 16);
 
-// Tiling with permuatiation
+// Tiling with permutation
 
 #pragma omp parallel for
 for (c0 = 0; c0 <= UB; c0 += 1)
@@ -54,7 +54,7 @@ for (c0 = 0; c0 <= UB; c0 += 1)
 
 
 
-// Tiling without permuatiation
+// Tiling without permutation
 /*
 
 #pragma omp parallel for

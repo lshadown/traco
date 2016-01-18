@@ -36,6 +36,8 @@ void comp(float tmp[DIM1][DIM2], float tmor[DIM1][DIM2], float qbnew[DIM1][DIM2]
 int col, j, i;
 int c0, c2,c4,c6,c8,c10;
 int UB = floord(N1 - 2, 16);
+
+// Tiling with permutation
 #pragma omp parallel for
 for (c0 = 0; c0 <= UB; c0 += 1) {
   for (c6 = 16 * c0 + 2; c6 <= min(16 * c0 + 17, N1); c6 += 1)
@@ -46,6 +48,9 @@ for (c0 = 0; c0 <= UB; c0 += 1) {
         for (c8 = 16 * c4 + 2; c8 <= min(16 * c4 + 17, N3); c8 += 1)
           for (c10 = 16 * c0 + 2; c10 <= min(16 * c0 + 17, N1); c10 += 1)
             tmor[c6][c10]=tmor[c6][c10]+qbnew[c8-1][c6][1]*temp[c8][c10];
+}
+
+// Tiling without permutation
 
 /*
 
@@ -60,17 +65,8 @@ for (c0 = 0; c0 <= UB; c0 += 1) {
           for (c10 = 16 * c4 + 2; c10 <= min(16 * c4 + 17, N3); c10 += 1)
             tmor[c8][c6]=tmor[c8][c6]+qbnew[c10-1][c8][1]*temp[c10][c6];
 }
-/*
-for(col = 2; col <= N1; col++){
-  tmor[1][col]=tmor[1][col]+temp[1][col];
-  for(j = 1; j <= N2; j++){
-    for(i = 2; i <= N3; i++){
-      tmor[j][col] = tmor[j][col] + qbnew[i-1][j][1] *temp[i][col];
-    }
-  }
-}
 */
-}
+
 }
 
 
@@ -121,32 +117,4 @@ int main(int argc, char *argv[]) {
 }
 
 
-/*
 
-#pragma omp parallel for
-for (c0 = 0; c0 <= floord(N1 - 2, 16); c0 += 1) {
-  for (c6 = 16 * c0 + 2; c6 <= min(16 * c0 + 17, N1); c6 += 1)
-    tmor[1][c6]=tmor[1][c6]+temp[1][c6];
-  for (c2 = 0; c2 <= floord(N2 - 1, 16); c2 += 1)
-    for (c4 = 0; c4 <= floord(N3 - 2, 16); c4 += 1)
-      for (c6 = 16 * c0 + 2; c6 <= min(16 * c0 + 17, N1); c6 += 1)
-        for (c8 = 16 * c2 + 1; c8 <= min(16 * c2 + 16, N2); c8 += 1)
-          for (c10 = 16 * c4 + 2; c10 <= min(16 * c4 + 17, N3); c10 += 1)
-            tmor[c8][c6]=tmor[c8][c6]+qbnew[c10-1][c8][1]*temp[c10][c6];
-}
-
-
-
-#pragma omp parallel for
-for (c0 = 0; c0 <= floord(N1 - 2, 16); c0 += 1) {
-  for (c6 = 16 * c0 + 2; c6 <= min(16 * c0 + 17, N1); c6 += 1)
-    tmor[1][c6]=tmor[1][c6]+temp[1][c6];
-  for (c2 = 0; c2 <= floord(N2 - 1, 16); c2 += 1)
-    for (c4 = 0; c4 <= floord(N3 - 2, 16); c4 += 1)
-      for (c6 = 16 * c2 + 1; c6 <= min(16 * c2 + 16, N2); c6 += 1)
-        for (c8 = 16 * c4 + 2; c8 <= min(16 * c4 + 17, N3); c8 += 1)
-          for (c10 = 16 * c0 + 2; c10 <= min(16 * c0 + 17, N1); c10 += 1)
-            tmor[c6][c10]=tmor[c6][c10]+qbnew[c8-1][c6][1]*temp[c8][c10];
-}
-
-*/
