@@ -17,6 +17,8 @@ for w in operators:
 
 print line
 
+print isl.Set("[i'] -> {[i] : i= 1}")
+
 r = isl.Map("{[i,j] -> [i',j'] : ( i' = 1+i and j' = 1+j  and 0 <= i <= 2 and 0 <= j <= 2 ) or ( i' = 1+i and 1+j' = j  and 0 <= i <= 2 and 1 <= j <= 3 ) or (Exists a: (2a = i)) };");
 
 
