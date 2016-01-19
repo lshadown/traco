@@ -189,6 +189,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     tmp = REPR.apply(RRstar).coalesce()
     REPR2 = DOM_RAN.subtract(tmp).coalesce()
+
+    print REPR
+    print REPR2
     REPR = REPR.union(REPR2).coalesce()
 
     REPR =imperf_tile.SimplifySlice(REPR)
@@ -257,7 +260,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     D = RSCHED.domain()
 
     #if(SIMPLIFY):
-    D =  imperf_tile.SimplifySlice(D)
+
+
+    #D =  imperf_tile.SimplifySlice(D)
 
     print "# DOMAIN RSCHED"
 
@@ -309,13 +314,20 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
         slices.append(slice.coalesce())
 
-    #print slices
+
 
     new_loop = []
     i=0
     for line in looprepr:
         if(st_reg.match(line)):
-            petla = iscc.isl_ast_codegen(slices[i]).split('\n')
+            #print slices[i]
+            codegen = 'barvinok'
+            if (codegen == 'barvinok'):
+                petla = iscc.iscc_communicate("L :=" + str(slices[i]) + "; codegen L;")
+                petla = petla.split('\n')
+            else: #isl
+                petla = iscc.isl_ast_codegen(slices[i]).split('\n')
+
             petla = correct.Korekta('', petla) # dodaj { } do for
             was_par = 0              # poprawic jak sie koncza petle i sa nowe
             for s in petla:
@@ -345,6 +357,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     nloop = nloop[:-1]
+
+
     nloop = nloop.split('\n')
 
     nloop = tiling_v3.postprocess_loop(nloop)
