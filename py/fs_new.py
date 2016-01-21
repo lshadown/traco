@@ -309,6 +309,12 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
         #slice = imperf_tile.SimplifySlice(slice)
 
 
+        # EKSPERIMENTAL CODE wywal z RE instrukcje nie nalezace do RE
+        if(1==0):
+            temp = slice.intersect(W).coalesce()
+            if (not temp.is_empty()):
+                slice = temp
+
         slice = slice.apply(rap)
 
 
@@ -372,6 +378,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print "OUTPUT CODE"
     print loop
 
+
+    print UDS
+    print UDS - REPR
 
 
 

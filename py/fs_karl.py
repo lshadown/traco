@@ -24,7 +24,6 @@ def FSwithoutRG(r):
     rp = rp.set_dim_name(isl.dim_type.in_,0, 'ik1')
     rp = rp.set_dim_name(isl.dim_type.out,0, 'ok1')
 
-    print rp.get_space()
 
 
 
@@ -54,7 +53,15 @@ def FSwithoutRG(r):
 
     # ----------------------------------------------------
 
-    r0p_plus = rp.transitive_closure()[0]
+    r0p_plus = rp.transitive_closure()
+    if r0p_plus[1] == 0:
+        print 'Rp+ not exact !'
+        sys.exit(0)
+
+    r0p_plus = r0p_plus[0]
+
+
+
     isl_ident = isl.Map.identity(rp.get_space())
     r0p_star = r0p_plus.union(isl_ident).coalesce()
 

@@ -828,7 +828,14 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
     rucs = tiling_v3.ExtendMap(rucs, sym_exvars, Extend)
 
     rbis = isl.Map.from_domain_and_range(isl_TILEbis,isl_TILEbis)
+
+
+
+
+
     rs = rbis.intersect(rstar)
+
+
 
     rs = rs.union(rucs.transitive_closure()[0].intersect(rbis)).coalesce()
 
@@ -1041,11 +1048,18 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
         return ""
     else:
 
+
         rel_ = rbis.intersect(rel_)
+
+
+
+
 
         rel_ = rel_.project_out(isl.dim_type.in_, x*len(sym_exvars),x*len(sym_exvars))
         rel_ = rel_.project_out(isl.dim_type.out, x*len(sym_exvars),x*len(sym_exvars))
         rel_ = rel_.coalesce()
+
+
 
         relw = isl.Map(Rel_W)
 
@@ -1063,7 +1077,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
 
         # FS z RK
-        sk = fs_rk.fs_rk1(rel_, SIMPLIFY, indt)
+        #sk = fs_rk.fs_rk1(rel_, SIMPLIFY, indt)
 
 
         # FS bez RK

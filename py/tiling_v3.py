@@ -461,8 +461,8 @@ def ExtendMap(R, sym_exvars, Extend = False):
 
     if(Extend):
         for i in range(0, 2*len(sym_exvars)):
-            R = R.insert_dims(isl.dim_type.in_, 2*i+1, 1)
-            R = R.insert_dims(isl.dim_type.out, 2*i+1, 1)
+            R = R.insert_dims(isl.dim_type.in_, 2*i, 1)
+            R = R.insert_dims(isl.dim_type.out, 2*i, 1)
 
     return R
 
