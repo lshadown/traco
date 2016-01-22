@@ -22,6 +22,7 @@ from multiprocessing import Pool
 
 import imperf_tile
 import test_isl
+import relation_util
 
 import Dependence
 
@@ -779,15 +780,20 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # **************************************************************************
     exact_rplus = '-1'
+    islrp = True
     isl_relclosure = isl_rel
     if(rplus_file != ''):
         with open (rplus_file, "r") as myfile:
             data=myfile.read().replace('\n', '')
             isl_relclosure = isl.Map(str(data))
     else:
-        isl_relclosure = isl_rel.transitive_closure()
-        exact_rplus = isl_relclosure[1]
-        isl_relclosure = isl_relclosure[0]
+        if islrp:
+            isl_relclosure = isl_rel.transitive_closure()
+            exact_rplus = isl_relclosure[1]
+            isl_relclosure = isl_relclosure[0]
+        else:
+            isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
+            exact_rplus = True
 
     isl_relplus = isl_relclosure
     end = time.time()

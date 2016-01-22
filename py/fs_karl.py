@@ -8,6 +8,7 @@ except ImportError, e:
 
 import sys
 import iscc
+import relation_util
 
 
 
@@ -53,14 +54,20 @@ def FSwithoutRG(r):
 
     # ----------------------------------------------------
 
-    r0p_plus = rp.transitive_closure()
-    if r0p_plus[1] == 0:
-        print 'Rp+ not exact !'
-        sys.exit(0)
+    r0p_plus = rp
+    islrplus = False
 
-    r0p_plus = r0p_plus[0]
+    print rp
+    print 'Start...'
 
-
+    if(islrplus):
+        r0p_plus = rp.transitive_closure()
+        if r0p_plus[1] == 0:
+            print 'Rp+ not exact !'
+            sys.exit(0)
+        r0p_plus = r0p_plus[0]
+    else:
+        r0p_plus = relation_util.oc_IterateClosure(rp)
 
     isl_ident = isl.Map.identity(rp.get_space())
     r0p_star = r0p_plus.union(isl_ident).coalesce()
