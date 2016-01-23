@@ -71,18 +71,18 @@ if (l >= 2 && N >= l + 2) {
         for (c4 = 0; c4 < l / 2; c4 += 1)
           for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
             for (c8 = 2 * c4; c8 <= 2 * c4 + 1; c8 += 1)
-              path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
       } else if (l >= 2 * c2 + 2) {
         for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
           for (c8 = -(l % 2) + l; c8 <= -(l % 2) + l + 1; c8 += 1)
-            path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+            path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
       } else
         for (c4 = 0; c4 < c2; c4 += 1)
           for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
             for (c8 = 2 * c4; c8 <= 2 * c4 + 1; c8 += 1)
-              path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
     }
   for (c0 = 2; c0 <= 4; c0 += 1) {
@@ -91,7 +91,7 @@ if (l >= 2 && N >= l + 2) {
         for (c4 = l / 2 + 1; c4 < floord(N + 1, 2); c4 += 1)
           for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
             for (c8 = 2 * c4; c8 <= min(N - 1, 2 * c4 + 1); c8 += 1)
-              path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
 #pragma omp parallel for
     for (c2 = max(c0 + l / 2 - 3, l / 2); c2 < UB1; c2 += 1) {
@@ -99,29 +99,29 @@ if (l >= 2 && N >= l + 2) {
         for (c4 = l / 2 + 1; c4 < (N + 1) / 2; c4 += 1)
           for (c6 = 2 * c2; c6 <= min(N - 1, 2 * c2 + 1); c6 += 1)
             for (c8 = 2 * c4; c8 <= min(N - 1, 2 * c4 + 1); c8 += 1)
-              path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
       } else if (c0 == 2 && 2 * c2 >= l + 1) {
         for (c4 = 0; c4 < floord(l, 2); c4 += 1)
           for (c6 = 2 * c2; c6 <= min(N - 1, 2 * c2 + 1); c6 += 1)
             for (c8 = 2 * c4; c8 <= 2 * c4 + 1; c8 += 1)
-              path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
       } else if (c0 == 3 && 2 * c2 >= l + 1) {
         for (c6 = 2 * c2; c6 <= min(N - 1, 2 * c2 + 1); c6 += 1)
           for (c8 = -(l % 2) + l; c8 <= -(l % 2) + l + 1; c8 += 1)
-            path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+            path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
       } else if (c0 == 3) {
         for (c4 = c2 + 1; c4 < (N + 1) / 2; c4 += 1)
           for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
             for (c8 = 2 * c4; c8 <= min(N - 1, 2 * c4 + 1); c8 += 1)
-              path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
       } else
         for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
           for (c8 = 2 * c2; c8 <= 2 * c2 + 1; c8 += 1)
-            path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+            path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
     }
   }
@@ -133,24 +133,24 @@ if (l >= 2 && N >= l + 2) {
           for (c4 = 1; c4 < (N + 1) / 2; c4 += 1)
             for (c6 = 2 * c2; c6 <= min(N - 1, 2 * c2 + 1); c6 += 1)
               for (c8 = 2 * c4; c8 <= min(N - 1, 2 * c4 + 1); c8 += 1)
-                path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+                path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
         } else if (c2 >= 1) {
           for (c6 = 2 * c2; c6 <= min(N - 1, 2 * c2 + 1); c6 += 1)
             for (c8 = 0; c8 <= 1; c8 += 1)
-              path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
         } else
           for (c4 = 1; c4 < (N + 1) / 2; c4 += 1)
             for (c6 = 0; c6 <= 1; c6 += 1)
               for (c8 = 2 * c4; c8 <= min(N - 1, 2 * c4 + 1); c8 += 1)
-                path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+                path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
       }
     } else
       for (c6 = 0; c6 <= 1; c6 += 1)
         for (c8 = 0; c8 <= 1; c8 += 1)
-          path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+          path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
   }
 } else if (N >= 3 && l + 1 == N)
@@ -161,24 +161,24 @@ if (l >= 2 && N >= l + 2) {
           for (c4 = 0; c4 < (N + 1) / 2 - 1; c4 += 1)
             for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
               for (c8 = 2 * c4; c8 <= 2 * c4 + 1; c8 += 1)
-                path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+                path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
         } else if (N >= 2 * c2 + 3) {
           for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
             for (c8 = -((N - 1) % 2) + N - 1; c8 < N; c8 += 1)
-              path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
         } else
           for (c4 = 0; c4 < c2; c4 += 1)
             for (c6 = 2 * c2; c6 < N; c6 += 1)
               for (c8 = 2 * c4; c8 <= 2 * c4 + 1; c8 += 1)
-                path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+                path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
       }
     } else
       for (c6 = -((N - 1) % 2) + N - 1; c6 < N; c6 += 1)
         for (c8 = -((N - 1) % 2) + N - 1; c8 < N; c8 += 1)
-          path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
+          path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
 
   }
 
