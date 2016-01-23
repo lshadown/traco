@@ -18,6 +18,9 @@ int main(int argc, char *argv[]) {
 
     int kind = atoi(argv[1]);
 	int N = atoi(argv[2]);
+	int cpus = atoi(argv[3]);
+
+	omp_set_num_threads(cpus);
 
 	int k,i,j,t;
 
