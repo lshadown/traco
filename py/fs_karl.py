@@ -55,7 +55,7 @@ def FSwithoutRG(r):
     # ----------------------------------------------------
 
     r0p_plus = rp
-    islrplus = False
+    islrplus = True
 
     print rp
     print 'Start...'
@@ -69,6 +69,8 @@ def FSwithoutRG(r):
     else:
         r0p_plus = relation_util.oc_IterateClosure(rp)
 
+
+
     isl_ident = isl.Map.identity(rp.get_space())
     r0p_star = r0p_plus.union(isl_ident).coalesce()
 
@@ -80,11 +82,10 @@ def FSwithoutRG(r):
         RG = RG.set_dim_name(isl.dim_type.set, i, 'i' + str(i))
         RG1 = RG1.set_dim_name(isl.dim_type.set, i, 'i' + str(i))
 
-    ORGp = iscc.iscc_communicate("S := " + str(RG) + ";S;", 1)
-    ORGs = iscc.iscc_communicate("S := " + str(RG1) + ";S;", 1)
+    ORGp = relation_util.islSettoOmegaStr(RG)
+    ORGs = relation_util.islSettoOmegaStr(RG1)
 
-    #print ORGs
-    #print ORGp
+
 
     # SYMB------------------------------------------------------
 
@@ -103,7 +104,7 @@ def FSwithoutRG(r):
       data.append('i' +  str(i))
 
     var = '[' + ', '.join(data) + '] : '
-    #print var
+
 
 
     # ------------------------------------------------------
@@ -126,9 +127,6 @@ def FSwithoutRG(r):
     ORGs = '( ' + ORGs + ' )'
     ORGp = '( ' + ORGp + ' )'
 
-    #print ORGs
-    #print ORGp
-
     # ------------------------------------------------------
 
     FS = isl_symb + '{' + var + ORGs
@@ -136,6 +134,8 @@ def FSwithoutRG(r):
     FS = FS + ' and not exists k0k : k0k > i0 and ' + ORGp.replace('i0', 'k0k')
 
     FS = FS + '}'
+
+
     FS = isl.Set(FS)
 
     #print FS

@@ -21,6 +21,14 @@ def islMaptoOmegaStr(R):
 
     return p.print_map(R).get_str()
 
+def islSettoOmegaStr(R):
+
+    p = isl.Printer.to_str(isl.DEFAULT_CONTEXT)
+    p = p.set_output_format(isl.format.OMEGA)
+    p.flush()
+
+    return p.print_set(R).get_str()
+
 def oc_IterateClosure(R):
 
 

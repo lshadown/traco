@@ -739,7 +739,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
     #print isl_TILEbis
     srepr,rucs = slicing.Create_Srepr(isl_rel, isl_relclosure)
 
-    fs = 0
+    fs = 1
 
     ir = isl_rel.domain().union(isl_rel.range()).coalesce()
     ir = ir.insert_dims(isl.dim_type.set, 0, len(sym_exvars))
@@ -1097,7 +1097,10 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
         print sk
 
         print "Codegen now..."
-        fsloop = iscc.iscc_communicate("L :=" + str(sk) + "; codegen L;")
+        #fsloop = iscc.iscc_communicate("L :=" + str(sk) + "; codegen L;")
+
+        fsloop =  iscc.isl_ast_codegen(sk)
+
         print "Codegen done."
 
         nloop = fsloop.split('\n')
