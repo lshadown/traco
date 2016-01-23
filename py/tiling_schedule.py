@@ -739,7 +739,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
     #print isl_TILEbis
     srepr,rucs = slicing.Create_Srepr(isl_rel, isl_relclosure)
 
-    fs = 1
+    fs = 0
 
     ir = isl_rel.domain().union(isl_rel.range()).coalesce()
     ir = ir.insert_dims(isl.dim_type.set, 0, len(sym_exvars))
@@ -1050,9 +1050,6 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
 
         rel_ = rbis.intersect(rel_)
-
-
-
 
 
         rel_ = rel_.project_out(isl.dim_type.in_, x*len(sym_exvars),x*len(sym_exvars))

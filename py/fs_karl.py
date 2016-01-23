@@ -19,14 +19,12 @@ def FSwithoutRG(r):
 
     r = isl.Map(str(r))
 
+
     rp = r
     rp = rp.insert_dims(isl.dim_type.in_, 0, 1)
     rp = rp.insert_dims(isl.dim_type.out, 0, 1)
     rp = rp.set_dim_name(isl.dim_type.in_,0, 'ik1')
     rp = rp.set_dim_name(isl.dim_type.out,0, 'ok1')
-
-
-
 
     c = isl.Constraint.eq_from_names(rp.get_space(), {'ik1': -1, 'ok1':1, 1 : -1})
 
@@ -138,7 +136,7 @@ def FSwithoutRG(r):
 
     FS = isl.Set(FS)
 
-    #print FS
+    print FS
     return FS
 
 
@@ -153,6 +151,7 @@ def FSwithoutRG(r):
 #r3 = isl.Map(r3)
 
 #r = r1.union(r2).union(r3).coalesce()
+#print r
 
 #r = '[n] -> { [i0, 2, i2, 0, 8] -> [i0, 2, 1 + i2, 0, 8] : i0 >= 0 and 16i0 <= -1 + n and i2 >= 0 and ' \
 #    '16i2 <= -17 + n; [i0, 2, i2, 0, 8] -> [1 + i0, 2, i2, 0, 8] : i0 >= 0 and 16i0 <= -17 + n and i2 >= 0 ' \

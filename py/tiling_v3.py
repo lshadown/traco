@@ -493,7 +493,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print 'Perfectly nested loop mode: enabled'
 
 
-    simpl_ub = True
+    simpl_ub = False
 
     BLOCK = block.split(',')
     par_tiling = False
