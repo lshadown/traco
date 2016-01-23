@@ -174,7 +174,7 @@ if (l >= 32 && N >= l + 1) {
           for(i = 0; i < N; i++)
             for (j = 0; j < N; j++){
               if(path1[i][j] != path[i][j])
-                printf("Error!");
+                printf("Error!\n");
                 exit(0);
               }
         }
