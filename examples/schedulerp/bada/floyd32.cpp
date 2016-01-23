@@ -57,6 +57,27 @@ if(kind == 1){
 
   }
 }
+else if(kind == 3){
+
+
+  int t1, t2, t3, t4, t5;
+
+ register int lbv, ubv;
+
+/* Start of CLooG code */
+if (N >= 1) {
+  for (t1=0;t1<=N-1;t1++) {
+    for (t2=0;t2<=floord(N-1,32);t2++) {
+      for (t3=0;t3<=floord(N-1,32);t3++) {
+        for (t4=32*t2;t4<=min(N-1,32*t2+31);t4++) {
+          for (t5=32*t3;t5<=min(N-1,32*t3+31);t5++) {
+            path[t4][t5] = path[t4][t5] < path[t4][t1] + path[t1][t5] ? path[t4][t5] : path[t4][t1] + path[t1][t5];;
+          }
+        }
+      }
+    }
+  }
+}
 else{
 
     //traco
