@@ -217,7 +217,6 @@ if (l >= 2 && N >= l + 2) {
         }
     }
 
-	#pragma endscop
 
 	// Clean-up and exit the function
 	fflush(stdout);
