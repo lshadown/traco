@@ -30,10 +30,15 @@ int main(int argc, char *argv[]) {
 	for (i=0; i<N; i++)
 	  path[i] = new float[N];
 
+    float **path1 = new float*[N];
+	for (i=0; i<N; i++)
+	  path1[i] = new float[N];
+
 	// Set the input data
 	for (i=0; i<N; i++) {
 		for (j=0; j<N; j++) {
 			path[i][j] = ((float) i*i*(j+2) + 2) / N;
+			path1[i][j] = ((float) i*i*(j+2) + 2) / N;
 		}
 	}
 
@@ -42,18 +47,15 @@ double start = omp_get_wtime();
 // -----------------------------------
 if(kind == 1){
 
-
-#pragma scop
   for (k = 0; k < N; k++)
   {
       for(i = 0; i < N; i++)
 	    for (j = 0; j < N; j++){
-	      path[i][j] = path[i][j] < path[i][k] + path[k][j] ? path[i][j] : path[i][k] + path[k][j];
+	      path1[i][j] = path1[i][j] < path1[i][k] + path1[k][j] ? path1[i][j] : path1[i][k] + path1[k][j];
 
 	      }
 
   }
-#pragma endscop
 }
 else{
 
@@ -187,9 +189,33 @@ if (l >= 2 && N >= l + 2) {
 }
 }
 
+
+
+
     double end = omp_get_wtime();
 	printf("%.3f\n", end - start);
 	printf("%i\n", z);
+
+    if(kind != 1){
+        for (k = 0; k < N; k++)
+        {
+          for(i = 0; i < N; i++)
+            for (j = 0; j < N; j++){
+              path1[i][j] = path1[i][j] < path1[i][k] + path1[k][j] ? path1[i][j] : path1[i][k] + path1[k][j];
+
+              }
+        }
+
+        for (k = 0; k < N; k++)
+        {
+          for(i = 0; i < N; i++)
+            for (j = 0; j < N; j++){
+              if(path1[i][j] != path[i][j])
+                printf("Error!");
+                exit(0);
+              }
+        }
+    }
 
 	#pragma endscop
 
