@@ -49,7 +49,7 @@ if(kind == 1){
       for(i = 0; i < N; i++)
 	    for (j = 0; j < N; j++){
 	      path[i][j] = path[i][j] < path[i][k] + path[k][j] ? path[i][j] : path[i][k] + path[k][j];
-	      z++;
+
 	      }
 
   }
