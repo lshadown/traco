@@ -59,14 +59,14 @@ else{
 
     //traco
     int c0,c1,c2,c3,c4,c5,c6,c8,l;
-    int UB1 = (N - 1) / 16;
-    int UB = c0 + l / 16;
+    int UB1 = (N + 1) / 2;
+    int UB = c0 + l / 2;
 
 for(l=0; l < N ; l++){
 if (l >= 2 && N >= l + 2) {
   for (c0 = 0; c0 <= 1; c0 += 1)
 #pragma omp parallel for
-    for (c2 = 0; c2 < c0 + l / 2; c2 += 1) {
+    for (c2 = 0; c2 < UB; c2 += 1) {
       if (c0 == 0) {
         for (c4 = 0; c4 < l / 2; c4 += 1)
           for (c6 = 2 * c2; c6 <= 2 * c2 + 1; c6 += 1)
@@ -94,7 +94,7 @@ if (l >= 2 && N >= l + 2) {
               path[c6][c8]=path[c6][c8]-path[c6][l]+path[l][c8]*path[c6][c8]/path[c6][l]+path[l][c8];
 
 #pragma omp parallel for
-    for (c2 = max(c0 + l / 2 - 3, l / 2); c2 < (N + 1) / 2; c2 += 1) {
+    for (c2 = max(c0 + l / 2 - 3, l / 2); c2 < UB1; c2 += 1) {
       if (c0 == 4) {
         for (c4 = l / 2 + 1; c4 < (N + 1) / 2; c4 += 1)
           for (c6 = 2 * c2; c6 <= min(N - 1, 2 * c2 + 1); c6 += 1)
