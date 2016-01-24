@@ -87,32 +87,6 @@ else{
 
 for (i = 1; i < ni; i++)
 {
-/*
-  if (i >= 32 && ni >= i + 1)
-    for (c0 = 0; c0 <= (i - 1) / 32; c0 += 1) {
-#pragma omp parallel for
-      for (c2 = 0; c2 < i / 32; c2 += 1)
-        for (c6 = 32 * c2; c6 <= 32 * c2 + 31; c6 += 1) {
-          if (c0 >= 1) {
-            for (c8 = 32 * c0; c8 <= min(i - 1, 32 * c0 + 31); c8 += 1)
-              B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-          } else
-            for (c8 = 0; c8 <= 31; c8 += 1)
-              B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-        }
-      if (i >= 33)
-        for (c2 = i / 32 + 1; c2 <= (ni-1)/32; c2 += 1)
-          for (c6 = 32 * c2; c6 <= min(ni - 1, 32 * c2 + 31); c6 += 1) {
-            if (c0 >= 1) {
-              for (c8 = 32 * c0; c8 <= min(i - 1, 32 * c0 + 31); c8 += 1)
-                B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-            } else
-              for (c8 = 0; c8 <= 31; c8 += 1)
-                B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-          }
-    }
-*/
-{
   if (ni >= i + 1)
     for (c0 = 0; c0 <= floord(i - 1, 32); c0 += 1) {
       if (i >= 32) {
@@ -163,7 +137,7 @@ for (i = 1; i < ni; i++)
 }
 
 }
-}
+
 
 
     double end = omp_get_wtime();
