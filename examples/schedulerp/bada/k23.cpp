@@ -48,13 +48,13 @@ int main(int argc, char *argv[]) {
 	// Set the input data
 	for (i=0; i<N+1; i++) {
 		for (j=0; j<N+1; j++) {
-			za[i][j] = ((float) i*i*(j+2) + 2) / N;
-			za1[i][j] = ((float) i*i*(j+2) + 2) / N;
-			zb[i][j] = ((float) i*i*(j+2) + 2) / N;
-			zr[i][j] = ((float) i*i*(j+2) + 2) / N;
-			zv[i][j] = ((float) i*i*(j+2) + 2) / N;
-			zu[i][j] = ((float) i*i*(j+2) + 2) / N;
-			zz[i][j] = ((float) i*i*(j+2) + 2) / N;
+			za[i][j] = 0.001;
+			za1[i][j] = 0.001;
+			zb[i][j] = 0.002;
+			zr[i][j] = 0.003;
+			zv[i][j] = 0.005;
+			zu[i][j] = 0.002;
+			zz[i][j] = 0.001;
 		}
 	}
 
@@ -164,7 +164,7 @@ if (n >= 34 && loop >= 34)
         for ( j=1 ; j<6 ; j++ ) {
             for ( k=1 ; k<n ; k++ ) {
               if(za[j][k] != za1[j][k])
-                printf("Error!\n");
+                printf("Error!\n %.f %.f\n", za[j][k], za1[j][k]);
                 exit(0);
               }
         }
