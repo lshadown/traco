@@ -100,7 +100,7 @@ for (i = 1; i < ni; i++)
               B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
         }
       if (i >= 33)
-        for (c2 = i / 32 + 1; c2 <= floord(ni - 1, 32); c2 += 1)
+        for (c2 = i / 32 + 1; c2 <= (ni-1)/32; c2 += 1)
           for (c6 = 32 * c2; c6 <= min(ni - 1, 32 * c2 + 31); c6 += 1) {
             if (c0 >= 1) {
               for (c8 = 32 * c0; c8 <= min(i - 1, 32 * c0 + 31); c8 += 1)
@@ -110,20 +110,6 @@ for (i = 1; i < ni; i++)
                 B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
           }
     }
-  if (i == 32)
-#pragma omp parallel for
-    for (c6 = 32; c6 <= min(63, ni - 1); c6 += 1)
-      for (c8 = 0; c8 <= 31; c8 += 1)
-        B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-  if (ni >= i + 1)
-    for (c0 = max(floord(i - 1, 32) + 1, 2); c0 <= min(floord(i - 1, 16) + 1, 2 * floord(i, 32) + 1); c0 += 1)
-      for (c6 = -(i % 32) + i; c6 <= min(ni - 1, -(i % 32) + i + 31); c6 += 1)
-        for (c8 = ((i + 31) % 32) - i + 32 * c0 - 31; c8 <= min(i - 1, ((i + 31) % 32) - i + 32 * c0); c8 += 1)
-          B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-}
-
-
-
 
 }
 
