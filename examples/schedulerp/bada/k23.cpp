@@ -100,7 +100,7 @@ if ((loop >= 1) && (n >= 2)) {
     //traco
 
 int c0,c1,c2,c3,c4,c5c6,c7,c8,c10,c12;
-/*
+
 if (n >= 34 && loop >= 34)
   for (c0 = 0; c0 <= (n + 2 * loop - 4) / 32; c0 += 1)
 {
@@ -124,22 +124,6 @@ if (n >= 34 && loop >= 34)
           }
     }
     }
-
-*/
-
-
-
-
-
-if (n >= 34 && loop >= 34)
-  for (c0 = 0; c0 <= (n + 2 * loop - 4) / 32; c0 += 1)
-#pragma omp parallel for
-    for (c2 = max(max(0, c0 - (n + loop + 29) / 32 + 1), floord(-n + 32 * c0 - 30, 64) + 1); c2 <= min((loop - 1) / 32, c0 / 2); c2 += 1)
-      for (c8 = max(32 * c2 + 1, -n + 32 * c0 - 32 * c2 + 3); c8 <= min(loop, 32 * c2 + 32); c8 += 1)
-        for (c10 = 1; c10 <= 5; c10 += 1)
-          for (c12 = max(1, 32 * c0 - 32 * c2 - c8 + 2); c12 <= min(n - 1, 32 * c0 - 32 * c2 - c8 + 33); c12 += 1)
-            za[c10][c12]=za[c10][c12]+0.175*(za[c10+1][c12]*zr[c10][c12]+za[c10-1][c12]*zb[c10][c12]+za[c10][c12+1]*zu[c10][c12]+za[c10][c12-1]*zv[c10][c12]+zz[c10][c12]-za[c10][c12]);
-
 
 
 
