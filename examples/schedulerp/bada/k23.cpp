@@ -17,11 +17,15 @@ int main(int argc, char *argv[]) {
 
     int kind = atoi(argv[1]);
 	int N = atoi(argv[2]);
+	int cpus = atoi(argv[3]);
+
+	omp_set_num_threads(cpus);
 
 	int k,l,i,j,t,loop=N,n=N;
 
 	// Declare arrays on the stack
 	float **za = new float*[N+1];
+	float **za1 = new float*[N+1];
 	float **zb = new float*[N+1];
 	float **zr = new float*[N+1];
 	float **zu = new float*[N+1];
@@ -30,6 +34,7 @@ int main(int argc, char *argv[]) {
 
 	for (i=0; i<N+1; i++){
 	  za[i] = new float[N+1];
+	  za1[i] = new float[N+1];
 	  zb[i] = new float[N+1];
 	  zr[i] = new float[N+1];
 	  zu[i] = new float[N+1];
@@ -44,6 +49,7 @@ int main(int argc, char *argv[]) {
 	for (i=0; i<N+1; i++) {
 		for (j=0; j<N+1; j++) {
 			za[i][j] = ((float) i*i*(j+2) + 2) / N;
+			za1[i][j] = ((float) i*i*(j+2) + 2) / N;
 			zb[i][j] = ((float) i*i*(j+2) + 2) / N;
 			zr[i][j] = ((float) i*i*(j+2) + 2) / N;
 			zv[i][j] = ((float) i*i*(j+2) + 2) / N;
@@ -93,13 +99,13 @@ if ((loop >= 1) && (n >= 2)) {
 
     //traco
 
-int c0,c1,c2,c3,c4,c5c6,c7,c8;
-
+int c0,c1,c2,c3,c4,c5c6,c7,c8,c10,c12;
+/*
 if (n >= 34 && loop >= 34)
   for (c0 = 0; c0 <= (n + 2 * loop - 4) / 32; c0 += 1)
-#pragma omp parallel for
 {
   register int LB =  max(max(0, c0 - (n + loop + 29) / 32 + 1), floord(-n + 32 * c0 - 30, 64) + 1);
+#pragma omp parallel for
     for (c2 = LB; c2 <= min((loop - 1) / 32, c0 / 2); c2 += 1) {
       if (c2 >= 1) {
         for (c8 = max(32 * c2 + 1, -n + 32 * c0 - 32 * c2 + 3); c8 <= min(loop, 32 * c2 + 32); c8 += 1)
@@ -119,11 +125,11 @@ if (n >= 34 && loop >= 34)
     }
     }
 
+*/
 
 
 
 
-/*
 
 if (n >= 34 && loop >= 34)
   for (c0 = 0; c0 <= (n + 2 * loop - 4) / 32; c0 += 1)
@@ -138,12 +144,34 @@ if (n >= 34 && loop >= 34)
 
 
 
-*/
+
 
 }
-
     double end = omp_get_wtime();
 	printf("%.3f\n", end - start);
+
+
+    if(kind != 1){
+    for ( l=1 ; l<=loop ; l++ ) {
+        for ( j=1 ; j<6 ; j++ ) {
+            for ( k=1 ; k<n ; k++ ) {
+                za1[j][k] = za1[j][k] + 0.175*( za1[j+1][k]*zr[j][k] + za1[j-1][k]*zb[j][k] + za1[j][k+1]*zu[j][k] + za1[j][k-1]*zv[j][k] + zz[j][k] - za1[j][k] );
+            }
+        }
+    }
+
+    for ( l=1 ; l<=loop ; l++ ) {
+        for ( j=1 ; j<6 ; j++ ) {
+            for ( k=1 ; k<n ; k++ ) {
+              if(za[j][k] != za1[j][k])
+                printf("Error!\n");
+                exit(0);
+              }
+        }
+    }
+    }
+
+
 
 	#pragma endscop
 
