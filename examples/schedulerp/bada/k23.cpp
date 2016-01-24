@@ -24,26 +24,26 @@ int main(int argc, char *argv[]) {
 	int k,l,i,j,t,loop=N,n=N;
 
 	// Declare arrays on the stack
-	float **za = new float*[N+1];
-	float **za1 = new float*[N+1];
-	float **zb = new float*[N+1];
-	float **zr = new float*[N+1];
-	float **zu = new float*[N+1];
-	float **zv = new float*[N+1];
-	float **zz = new float*[N+1];
+	double **za = new double*[N+1];
+	double **za1 = new double*[N+1];
+	double **zb = new double*[N+1];
+	double **zr = new double*[N+1];
+	double **zu = new double*[N+1];
+	double **zv = new double*[N+1];
+	double **zz = new double*[N+1];
 
 	for (i=0; i<N+1; i++){
-	  za[i] = new float[N+1];
-	  za1[i] = new float[N+1];
-	  zb[i] = new float[N+1];
-	  zr[i] = new float[N+1];
-	  zu[i] = new float[N+1];
-	  zv[i] = new float[N+1];
-	  zz[i] = new float[N+1];
+	  za[i] = new double[N+1];
+	  za1[i] = new double[N+1];
+	  zb[i] = new double[N+1];
+	  zr[i] = new double[N+1];
+	  zu[i] = new double[N+1];
+	  zv[i] = new double[N+1];
+	  zz[i] = new double[N+1];
 
 
     }
-    float *w = new float[N];
+    double *w = new double[N];
 
 	// Set the input data
 	for (i=0; i<N+1; i++) {
