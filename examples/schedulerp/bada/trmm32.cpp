@@ -112,7 +112,7 @@ for (i = 1; i < ni; i++)
     }
 
 }
-
+}
 
 
     double end = omp_get_wtime();
