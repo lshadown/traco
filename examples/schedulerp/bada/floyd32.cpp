@@ -37,8 +37,9 @@ int main(int argc, char *argv[]) {
 	// Set the input data
 	for (i=0; i<N; i++) {
 		for (j=0; j<N; j++) {
-			path[i][j] = ((float) i*i*(j+2) + 2) / N;
-			path1[i][j] = ((float) i*i*(j+2) + 2) / N;
+			//path[i][j] = ((float) (N-j)*j*(j+2) + 2) / N;
+			path[i][j] = rand()/N;
+			path1[i][j] =  path[i][j]; //  ((float) (N-j)*j*(j+2) + 2) / N;
 		}
 	}
 
@@ -83,17 +84,14 @@ else{
 
     //traco
     int c0,c1,c2,c3,c4,c5,c6,c8,l;
-    int UB1 = (N - 1) / 32;
-    int UB = min(c0 + l / 32 - 1, -c0 + l / 32 + 1);
-    int UB0 = min(N - 1, -(l % 32) + l + 31);
+
 
 
 for (l = 0; l < N; l++){
-if (l >= 32 && N >= l + 1) {
   for (c0 = 0; c0 <= min(3, N - l + 1); c0 += 1) {
     if (N >= l + c0 && c0 <= 2)
 #pragma omp parallel for
-      for (c2 = 0; c2 <= UB; c2 += 1) {
+      for (c2 = 0; c2 <= min(c0 + l / 32 - 1, -c0 + l / 32 + 1); c2 += 1) {
         if (c0 == 2) {
           for (c4 = l / 32 + 1; c4 <= (N - 1) / 32; c4 += 1)
             for (c6 = 32 * c2; c6 <= 32 * c2 + 31; c6 += 1)
@@ -116,12 +114,12 @@ if (l >= 32 && N >= l + 1) {
       }
     if (c0 == 2)
 #pragma omp parallel for
-      for (c6 = -(l % 32) + l; c6 <= UB0; c6 += 1)
+      for (c6 = -(l % 32) + l; c6 <= min(N - 1, -(l % 32) + l + 31); c6 += 1)
         for (c8 = -(l % 32) + l; c8 <= min(N - 1, -(l % 32) + l + 31); c8 += 1)
           path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
     if (c0 >= 2)
 #pragma omp parallel for
-      for (c2 = -c0 + l / 32 + 3; c2 <= UB1; c2 += 1) {
+      for (c2 = -c0 + l / 32 + 3; c2 <= (N - 1) / 32; c2 += 1) {
         if (c0 == 2) {
           for (c4 = 0; c4 < floord(l, 32); c4 += 1)
             for (c6 = 32 * c2; c6 <= min(N - 1, 32 * c2 + 31); c6 += 1)
@@ -139,35 +137,12 @@ if (l >= 32 && N >= l + 1) {
       }
   }
 #pragma omp parallel for
-  for (c2 = l / 32 + 1; c2 <= UB1; c2 += 1)
+  for (c2 = l / 32 + 1; c2 <= (N - 1) / 32; c2 += 1)
     for (c4 = l / 32 + 1; c4 <= (N - 1) / 32; c4 += 1)
       for (c6 = 32 * c2; c6 <= min(N - 1, 32 * c2 + 31); c6 += 1)
         for (c8 = 32 * c4; c8 <= min(N - 1, 32 * c4 + 31); c8 += 1)
           path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
-} else if (N >= 33 && l >= 0 && l <= 31)
-  for (c0 = 0; c0 <= 2; c0 += 1) {
-    if (c0 >= 1) {
-      for (c2 = c0 - 1; c2 <= (N - 1) / 32; c2 += 1) {
-        if (c0 == 2) {
-          for (c4 = 1; c4 <= (N - 1) / 32; c4 += 1)
-            for (c6 = 32 * c2; c6 <= min(N - 1, 32 * c2 + 31); c6 += 1)
-              for (c8 = 32 * c4; c8 <= min(N - 1, 32 * c4 + 31); c8 += 1)
-                path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
-        } else if (c2 >= 1) {
-          for (c6 = 32 * c2; c6 <= min(N - 1, 32 * c2 + 31); c6 += 1)
-            for (c8 = 0; c8 <= 31; c8 += 1)
-              path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
-        } else
-          for (c4 = 1; c4 <= (N - 1) / 32; c4 += 1)
-            for (c6 = 0; c6 <= 31; c6 += 1)
-              for (c8 = 32 * c4; c8 <= min(N - 1, 32 * c4 + 31); c8 += 1)
-                path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
-      }
-    } else
-      for (c6 = 0; c6 <= 31; c6 += 1)
-        for (c8 = 0; c8 <= 31; c8 += 1)
-          path[c6][c8]=path[c6][c8]<path[c6][l]+path[l][c8]?path[c6][c8]:path[c6][l]+path[l][c8];
-  }
+
 }
 
 
