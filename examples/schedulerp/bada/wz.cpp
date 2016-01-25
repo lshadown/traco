@@ -170,7 +170,7 @@ for (c1 = 0; c1 < b; c1 += 1) {
       }
      }
 
-
+/*
 printf("Checking...");
 
           for(i = 0; i < 2*N; i++)
