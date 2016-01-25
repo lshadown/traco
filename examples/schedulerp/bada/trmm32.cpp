@@ -87,53 +87,42 @@ else{
 
 for (i = 1; i < ni; i++)
 {
-  if (ni >= i + 1)
-    for (c0 = 0; c0 <= floord(i - 1, 32); c0 += 1) {
-      if (i >= 32) {
+  {
+  if (i >= 8 && ni >= i + 1)
+    for (c0 = 0; c0 <= (i - 1) / 8; c0 += 1) {
 #pragma omp parallel for
-        for (c2 = 0; c2 < i / 32; c2 += 1)
-          for (c6 = 32 * c2; c6 <= 32 * c2 + 31; c6 += 1) {
+      for (c2 = 0; c2 < i / 8; c2 += 1)
+        for (c6 = 8 * c2; c6 <= 8 * c2 + 7; c6 += 1) {
+          if (c0 >= 1) {
+            for (c8 = 8 * c0; c8 <= min(i - 1, 8 * c0 + 7); c8 += 1)
+              B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
+          } else
+            for (c8 = 0; c8 <= 7; c8 += 1)
+              B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
+        }
+      if (i >= 9)
+        for (c2 = i / 8 + 1; c2 <= floord(ni - 1, 8); c2 += 1)
+          for (c6 = 8 * c2; c6 <= min(ni - 1, 8 * c2 + 7); c6 += 1) {
             if (c0 >= 1) {
-              for (c8 = 32 * c0; c8 <= min(i - 1, 32 * c0 + 31); c8 += 1)
+              for (c8 = 8 * c0; c8 <= min(i - 1, 8 * c0 + 7); c8 += 1)
                 B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
             } else
-              for (c8 = 0; c8 <= 31; c8 += 1)
+              for (c8 = 0; c8 <= 7; c8 += 1)
                 B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
           }
-        if (i >= 33)
-          for (c2 = i / 32 + 1; c2 <= floord(ni - 1, 32); c2 += 1)
-            for (c6 = 32 * c2; c6 <= min(ni - 1, 32 * c2 + 31); c6 += 1) {
-              if (c0 >= 1) {
-                for (c8 = 32 * c0; c8 <= min(i - 1, 32 * c0 + 31); c8 += 1)
-                  B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-              } else
-                for (c8 = 0; c8 <= 31; c8 += 1)
-                  B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-            }
-      } else
-#pragma omp parallel for
-        for (c6 = 0; c6 < i; c6 += 1)
-          for (c8 = 0; c8 < i; c8 += 1)
-            B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
     }
+  if (i == 8)
 #pragma omp parallel for
-  for (c6 = i; c6 <= min(31, ni - 1); c6 += 1)
-    for (c8 = 0; c8 < i; c8 += 1)
-      B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
+    for (c6 = 8; c6 <= min(15, ni - 1); c6 += 1)
+      for (c8 = 0; c8 <= 7; c8 += 1)
+        B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
   if (ni >= i + 1)
-    for (c0 = max(floord(i - 1, 32) + 1, -floord(i, 32) + floord(15 * i - 32 * floord(i, 32) + 31, 480) + 2); c0 <= min(floord(i - 1, 16) + 1, 2 * floord(i, 32) + 1); c0 += 1)
-      for (c6 = -(i % 32) + i; c6 <= min(i, i - c0 + (i + 31) / 32 + i / 32 - 1); c6 += 1)
-        for (c8 = ((i + 31) % 32) - i + 32 * c0 - 31; c8 <= min(i - 1, ((i + 31) % 32) - i + 32 * c0); c8 += 1)
+    for (c0 = max(floord(i - 1, 8) + 1, 2); c0 <= min(floord(i - 1, 4) + 1, 2 * floord(i, 8) + 1); c0 += 1)
+      for (c6 = -(i % 8) + i; c6 <= min(ni - 1, -(i % 8) + i + 7); c6 += 1)
+        for (c8 = ((i + 7) % 8) - i + 8 * c0 - 7; c8 <= min(i - 1, ((i + 7) % 8) - i + 8 * c0); c8 += 1)
           B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-  if (i >= 33 && i % 32 >= 1 && i >= 2 * (i % 32))
-    for (c6 = i; c6 <= min(ni - 1, -((i - 1) % 32) + i + 30); c6 += 1) {
-      if (c6 >= i + 1) {
-        for (c8 = 0; c8 < i; c8 += 1)
-          B[i][c6]+=alpha*A[i][c8]*B[c6][c8];
-      } else
-        for (c8 = -(i % 32) + i; c8 < i; c8 += 1)
-          B[i][i]+=alpha*A[i][c8]*B[i][c8];
-    }
+}
+
 }
 
 }
