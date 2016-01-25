@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 	int N = atoi(argv[2]);
 	int cpus = atoi(argv[3]);
 	int z = 0;
-	float det=0;
+	float det=1;
 	b=n=N;
 
 	omp_set_num_threads(cpus);
@@ -43,10 +43,10 @@ int main(int argc, char *argv[]) {
 	for (i=0; i<2*N; i++) {
 		for (j=0; j<2*N; j++) {
 			//path[i][j] = ((float) (N-j)*j*(j+2) + 2) / N;
-			w[i][j] = 000000.1;
-			w[i][j] = w1[i][j]; //  ((float) (N-j)*j*(j+2) + 2) / N;
-			a[i][j] = 000000.5;
-			a[i][j] = a1[i][j]; //  ((float) (N-j)*j*(j+2) + 2) / N;
+			w[i][j] = 00.1;
+			w1[i][j] = w[i][j]; //  ((float) (N-j)*j*(j+2) + 2) / N;
+			a[i][j] = 00.2;
+			a1[i][j] = a[i][j]; //  ((float) (N-j)*j*(j+2) + 2) / N;
 		}
 	}
 
@@ -63,9 +63,11 @@ if(kind == 1){
 
         for(j=k+1; j<=n-k; j++){
           a[i][j] = a[i][j] - w[i][k]*a[k][j] - w[i][n-k+1]*a[n-k+1][j];
+
       }
      }
    }
+
 }
 
 else if(kind == 3){
@@ -91,15 +93,18 @@ for (c1 = 0; c1 < b; c1 += 1) {
       if (c4 == 5) {
         for (c5 = (c1 + 2) / 32; c5 <= (n - c1 - 1) / 32; c5 += 1)
           for (c9 = max(c1 + 2, 32 * c3); c9 <= min(n - c1 - 1, 32 * c3 + 31); c9 += 1)
-            for (c11 = max(c1 + 2, 32 * c5); c11 <= min(n - c1 - 1, 32 * c5 + 31); c11 += 1)
+            for (c11 = max(c1 + 2, 32 * c5); c11 <= min(n - c1 - 1, 32 * c5 + 31); c11 += 1){
               a[c9][c11]=a[c9][c11]-w[c9][c1+1]*a[c1+1][c11]-w[c9][n-c1+1+1]*a[n-c1+1+1][c11];
+              }
       } else
         for (c9 = max(c1 + 2, 32 * c3); c9 <= min(n - c1 - 1, 32 * c3 + 31); c9 += 1) {
           w[c9][c1+1]=a[n-c1+1+1][n-c1+1+1]*a[c9][c1+1]-a[n-c1+1+1][c1+1]*a[c9][n-c1+1+1]/det;
           w[c9][n-c1+1+1]=a[c1+1][c1+1]*a[c9][n-c1+1+1]-a[c1+1][n-c1+1+1]*a[c9][c1+1]/det;
+
         }
     }
 }
+
 
 }
 
@@ -137,7 +142,7 @@ printf("Checking...");
                     printf("Error w!\n");
 
 
-                printf("%.8f %.8f %.8f %.8f\n",a[i][j],a1[i][j],w[i][j],w1[i][j]);
+                printf("%.8f %.8f %.8f %.8f %i %i\n",a[i][j],a1[i][j],w[i][j],w1[i][j],i,j);
                 exit(0);
                 }
 
