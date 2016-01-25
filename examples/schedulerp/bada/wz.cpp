@@ -72,7 +72,7 @@ if(kind == 1){
 
 else if(kind == 3){
 
-
+printf("pl\n");
   int t1, t2, t3, t4, t5;
  int lb, ub, lbp, ubp, lb2, ub2;
  register int lbv, ubv;
