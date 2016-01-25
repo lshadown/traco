@@ -22,7 +22,8 @@ int main(int argc, char *argv[]) {
 	int cpus = atoi(argv[3]);
 	int z = 0;
 	float det=1;
-	b=n=N;
+	n=N;
+	b=(n+2)/2;
 
 	omp_set_num_threads(cpus);
 
