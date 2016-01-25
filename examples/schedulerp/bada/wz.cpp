@@ -157,7 +157,7 @@ for (c1 = 0; c1 < b; c1 += 1) {
 
     if(kind != 1){
 
-/*
+
     for(k=1; k<=b; k++){
       det = a1[k][k]*a1[n-k+1][n-k+1] - a1[n-k+1][k]*a1[k][n-k+1];
       for(i=k+1; i<=n-k; i++){
@@ -189,7 +189,7 @@ printf("Checking...");
                 }
 
               }
-*/
+
     }
 
 
