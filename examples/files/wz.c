@@ -1,5 +1,5 @@
 #pragma scop
-if(2*b == n+2){
+if(2*b == n+2 && n > 2){
 for(k=1; k<=b; k++){
    for(i=0; i<1; i++){
      for(j=0; j<1; j++){
