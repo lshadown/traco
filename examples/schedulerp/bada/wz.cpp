@@ -74,8 +74,48 @@ else if(kind == 3){
 
 
   int t1, t2, t3, t4, t5;
-
+ int lb, ub, lbp, ubp, lb2, ub2;
  register int lbv, ubv;
+/* Start of CLooG code */
+if ((b >= 3) && (2*b == n+2)) {
+  for (t1=1;t1<=b;t1++) {
+    for (t2=max(-1,ceild(29*t1-29*b,32));t2<=min(floord(-t1+2*b-2,16),floord(-3*t1+5*b-6,32));t2++) {
+      if (t2 == 0) {
+        det[t1] = a[t1][t1]*a[n-t1+1][n-t1+1] - a[n-t1+1][t1]*a[t1][n-t1+1];;
+      }
+      if (t1 <= b-2) {
+        lbp=max(0,ceild(t1+32*t2-2*b+2,32));
+        ubp=min(floord(-t1+2*b-2,32),floord(-t1+32*t2+30,32));
+#pragma omp parallel for private(lbv,ubv,t4,t5)
+        for (t3=lbp;t3<=ubp;t3++) {
+          if ((t1 <= 30) && (t3 == 0)) {
+            for (t4=max(32*t2,t1+1);t4<=min(32*t2+31,-t1+2*b-2);t4++) {
+              w[t4][t1] = a[n-t1+1][n-t1+1]*a[t4][t1] - a[n-t1+1][t1]*a[t4][n-t1+1]/det[t1];;
+              w[t4][n-t1+1] = a[t1][t1]*a[t4][n-t1+1] - a[t1][n-t1+1]*a[t4][t1] / det[t1];;
+              for (t5=t1+1;t5<=min(31,-t1+2*b-2);t5++) {
+                a[t4][t5] = a[t4][t5] - w[t4][t1]*a[t1][t5] - w[t4][n-t1+1]*a[n-t1+1][t5];;
+              }
+            }
+          }
+          if ((t1 >= 31) && (t3 == 0)) {
+            for (t4=max(32*t2,t1+1);t4<=min(32*t2+31,-t1+2*b-2);t4++) {
+              w[t4][t1] = a[n-t1+1][n-t1+1]*a[t4][t1] - a[n-t1+1][t1]*a[t4][n-t1+1]/det[t1];;
+              w[t4][n-t1+1] = a[t1][t1]*a[t4][n-t1+1] - a[t1][n-t1+1]*a[t4][t1] / det[t1];;
+            }
+          }
+          if (t1 <= 32*t3+30) {
+            for (t4=max(t1+1,32*t2-32*t3);t4<=min(min(32*t2-1,-t1+2*b-2),32*t2-32*t3+31);t4++) {
+              for (t5=max(32*t3,t1+1);t5<=min(32*t3+31,-t1+2*b-2);t5++) {
+                a[t4][t5] = a[t4][t5] - w[t4][t1]*a[t1][t5] - w[t4][n-t1+1]*a[n-t1+1][t5];;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+/* End of CLooG code */
 
 
 }
