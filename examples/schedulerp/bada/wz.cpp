@@ -89,12 +89,14 @@ for (c1 = 0; c1 < b; c1 += 1) {
   register int ub = floord(n - c1 - 1, 32);
   #pragma omp parallel for
   for (c3 = (c1 + 2) / 32; c3 <= ub; c3 += 1)
-  {
+    for (c4 = 4; c4 <= 5; c4 += 1) {
+      if (c4 == 5) {
         for (c5 = (c1 + 2) / 32; c5 <= (n - c1 - 1) / 32; c5 += 1)
           for (c9 = max(c1 + 2, 32 * c3); c9 <= min(n - c1 - 1, 32 * c3 + 31); c9 += 1)
             for (c11 = max(c1 + 2, 32 * c5); c11 <= min(n - c1 - 1, 32 * c5 + 31); c11 += 1){
               a[c9][c11]=a[c9][c11]-w[c9][c1+1]*a[c1+1][c11]-w[c9][n-c1+1+1]*a[n-c1+1+1][c11];
               }
+      } else
         for (c9 = max(c1 + 2, 32 * c3); c9 <= min(n - c1 - 1, 32 * c3 + 31); c9 += 1) {
           w[c9][c1+1]=a[n-c1+1+1][n-c1+1+1]*a[c9][c1+1]-a[n-c1+1+1][c1+1]*a[c9][n-c1+1+1]/det;
           w[c9][n-c1+1+1]=a[c1+1][c1+1]*a[c9][n-c1+1+1]-a[c1+1][n-c1+1+1]*a[c9][c1+1]/det;
