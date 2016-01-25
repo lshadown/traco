@@ -128,6 +128,7 @@ for (c1 = 0; c1 < b; c1 += 1) {
       }
       }
      }
+
 /*
 printf("Checking...");
 
@@ -150,7 +151,7 @@ printf("Checking...");
 
     }
 */
-
+}
 	// Clean-up and exit the function
 	fflush(stdout);
 	return 0;
