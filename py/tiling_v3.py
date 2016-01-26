@@ -173,10 +173,6 @@ def MakeBij(_SYM, vars, sym_exvars, par_vars, stuff, BLOCK, dane, par_tiling):
             Bij = Bij + " || "
         
     Bij = Bij + ")};"
-    print Bij
-    print '00000000000000----------------000000000000000000'
-    print dane
-    return Bij
 
 
 def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, BLOCK, dane, dane2, par_tiling):
