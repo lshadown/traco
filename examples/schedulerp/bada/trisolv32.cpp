@@ -71,30 +71,31 @@ else{
     //traco
 
 int c0,c1,c2,c3,c4,c5,c6,c7,c8,c10,c12,c9,c11;
-int UB = floord(N - 1, 16);
+int UB = floord(N - 1, 32);
+
 
 
 #pragma omp parallel for
-for (c1 = 0; c1 <= UB + 1; c1 += 1)
-  for (c3 = 0; c3 <= floord(N - 1, 16); c3 += 1) {
-    for (c5 = c3; c5 <= min(c3 + 1, (N + 14) / 16); c5 += 1)
-      for (c7 = max(16 * c3, 16 * c5 - 15); c7 <= min(min(N - 1, 16 * c3 + 15), 16 * c5); c7 += 1)
-        for (c11 = 16 * c1; c11 <= min(N + 15, 16 * c1 + 15); c11 += 1)
-          //B[c7][c11]=B[c7][c11]/L[c7][c7];
+for (c0 = 0; c0 <= UB; c0 += 1)
+  for (c2 = 0; c2 <= (N - 1) / 32; c2 += 1)
+    for (c4 = max(c2 - 1, 0); c4 <= min(floord(N - 2, 32), c2); c4 += 1) {
+      for (c6 = max(32 * c4 + 1, 32 * c2); c6 <= min(min(N - 1, 32 * c4 + 32), 32 * c2 + 31); c6 += 1) {
+        if (c4 == c2)
+          for (c8 = 32 * c0; c8 <= min(32 * c0 + 31, N - 1); c8 += 1)
+            for (c10 = 32 * c2 + 1; c10 < c6; c10 += 1)
+              //B[c8][c10]=B[c8][c10]-L[c8][c6]*B[c6][c10];
+              z++;
+        for (c8 = 32 * c0; c8 <= min(N - 1, 32 * c0 + 31); c8 += 1)
+          //B[c6][c8]=B[c6][c8]/L[c6][c6];
           z++;
-    if (N >= 16 * c1 + 2)
-      for (c5 = c1; c5 <= c3; c5 += 1) {
-        for (c9 = max(16 * c1 + 1, 16 * c5); c9 <= min(N - 1, 16 * c5 + 15); c9 += 1)
-          for (c11 = 16 * c1; c11 <= min(16 * c1 + 15, c9 - 1); c11 += 1)
-          //  B[16*c3][c11]=B[16*c3][c11]-L[16*c3][c9]*B[c9][c11];
-          z++;
-        if (N >= 16 * c3 + 2 && c5 == c3)
-          for (c9 = 16 * c1 + 1; c9 < 16 * c3; c9 += 1)
-            for (c11 = 16 * c1; c11 <= min(16 * c1 + 15, c9 - 1); c11 += 1)
-            //  B[16*c3+1][c11]=B[16*c3+1][c11]-L[16*c3+1][c9]*B[c9][c11];
-            z++;
       }
-  }
+      if (c4 == c2)
+        for (c6 = 32 * c2 + 32; c6 < N; c6 += 1)
+          for (c8 = 32 * c0; c8 <= min(N - 1, 32 * c0 + 31); c8 += 1)
+            for (c10 = 32 * c2 + 1; c10 <= 32 * c2 + 31; c10 += 1)
+              //B[c8][c10]=B[c8][c10]-L[c8][c6]*B[c6][c10];
+              z++;
+    }
 
 }
     double end1 = omp_get_wtime();
