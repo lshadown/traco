@@ -1050,9 +1050,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         #poprawka intersect z IS - EKSPERYMENTALNA !!!!
         IS = getIS(plik, isl_rel, dane)
-        print IS
+        #print IS
         # sys.exit(0)
-        isl_TILEprim[i] = isl_TILEprim[i].intersect(IS).coalesce()
+        #isl_TILEprim[i] = isl_TILEprim[i].intersect(IS).coalesce()
 
         for ll in range(0,i):
             isl_TILEprim[i] = isl_TILEprim[i].subtract(isl_TILEprim[ll]).coalesce()
