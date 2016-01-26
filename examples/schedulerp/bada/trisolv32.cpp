@@ -75,7 +75,7 @@ int c0,c1,c2,c3,c4,c5,c6,c7,c8,c10,c12,c9,c11;
 int UB = floord(N - 1, 32);
 
 
-
+/*
 #pragma omp parallel for
 for (c1 = 0; c1 <= UB; c1 += 1)
   for (c3 = 0; c3 <= (N - 1) / 32; c3 += 1)
@@ -101,6 +101,32 @@ for (c1 = 0; c1 <= UB; c1 += 1)
                 B[c9][c7]=B[c9][c7]-L[c9][c11]*B[c11][c7];
                // z++;
               }
+    }
+    */
+
+
+    #pragma omp parallel for
+for (c1 = 0; c1 <= UB; c1 += 1)
+  for (c3 = 0; c3 <= (N - 1) / 32; c3 += 1)
+    for (c4 = max(2, -N + 4); c4 <= 3; c4 += 1) {
+      if (c4 == 3) {
+        for (c7 = 32 * c1; c7 <= min(N - 1, 32 * c1 + 31); c7 += 1)
+          for (c9 = 32 * c3; c9 <= min(N - 1, 32 * c3 + 31); c9 += 1)
+            for (c10 = max(2, 32 * c3 - c9 + 3); c10 <= 3; c10 += 1) {
+              if (c10 == 3) {
+                //B[c9][c7]=B[c9][c7]/L[c9][c9];
+                z++;
+              } else
+                for (c11 = 32 * c3; c11 < c9; c11 += 1)
+                  //B[c9][c7]=B[c9][c7]-L[c9][c11]*B[c11][c7];
+                  z++;
+            }
+      } else
+        for (c5 = 0; c5 <= min(c3, (N - 2) / 32); c5 += 1)
+          for (c7 = 32 * c1; c7 <= min(N - 1, 32 * c1 + 31); c7 += 1)
+            for (c9 = max(32 * c3, 32 * c5 + 1); c9 <= min(N - 1, 32 * c3 + 31); c9 += 1)
+              for (c11 = 32 * c5; c11 <= min(32 * c3, 32 * c5 + 31); c11 += 1)
+                z++; //B[c9][c7]=B[c9][c7]-L[c9][c11]*B[c11][c7];
     }
 
 }
