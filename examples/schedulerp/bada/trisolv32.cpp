@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     int kind = atoi(argv[1]);
 	int N = atoi(argv[2]);
 	int cpus = atoi(argv[3]);
-
+    int z = 0;
 	omp_set_num_threads(cpus);
 
 	int k,l,i,j,t,loop=N,n=N;
@@ -56,9 +56,11 @@ if(kind == 1){
         for (j=0;j<=N-1;j++) {
             for (k=0;k<=j-1;k++) {
                 B[j][i]=B[j][i]-L[j][k]*B[k][i];
+                z++;
 
             }
             B[j][i]=B[j][i]/L[j][j];
+            z++;
         }
     }
 
@@ -78,16 +80,19 @@ for (c1 = 0; c1 <= UB + 1; c1 += 1)
     for (c5 = c3; c5 <= min(c3 + 1, (N + 14) / 16); c5 += 1)
       for (c7 = max(16 * c3, 16 * c5 - 15); c7 <= min(min(N - 1, 16 * c3 + 15), 16 * c5); c7 += 1)
         for (c11 = 16 * c1; c11 <= min(N + 15, 16 * c1 + 15); c11 += 1)
-          B[c7][c11]=B[c7][c11]/L[c7][c7];
+          //B[c7][c11]=B[c7][c11]/L[c7][c7];
+          z++;
     if (N >= 16 * c1 + 2)
       for (c5 = c1; c5 <= c3; c5 += 1) {
         for (c9 = max(16 * c1 + 1, 16 * c5); c9 <= min(N - 1, 16 * c5 + 15); c9 += 1)
           for (c11 = 16 * c1; c11 <= min(16 * c1 + 15, c9 - 1); c11 += 1)
-            B[16*c3][c11]=B[16*c3][c11]-L[16*c3][c9]*B[c9][c11];
+          //  B[16*c3][c11]=B[16*c3][c11]-L[16*c3][c9]*B[c9][c11];
+          z++;
         if (N >= 16 * c3 + 2 && c5 == c3)
           for (c9 = 16 * c1 + 1; c9 < 16 * c3; c9 += 1)
             for (c11 = 16 * c1; c11 <= min(16 * c1 + 15, c9 - 1); c11 += 1)
-              B[16*c3+1][c11]=B[16*c3+1][c11]-L[16*c3+1][c9]*B[c9][c11];
+            //  B[16*c3+1][c11]=B[16*c3+1][c11]-L[16*c3+1][c9]*B[c9][c11];
+            z++;
       }
   }
 
@@ -117,9 +122,7 @@ for (c1 = 0; c1 <= UB + 1; c1 += 1)
 
     }
 
-
-
-	#pragma endscop
+    printf("%i\n", z);
 
 	// Clean-up and exit the function
 	fflush(stdout);
