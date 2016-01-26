@@ -161,8 +161,8 @@ def MakeBij(_SYM, vars, sym_exvars, par_vars, stuff, BLOCK, dane, par_tiling):
     
     #eksperymentalnie gorna granica zawsze wieksza od dolnej   
     for i in range(0,len(dane['path'])):  #
-        #l = dane['path'][i]
-        l = i
+        l = dane['path'][i]
+        #l = i
         Bij = Bij + stuff[l]['lb'] + ' <= ' + stuff[l]['ub'] + ' && '
         
     Bij = Bij + "("
@@ -173,6 +173,9 @@ def MakeBij(_SYM, vars, sym_exvars, par_vars, stuff, BLOCK, dane, par_tiling):
             Bij = Bij + " || "
         
     Bij = Bij + ")};"
+    print Bij
+    print '00000000000000----------------000000000000000000'
+    print dane
     return Bij
 
 
@@ -493,7 +496,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print 'Perfectly nested loop mode: enabled'
 
 
-    simpl_ub = True
+    simpl_ub = False
 
     BLOCK = block.split(',')
     par_tiling = False
@@ -926,6 +929,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         Bij = MakeBij(_SYM, vars, sym_exvars, im_par_vars, stuff, BLOCK, instrukcje[i], par_tiling)
         isl_TILE.append(isl.Set(str(Bij).replace("_Bij := ", "")))
 
+        print 'T --------------------------------------------'
+        print stuff
+        print isl_TILE[i]
+
         # oblicz II_SET
         if(False):
             if(len(symb) > 0):
@@ -997,6 +1004,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         isl_TILE2.append(isl_BPREV)
 
         isl_TILEprim.append(isl_TILE1[i].union(isl_TILE2[i]).coalesce())
+        #isl_TILEprim.append(isl_TILE[i])
 
         # print isl_TILEprim[0]
 
@@ -1119,7 +1127,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #Extend = True
 
     #print imperf
-    #sys.exit(0);
+
+
 
     _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, 0)
 

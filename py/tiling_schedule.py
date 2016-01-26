@@ -739,6 +739,8 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
     #print isl_TILEbis
     srepr,rucs = slicing.Create_Srepr(isl_rel, isl_relclosure)
 
+
+
     fs = 0
 
     ir = isl_rel.domain().union(isl_rel.range()).coalesce()
@@ -748,7 +750,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
     if(Extend):
         for i in range(0, 2*len(sym_exvars)):
-            ir = ir.insert_dims(isl.dim_type.set, 2*i+1, 1)
+            ir = ir.insert_dims(isl.dim_type.set, 2*i, 1)
 
     srepr = srepr.insert_dims(isl.dim_type.set, 0, len(sym_exvars))
     for i in range(0, len(sym_exvars)):
@@ -756,7 +758,10 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
     if(Extend):
         for i in range(0, 2*len(sym_exvars)):
-            srepr = srepr.insert_dims(isl.dim_type.set, 2*i+1, 1)
+            srepr = srepr.insert_dims(isl.dim_type.set, 2*i, 1)
+
+
+
 
 
     x = 1
@@ -804,6 +809,8 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
     TILE_SOUR = isl_TILEbis.intersect(srepr).coalesce()
 
 
+
+
     TILE_IND = isl_TILEbis.subtract(isl_TILEbis.intersect(ir)).coalesce()
 
     indloop =  iscc.iscc_communicate("L :=" + str(TILE_IND) + "; codegen L;")
@@ -841,12 +848,17 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
 
     
-    Exp = True
+    Exp = False
     TMP2 = TILE_SOUR
     if(Exp and fs != 1):
         rel_simple = rbis.intersect(rel_)
+        print rel_simple
+
         rel_simple = rel_simple.project_out(isl.dim_type.in_, x*len(sym_exvars),x*len(sym_exvars))
         rel_simple = rel_simple.project_out(isl.dim_type.out, x*len(sym_exvars),x*len(sym_exvars))
+
+
+
         relw = isl.Map(Rel_W)
         rel_simple = rel_simple.intersect(relw).coalesce()
 
@@ -856,8 +868,19 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
         print rel_simple
 
         #independent tiles
+
+
         indt = rel_simple.domain().union(rel_simple.range()).coalesce()
-        indt = ii_SET.subtract(indt).coalesce()
+
+
+        print indt
+        #print II_SET
+
+        #indt = ii_SET.subtract(indt).coalesce()
+
+        # II_SET z Clana
+
+
 
 
         rel_simple_plus = rel_simple.transitive_closure()[0]
@@ -867,9 +890,16 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
         srepr,rucs = slicing.Create_Srepr(rel_simple, rel_simple_plus)
 
+        print srepr
+        sys.exit(0)
+
+        # NAPRAWIC
+
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         #add independent tiles for srepr
-        srepr = srepr.union(indt).coalesce()
+
+
+        #srepr = srepr.union(indt).coalesce()
 
         print "SREPR"
         print srepr
@@ -883,6 +913,10 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
        # srepr = imperf_tile.SimplifySlice(srepr)
         srepr = srepr.insert_dims(isl.dim_type.set, x*len(sym_exvars), x*len(sym_exvars))
         TILE_SOUR = isl_TILEbis.intersect(srepr).coalesce()
+
+
+
+
         TMP2 = TILE_SOUR
 
     

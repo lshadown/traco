@@ -96,10 +96,12 @@ def Create_UDS(isl_rel):
 
 def Create_Srepr(isl_rel, isl_relclosure):
     uds = Create_UDS(isl_rel)
+    print isl_rel
     rucs =  Create_RUCS(isl_rel, isl_relclosure, uds, uds)
     srepr = uds.subtract(rucs.range()).coalesce()
     if srepr.is_empty():
         srepr = uds
+    print uds
     return [srepr,rucs]
 
 
