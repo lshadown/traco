@@ -170,9 +170,10 @@ for (l = 0; l < N; l++){
         {
           for(i = 0; i < N; i++)
             for (j = 0; j < N; j++){
-              if(path1[i][j] != path[i][j])
+              if(path1[i][j] != path[i][j]){
                 printf("Error!\n");
                 exit(0);
+              }
               }
         }
     }
