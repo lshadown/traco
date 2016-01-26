@@ -115,7 +115,7 @@ for (c1 = 0; c1 <= UB + 1; c1 += 1)
     for (i=0;i<=N-1;i++) {
         for (j=0;j<=N-1;j++) {
               if(B[j][k] != B1[j][k])
-                printf("Error!\n %.f %.f\n", B[i][j], B1[i][j]);
+              //  printf("Error!\n %.f %.f\n", B[i][j], B1[i][j]);
              //   exit(0);
               }
         }
