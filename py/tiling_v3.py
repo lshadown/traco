@@ -25,6 +25,7 @@ import test_isl
 import relation_util
 
 import Dependence
+import clanpy
 
 
 from CPython import codegen
@@ -122,7 +123,8 @@ def Constraint(vars, sym_exvars, stuff, BLOCK, dane,par_vars,par_tiling):
     
   ##########################################
   ##########################################
-    
+
+
     if(dane["max_loop"] == dane["nest"]):
         for i in range(dane["max_loop"], len(sym_exvars)):
             s = s + sym_exvars[i] + " = 0 && "
@@ -171,8 +173,10 @@ def MakeBij(_SYM, vars, sym_exvars, par_vars, stuff, BLOCK, dane, par_tiling):
         Bij = Bij + " v = "+ str(dane['st'][i])
         if(i < len(dane['st'])-1):
             Bij = Bij + " || "
-        
+
     Bij = Bij + ")};"
+
+
     return Bij
 
 
@@ -478,6 +482,47 @@ def MultiNest(instrukcje):
                         return True
     return False
 ###############################################################
+
+def getIS(plik, rel, dane):
+    global_size = rel.dim(isl.dim_type.in_)
+
+    #UDS = rel.domain().subtract(rel.range()).coalesce()
+    #UDD = rel.range().subtract(rel.domain()).coalesce()
+    DOM_RAN = rel.range().union(rel.domain()).coalesce()
+
+    cl = clanpy.ClanPy()
+    cl.loop_path = plik
+    cl.Load()
+    cl.RunCandl()
+
+    IS = DOM_RAN
+    for i in range(0, len(cl.statements)):
+        IS_ =  isl.Set(cl.statements[i].domain_map).coalesce()
+
+        set_size = IS_.dim(isl.dim_type.set)
+
+        for j in range(set_size, global_size-1):
+            IS_ = IS_.insert_dims(isl.dim_type.set, j, 1)
+            IS_ = IS_.set_dim_name(isl.dim_type.set, j, 'i' + str(j))
+            c= isl.Constraint.eq_from_names(IS_.get_space(), {IS_.get_dim_name(isl.dim_type.set, j): -1, 1:-1})
+            IS_ = IS_.add_constraint(c).coalesce()
+
+        set_size = IS_.dim(isl.dim_type.set)
+
+        IS_= IS_.insert_dims(isl.dim_type.set, set_size, 1)
+        IS_ = IS_.set_dim_name(isl.dim_type.set, set_size, "v")
+
+        c= isl.Constraint.eq_from_names(IS_.get_space(), {"v": -1, 1:int(dane[i])})
+        IS_ = IS_.add_constraint(c).coalesce()
+
+
+
+        if i == 0:
+            IS = IS_
+        else:
+            IS = IS.union(IS_).coalesce()
+
+    return IS
 
 
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
@@ -930,6 +975,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print stuff
         print isl_TILE[i]
 
+
         # oblicz II_SET
         if(False):
             if(len(symb) > 0):
@@ -1001,6 +1047,18 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         isl_TILE2.append(isl_BPREV)
 
         isl_TILEprim.append(isl_TILE1[i].union(isl_TILE2[i]).coalesce())
+
+        #poprawka intersect z IS - EKSPERYMENTALNA !!!!
+        IS = getIS(plik, isl_rel, dane)
+        print IS
+        # sys.exit(0)
+        isl_TILEprim[i] = isl_TILEprim[i].intersect(IS).coalesce()
+
+        for ll in range(0,i):
+            isl_TILEprim[i] = isl_TILEprim[i].subtract(isl_TILEprim[ll]).coalesce()
+        #############################
+
+
         #isl_TILEprim.append(isl_TILE[i])
 
         # print isl_TILEprim[0]
@@ -1052,6 +1110,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         isl_TILEbis.append(Project(isl_TILEprim[i].apply(Rapply).coalesce(), sym_exvars).coalesce())
         isl_TILEorig.append(Project(isl_TILE[i].apply(Rapply).coalesce(), sym_exvars).coalesce())
+
+
+
+
+
 
         if(_debug_):
             print "TILE"
