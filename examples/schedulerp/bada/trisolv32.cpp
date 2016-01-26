@@ -51,7 +51,7 @@ double start = omp_get_wtime();
 if(kind == 1){
 
 
-#pragma scop
+
     for (i=0;i<=N-1;i++) {
         for (j=0;j<=N-1;j++) {
             for (k=0;k<=j-1;k++) {
@@ -61,7 +61,7 @@ if(kind == 1){
             B[j][i]=B[j][i]/L[j][j];
         }
     }
-#pragma endscop
+
 }
 
 else{
