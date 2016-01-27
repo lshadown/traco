@@ -86,7 +86,8 @@ int main(int argc, char** argv)
   int i, j, j1, j2;
   // float *mean, *stddev;
 
-	int cpus = atoi(argv[1]);
+	int cpus = atoi(argv[2]);
+	    int kind = atoi(argv[1]);
 
 	omp_set_num_threads(cpus);
 
@@ -131,9 +132,19 @@ int main(int argc, char** argv)
 
 
 
-
-
-
+if(kind==1){
+  for (j1 = 1; j1 <= M-1; j1++)
+  {
+    symmat[j1][j1] = 1.0;
+    for (j2 = j1+1; j2 <= M; j2++)
+    {
+      symmat[j1][j2] = 0.0;
+      for (i = 1; i <= N; i++)
+        symmat[j1][j2] += ( data[i][j1] * data[i][j2]);
+      symmat[j2][j1] = symmat[j1][j2];
+    }
+  }}
+else{
  int c0,  c1, c2, c4, c6, c8, c10, c3,c7,c5,c9,c11;
 #pragma omp parallel for
 for (c1 = 0; c1 <= (M - 2)/16; c1 += 1)
@@ -166,7 +177,7 @@ for (c1 = 0; c1 <= (M - 2)/16; c1 += 1)
         symmat[c7][c7]=1.0;
   }
 
-
+}
 
   symmat[M][M] = 1.0;
 
