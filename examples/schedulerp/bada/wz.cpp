@@ -65,6 +65,7 @@ if(kind == 1){
         for(j=k+1; j<=n-k; j++){
           a[i][j] = a[i][j] - w[i][k]*a[k][j] - w[i][n-k+1]*a[n-k+1][j];
 
+
       }
      }
    }
@@ -123,29 +124,26 @@ if ((b >= 3) && (2*b == n+2)) {
 else{
 
     //traco
-    int c0,c1,c2,c3,c4,c5,c6,c8,l,c9,c11;
+    int c0,c1,c2,c3,c4,c5,c6,c7,c8,l,c9,c11;
 
-for (c1 = 0; c1 < b; c1 += 1) {
-  det=a[c1+1][c1+1]*a[n-c1+1+1][n-c1+1+1]-a[n-c1+1+1][c1+1]*a[c1+1][n-c1+1+1];
-  register int ub = floord(n - c1 - 1, 32);
-  #pragma omp parallel for
-  for (c3 = (c1 + 2) / 32; c3 <= ub; c3 += 1)
-    for (c4 = 4; c4 <= 5; c4 += 1) {
-      if (c4 == 5) {
-        for (c5 = (c1 + 2) / 32; c5 <= (n - c1 - 1) / 32; c5 += 1)
-          for (c9 = max(c1 + 2, 32 * c3); c9 <= min(n - c1 - 1, 32 * c3 + 31); c9 += 1)
-            for (c11 = max(c1 + 2, 32 * c5); c11 <= min(n - c1 - 1, 32 * c5 + 31); c11 += 1){
-              a[c9][c11]=a[c9][c11]-w[c9][c1+1]*a[c1+1][c11]-w[c9][n-c1+1+1]*a[n-c1+1+1][c11];
-              }
-      } else
-        for (c9 = max(c1 + 2, 32 * c3); c9 <= min(n - c1 - 1, 32 * c3 + 31); c9 += 1) {
-          w[c9][c1+1]=a[n-c1+1+1][n-c1+1+1]*a[c9][c1+1]-a[n-c1+1+1][c1+1]*a[c9][n-c1+1+1]/det;
-          w[c9][n-c1+1+1]=a[c1+1][c1+1]*a[c9][n-c1+1+1]-a[c1+1][n-c1+1+1]*a[c9][c1+1]/det;
 
+for(c0=1; c0<=b; c0++){
+  det = a[c0][c0]*a[n-c0+1][n-c0+1] - a[n-c0+1][c0]*a[c0][n-c0+1];
+  #pragma omp parallel for private(det)
+    for (c1 = 0; c1 <= (-2 * c0 + n - 1)/32; c1 += 1) {
+      for (c2 = 1; c2 <= 2; c2 += 1)
+        for (c5 = c0 + 32 * c1 + 1; c5 <= min(-c0 + n, c0 + 32 * c1 + 32); c5 += 1) {
+          if (c2 == 2) {
+            w[c5][n-c0+1]=a[c0][c0]*a[c5][n-c0+1]-a[c0][n-c0+1]*a[c5][c0]/det;
+          } else
+            w[c5][c0]=a[n-c0+1][n-c0+1]*a[c5][c0]-a[n-c0+1][c0]*a[c5][n-c0+1]/det;
         }
+      for (c3 = max(0, floord(c0 + 1, 32)); c3 <= floord(-c0 + n, 32); c3 += 1)
+        for (c5 = c0 + 32 * c1 + 1; c5 <= min(-c0 + n, c0 + 32 * c1 + 32); c5 += 1)
+          for (c7 = max(c0 + 1, 32 * c3); c7 <= min(-c0 + n, 32 * c3 + 31); c7 += 1)
+            a[c5][c7]=a[c5][c7]-w[c5][c0]*a[c0][c7]-w[c5][n-c0+1]*a[n-c0+1][c7];
     }
 }
-
 
 }
 
@@ -168,29 +166,34 @@ for (c1 = 0; c1 < b; c1 += 1) {
           a1[i][j] = a1[i][j] - w1[i][k]*a1[k][j] - w1[i][n-k+1]*a1[n-k+1][j];
       }
       }
-     }
 
-/*
+    }
+
+
 printf("Checking...");
 
           for(i = 0; i < 2*N; i++)
             for (j = 0; j < 2*N; j++){
-              if(a[i][j] != a1[i][j]){
+              if((a[i][j] != a1[i][j] && !isnan(a[i][j]) && !isnan(a[i][j])) ||
+                  (w[i][j] != w1[i][j] && !isnan(w[i][j]) && !isnan(w[i][j] )))
+                   {
 
-                if(a[i][j] != a1[i][j])
+                if(a[i][j] != a1[i][j]){
                     printf("Error a!\n");
 
-                //if(w[i][j] != w1[i][j])
-                 //   printf("Error w!\n");
+                if(w[i][j] != w1[i][j])
+                    printf("Error w!\n");
 
 
-              //  printf("%.8f %.8f %.8f %.8f %i %i\n",a[i][j],a1[i][j],w[i][j],w1[i][j],i,j);
+                printf("%.8f %.8f %.8f %.8f %i %i\n",a[i][j],a1[i][j],w[i][j],w1[i][j],i,j);
                 exit(0);
+               }
                 }
 
               }
 
     }
+    printf("OK");
 
 
 	// Clean-up and exit the function
