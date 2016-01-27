@@ -139,6 +139,8 @@ int main(int argc, char** argv)
       data[i][j] /= sqrt(float_n) * stddev[j];
     }
 
+
+
 #pragma scop
   /* Calculate the m * m correlation matrix. */
   for (j1 = 1; j1 <= M-1; j1++)

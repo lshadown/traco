@@ -12,8 +12,11 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/time.h>
 #include <math.h>
+#include <omp.h>
+#include <omp.h>
 
 #define my_sqrt_array(x,j) sqrt(x[j])
 
@@ -81,6 +84,11 @@ int main(int argc, char** argv)
   double t_start, t_end;
   int i, j, j1, j2;
 
+  	int cpus = atoi(argv[2]);
+	    int kind = atoi(argv[1]);
+
+	omp_set_num_threads(cpus);
+
   init_array();
 
   IF_TIME(t_start = rtclock());
@@ -104,27 +112,39 @@ int main(int argc, char** argv)
     }
   }
 
-
-
-
-int c0, c2, c4, c6, c8, c10;
-
-if (N >= 1)
-  for (c0 = 0; c0 <= floord(M - 1, 32); c0 += 1) {
-    for (c2 = 0; c2 <= -c0 + (M - 1) / 32; c2 += 1)
-      for (c4 = 0; c4 <= floord(N - 1, 32); c4 += 1)
-        for (c6 = 32 * c0 + 1; c6 <= min(32 * c0 + 32, M - 32 * c2); c6 += 1)
-          for (c8 = 32 * c4 + 1; c8 <= min(N, 32 * c4 + 32); c8 += 1)
-            for (c10 = 32 * c2 + c6; c10 <= min(M, 32 * c2 + c6 + 31); c10 += 1)
-              symmat[c6][c10]+=data[c8][c6]*data[c8][c10];
-    for (c2 = 0; c2 <= -c0 + (M - 1) / 32; c2 += 1)
-      for (c6 = 32 * c0 + 1; c6 <= min(32 * c0 + 32, M - 32 * c2); c6 += 1)
-        for (c8 = 32 * c2 + c6; c8 <= min(M, 32 * c2 + c6 + 31); c8 += 1)
-          symmat[c8][c6]=symmat[c6][c8];
+if(kind==1){
+#pragma scop
+  for (j1 = 1; j1 <= M; j1++) {
+    for (j2 = j1; j2 <= M; j2++) {
+      for (i = 1; i <= N; i++) {
+        symmat[j1][j2] += data[i][j1] * data[i][j2];
+      }
+      symmat[j2][j1] = symmat[j1][j2];
+    }
   }
 
+#pragma endscop
+}
+else{
+ int c0,  c1, c2, c4, c6, c8, c10, c3,c7,c5,c9,c11;
 
 
+if (N >= 1)
+#pragma omp parallel for
+  for (c1 = 0; c1 <= (M - 1) / 32; c1 += 1)
+    for (c3 = 0; c3 <= -c1 + (M - 1) / 32; c3 += 1)
+      if (c1 >= 0 && N >= 1 && c3 >= 0) {
+        for (c7 = 32 * c1 + 1; c7 <= min(32 * c1 + 32, M - 32 * c3); c7 += 1)
+          for (c9 = 32 * c3 + c7; c9 <= min(M, 32 * c3 + c7 + 31); c9 += 1)
+            symmat[c9][c7]=symmat[c7][c9];
+        for (c5 = 0; c5 <= floord(N - 1, 32); c5 += 1)
+          for (c7 = 32 * c1 + 1; c7 <= min(32 * c1 + 32, M - 32 * c3); c7 += 1)
+            for (c9 = 32 * c3 + c7; c9 <= min(M, 32 * c3 + c7 + 31); c9 += 1)
+              for (c11 = 32 * c5 + 1; c11 <= min(N, 32 * c5 + 32); c11 += 1)
+                symmat[c7][c9]+=data[c11][c7]*data[c11][c9];
+
+      }
+}
 
   IF_TIME(t_end = rtclock());
   IF_TIME(fprintf(stdout, "%0.6lfs\n", t_end - t_start));
