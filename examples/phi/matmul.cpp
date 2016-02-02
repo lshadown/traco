@@ -96,7 +96,7 @@ for (c0 = mp/32; c0 <= (M - 1)/32; c0 += 1)
             C[c3][c4]+=A[c3][c5]*B[c5][c4];
 }
 }
-
+}
     double end1 = omp_get_wtime();
 	printf("%.3f\n", end1 - start);
 
