@@ -74,7 +74,7 @@ int UB = floord(N - 1, 32);
 {
 #pragma omp section
 {
-#pragma offload target(mic) in(A,B) out(C:length(mp*n)
+#pragma offload target(mic) in(A:length(N*N),B:length(N*N)) out(C:length(mp*N))
 #pragma omp parallel for
 for (c0 = 0; c0 <= (mp - 1)/32; c0 += 1)
   for (c1 = 0; c1 <= floord(N - 1, 32); c1 += 1)
