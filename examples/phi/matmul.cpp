@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
     int kind = atoi(argv[1]);
 	int N = atoi(argv[2]);
 	int M = N;
+	int mp = M / 2;
     int K = N;
 	int cpus = atoi(argv[3]);
     int z = 0;
@@ -64,21 +65,38 @@ if(kind == 1){
 else{
 
     //traco
-
+omp_set_nested(1);
 int c0,c1,c2,c3,c4,c5,c6,c7,c8,c10,c12,c9,c11;
 int UB = floord(N - 1, 32);
 
 
+#pragma omp parallel sections
+{
+#pragma omp section
+{
+#pragma offload target(mic) in(A,B) out(C:length(mp*n)
 #pragma omp parallel for
-for (c0 = 0; c0 <= (M - 1)/32; c0 += 1)
+for (c0 = 0; c0 <= (mp - 1)/32; c0 += 1)
   for (c1 = 0; c1 <= floord(N - 1, 32); c1 += 1)
     for (c2 = 0; c2 <= floord(K - 1, 32); c2 += 1)
       for (c3 = 32 * c0; c3 <= min(M - 1, 32 * c0 + 31); c3 += 1)
         for (c5 = 32 * c2; c5 <= min(K - 1, 32 * c2 + 31); c5 += 1)
           for (c4 = 32 * c1; c4 <= min(N - 1, 32 * c1 + 31); c4 += 1)
             C[c3][c4]+=A[c3][c5]*B[c5][c4];
-
 }
+#pragma omp section
+{
+#pragma omp parallel for
+for (c0 = mp/32; c0 <= (M - 1)/32; c0 += 1)
+  for (c1 = 0; c1 <= floord(N - 1, 32); c1 += 1)
+    for (c2 = 0; c2 <= floord(K - 1, 32); c2 += 1)
+      for (c3 = 32 * c0; c3 <= min(M - 1, 32 * c0 + 31); c3 += 1)
+        for (c5 = 32 * c2; c5 <= min(K - 1, 32 * c2 + 31); c5 += 1)
+          for (c4 = 32 * c1; c4 <= min(N - 1, 32 * c1 + 31); c4 += 1)
+            C[c3][c4]+=A[c3][c5]*B[c5][c4];
+}
+}
+
     double end1 = omp_get_wtime();
 	printf("%.3f\n", end1 - start);
 
