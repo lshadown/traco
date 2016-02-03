@@ -40,6 +40,7 @@ def oc_IterateClosure(R):
     outFile.write('R :=')
     outFile.write(islMaptoOmegaStr(R))
     outFile.write(';IterateClosure R;')
+    outFile.write(';R^+;')
     outFile.close()
 
     cmd = oc_proc

@@ -52,8 +52,11 @@ def FSwithoutRG(r):
 
     # ----------------------------------------------------
 
+
+
+
     r0p_plus = rp
-    islrplus =False
+    islrplus = False
 
     print rp
     print 'Start...'

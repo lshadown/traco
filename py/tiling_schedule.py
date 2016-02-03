@@ -741,7 +741,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
 
 
-    fs = 0
+    fs = 1
 
     ir = isl_rel.domain().union(isl_rel.range()).coalesce()
     ir = ir.insert_dims(isl.dim_type.set, 0, len(sym_exvars))

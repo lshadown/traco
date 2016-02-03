@@ -199,19 +199,19 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
         else:
             min_nest = i+1
 
-    #print dane["path"]
+
     #print dane2["path"]
     #print "===================================" + str(min_nest)
     if(dane["nest_id"] == dane2["nest_id"]):  # ta sama petla licz stara metoda
         for i in range(n-1,n):    # od 0 ????????????????????????????????????????????????????????
             for j in range(0,i):
-                #l = dane['path'][j]
-                l = j
+                l = dane['path'][j]
+                #l = j
                 tmp = Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, j, par_vars[l], dane['path'][j])
                 BLT = BLT + tmp
                 BGT = BGT + tmp
             l = dane['path'][i]
-            l = i
+            #l = i
             BLT = BLT + Constr_Przed(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i])
             BGT = BGT + Constr_Za(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i]) 
             for j in range(i+1,n):
@@ -227,8 +227,8 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
                 BGT = BGT + " or ("
     else:
         for i in range(min_nest-1,min_nest):   # od 0 ????????????????????????????????????????????????????????
-            #l = dane['path'][i]
-            l = i
+            l = dane['path'][i]
+            #l = i
             tmp = Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i])
             tmp = tmp[:-3] + " or "
             if(dane2["nest_id"] > dane["nest_id"]):
@@ -250,8 +250,8 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
 
     varcon = ") && ("
     for i in range(0, dane["nest"]):
-        #l = dane['path'][i]
-        l = i
+        l = dane['path'][i]
+        #l = i
         varcon = varcon + sym_exvars[i] + ">=0 && "
         if(par_tiling):
             varcon = varcon + par_vars[l] + "<=" + stuff[l]['ub'] +" && "
@@ -272,8 +272,8 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
             varcon = varcon + " && " + vars[i] + " = -1 " 
         else:
             if m < i+1:  # granice
-                #l = dane['path'][i]
-                l = i
+                l = dane['path'][i]
+                #l = i
                 varcon = varcon + "&& " + Constr_Dowolny(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i]) + sym_exvars[i] + " >= 0 && " 
                 varcon = varcon + Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i])
                 varcon = varcon[:-3]   
@@ -545,6 +545,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     
     for i in range(len(BLOCK),10):
         BLOCK.append(BLOCK[len(BLOCK)-1])
+
         
     if(not BLOCK[0].isdigit()):
         par_tiling = True
@@ -1004,6 +1005,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         
         for j in range(0, len(instrukcje)):
             BLGT = MakeBLTandBGT_v2(_SYM, vars, sym_exvars, im_par_vars, varsprim, exvars, stuff, BLOCK, instrukcje[j], instrukcje[i], par_tiling)   # porownaj zagniezdzenia instrukcji
+            print '-------LT ----------'
+            print BLGT[0]
             isltmp = isl.Set(str(BLGT[0]).replace("_BLT := ", ""))
             if(bltc==0):
                 isl_TILE_LT.append(isltmp)
@@ -1050,12 +1053,17 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         #poprawka intersect z IS - EKSPERYMENTALNA !!!!
         IS = getIS(plik, isl_rel, dane)
+        DOMRAN = isl_rel.domain().union(isl_rel.range()).coalesce()
+        INDDD = IS.subtract(DOMRAN).coalesce()
+        print '----------'
+        print INDDD
+        print IS
         #print IS
         # sys.exit(0)
         #isl_TILEprim[i] = isl_TILEprim[i].intersect(IS).coalesce()
 
-        for ll in range(0,i):
-            isl_TILEprim[i] = isl_TILEprim[i].subtract(isl_TILEprim[ll]).coalesce()
+        #for ll in range(0,i):
+        #    isl_TILEprim[i] = isl_TILEprim[i].subtract(isl_TILEprim[ll]).coalesce()
         #############################
 
 
@@ -1129,8 +1137,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             print isl_TILE2[i]
             print "TILE_VLD (TILE')"
             print isl_TILEprim[i]
-            print "card"
-            print test_isl.StringToCard(str(isl_TILEprim[i]))
+          #  print "card"
+          #  print test_isl.StringToCard(str(isl_TILEprim[i]))
             print "TILE_VLD_ext (TILE'')"
             print isl_TILEbis[i]
 
@@ -1174,7 +1182,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
         #if(SIMPLIFY):
-         #   isl_TILEbis[i] = imperf_tile.SimplifySlice(isl_TILEbis[i])
+        #    isl_TILEbis[i] = imperf_tile.SimplifySlice(isl_TILEbis[i])
 
 
         #print "TILE''" + "dla s" + str(i) + "\n" +  str(isl_TILEbis[i])
@@ -1193,7 +1201,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, 0)
 
     print _rap
-    
+
+
     if(Extend):
         z = isl_TILEbis[0].apply(_rap)
     else:
@@ -1360,7 +1369,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
             if(output_file != ""):
                 return ""
-            if(not schedule_mode):
+            if(not schedule_mode and 1==0):
                 rtile = tiling_schedule.get_RTILE(z, sym_exvars, isl_rel, Extend)
                 print "RTILE:"
                 print rtile
@@ -1378,6 +1387,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     Dodatek = [LPetit, dane,  maxl, step, nazwapar, permutate_list, permutate_maps]
 
     par_tiled = 0
+
+    print '!!!!'
+    print zorig
 
     if(schedule_mode and  par_tiled != 1):
         if(False):
