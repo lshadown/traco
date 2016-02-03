@@ -109,7 +109,7 @@ def Constraint(vars, sym_exvars, stuff, BLOCK, dane,par_vars,par_tiling):
 
 #par vars zle
 
-        l = i
+        #l = i
 
         # PORAWKA EKSPERYMENTALNA l = i zamiast dane[path][i]
 
@@ -398,7 +398,7 @@ def GetRapply2(vars, sym_exvars, _SYM, instrukcje, i):
 
 # poprawiona wersja  nest na kafel, nest kazdej instrukcji
 
-def GetRapply3(vars, sym_exvars, _SYM, instrukcje, i):
+def GetRapply3(vars, sym_exvars, _SYM, instrukcje, i, scat = []):
 
 
 
@@ -443,6 +443,59 @@ def GetRapply3(vars, sym_exvars, _SYM, instrukcje, i):
                     pos = instrukcje[l]['path'][j]
                 else:
                     pos = codegen.calculate_position2(l, instrukcje, len(sym_exvars))[j]   #pobierz tab[j]
+                z = z + s + "v = " + str(pos) + " and "
+                j = j + 1
+            z = z[:-4] + ") or "
+
+
+    R = R + z[:-3] + ")}"
+
+
+    isl_Rapply = isl.Map(R)
+
+
+    return isl_Rapply
+
+
+def GetRapply4(vars, sym_exvars, _SYM, instrukcje, i):
+
+    R = "{["
+    for s in sym_exvars:
+        R = R + s + ","
+    for s in vars:
+        R = R + s + ","
+    R = R + "v] -> ["
+    for s in sym_exvars:
+        R = R + s + "p," + s + ","
+    for s in vars:
+        R = R + s +  "v," + s + ","
+    R = R + "v] : "
+
+    z = ""
+
+    j = 0
+    for s in sym_exvars:
+        pos = -1
+        if j < len(instrukcje[i]['scatter']):  #poprawka bo niektore nie maja max zagniezdzen
+            pos = instrukcje[i]['scatter'][j]
+        else:
+            pos = "0"
+        z = z + s + "p = " + str(pos) + " and "
+        j = j + 1
+
+    z = z + "("
+
+
+    for l in range(0, i+1):
+        for st in instrukcje[l]['st']:
+            z = z + " (v = " + str(st) + " and "
+            j = 0
+            for s in vars:
+                pos = -1
+                if j < len(instrukcje[l]['scatter']):  #poprawka bo niektore nie maja max zagniezdzen
+                    pos = instrukcje[l]['scatter'][j]
+                else:
+                    pos = "0"
                 z = z + s + "v = " + str(pos) + " and "
                 j = j + 1
             z = z[:-4] + ") or "
@@ -526,6 +579,12 @@ def getIS(plik, rel, dane):
 
 
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
+
+
+
+
+
+
 
     schedule_mode = parallel_option
 
@@ -860,7 +919,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     end = time.time()
     print end - start
-    
+
 
     
     vars = []  # i
@@ -941,9 +1000,21 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     
             
     ########################################################################
-    
 
-    
+    cl = clanpy.ClanPy()
+    cl.loop_path = plik
+    cl.Load()
+    cl.RunCandl()
+
+    j = 0
+    for i in range(0, len(instrukcje)):
+        instrukcje[i]['scatter'] = cl.statements[j].scatering[:]
+        j = j + len(instrukcje[i]['st'])
+
+
+
+
+
 
     Rapply = GetRapply(vars, sym_exvars, _SYM)
 
@@ -1199,9 +1270,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, 0)
+    _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
 
-    print _rap
+
 
 
     if(Extend):
@@ -1210,7 +1281,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         z = isl_TILEbis[0]
     
     for j in range(1, len(isl_TILEbis)):
-        _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, j)
+        _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, j)
         print _rap
         if(Extend):
             z = z.union(isl_TILEbis[j].apply(_rap))
@@ -1221,7 +1292,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # -----------------------------------------------------------------
 
-    _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, 0)
+    _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
 
     if(Extend):
         zorig = isl_TILEorig[0].apply(_rap)
@@ -1229,7 +1300,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         zorig = isl_TILEorig[0]
 
     for j in range(1, len(isl_TILEorig)):
-        _rap =  GetRapply3(vars, sym_exvars, _SYM, instrukcje, j)
+        _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, j)
         if(Extend):
             zorig = zorig.union(isl_TILEorig[j].apply(_rap))
         else:

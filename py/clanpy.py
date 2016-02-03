@@ -139,7 +139,7 @@ class ClanPy:
                 for j in range(0,l,2):
                     self.statements[st].nest.append(int(lines[i+3+j].split('==')[1].replace(' ', '')))
 
-                for j in range(1,l,2):
+                for j in range(0,l,2):
                     self.statements[st].scatering.append(lines[i+3+j].split('==')[1].replace(' ', ''))
 
                 #print self.statements[st].scatering

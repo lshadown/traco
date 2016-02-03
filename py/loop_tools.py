@@ -1,5 +1,6 @@
 import functions
 import re
+import sys
 
 try:
     import islpy as isl
@@ -231,7 +232,7 @@ def ReadStatementNests(plik, dane):
                 nest_id = nest_id + 1
                 st = []
                 st.append(i)
-                instrukcje.append({'st' : st, 'nest' : nest, 'path' : nest_arr[:], 'vars': var_arr[:], 'max_loop' : max_loop, 'nest_id' : nest_id})
+                instrukcje.append({'st' : st, 'nest' : nest, 'path' : nest_arr[:], 'vars': var_arr[:], 'max_loop' : max_loop, 'nest_id' : nest_id, 'scatter' : []})
                 i = i + 1
                 newloop = 0
                 continue
@@ -239,7 +240,7 @@ def ReadStatementNests(plik, dane):
                 nest_id = nest_id + 1
                 st = []
                 st.append(i)
-                instrukcje.append({'st' : st, 'nest' : nest, 'path' : nest_arr[:], 'vars' : var_arr[:], 'max_loop' : max_loop, 'nest_id' : nest_id})
+                instrukcje.append({'st' : st, 'nest' : nest, 'path' : nest_arr[:], 'vars' : var_arr[:], 'max_loop' : max_loop, 'nest_id' : nest_id, 'scatter' : []})
                 newloop = 0
             else:
                 instrukcje[-1]['st'].append(i)
@@ -247,7 +248,29 @@ def ReadStatementNests(plik, dane):
 
         i = i +1
 
+    #global_max = 1
+    #for i in range(0,len(instrukcje)):
+    #    if (instrukcje[i]['max_loop'] > global_max):
+    #        global_max = instrukcje[i]['max_loop']
+
+    #offsets = [0] * global_max
+    #for i in range(0,len(instrukcje)):
+    #    instrukcje[i]['scatter'] = instrukcje[i]['path'][:]
+
+    #    for j in range(0, global_max):
+    #        if(j < len(instrukcje[i]['scatter'])):
+    #            instrukcje[i]['scatter'][j] = instrukcje[i]['scatter'][j] + offsets[j]
+    #        else:
+    #            instrukcje[i]['scatter'].append(offsets[j])
+    #            offsets[j] = offsets[j]+1
+
+
+
+
     combo = []
+
+
+
 
     combo.append(instrukcje)
     combo.append(nest_loop)
