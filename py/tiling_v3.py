@@ -345,56 +345,6 @@ def GetRapply(vars, sym_exvars, _SYM):
     return isl_Rapply
 
 
-def GetRapply2(vars, sym_exvars, _SYM, instrukcje, i):
-
-
-    R = "{["
-    for s in sym_exvars:
-        R = R + s + ","
-    for s in vars:
-        R = R + s + ","
-    R = R + "v] -> ["
-    for s in sym_exvars:
-        R = R + s + "," + s + "p,"
-    for s in vars:
-        R = R + s + "," + s + "v,"
-    R = R + "v] : " 
-    
-
-    z = ""
-
-    pos = codegen.calculate_position2(i, instrukcje, len(sym_exvars)) 
-    #pos = instrukcje[i]['path']
-    
-   
-    
-    #for l in range(len(instrukcje[i]['path']), len(sym_exvars)):
-    #    pos.append(-1)
-        
-    #print pos
-
-    j = 0
-    for s in sym_exvars:
-        z = z + s + "p = " + str(pos[j]) + " and "
-        j = j + 1
-        
-    z = z + "("
-
-    for l in range(0, i+1):
-        pos = codegen.calculate_position(l, instrukcje, len(sym_exvars)) 
-        for st in instrukcje[l]['st']:
-            z = z + " (v = " + str(st) + " and "
-            j = 0
-            for s in vars:
-                z = z + s + "v = " + str(pos[j]) + " and "
-                j = j + 1
-            z = z[:-4] + ") or "
-            
-        
-    R = R + z[:-3] + ")}"
-    isl_Rapply = isl.Map(R)
-    return isl_Rapply
-
 
 # poprawiona wersja  nest na kafel, nest kazdej instrukcji
 
@@ -579,11 +529,6 @@ def getIS(plik, rel, dane):
 
 
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
-
-
-
-
-
 
 
     schedule_mode = parallel_option
