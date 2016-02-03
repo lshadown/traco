@@ -1044,11 +1044,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         isl_BPREV = isl_BCUR.apply(isl_relclosure).intersect(isl_TILE_LT[i]).coalesce()
         isl_BPREV = isl_BPREV.subtract(X).coalesce()    # changed according to ACM TOPLAS reviewer
 
-        #print isl_BPREV
-        #print '---'
+        print isl_BPREV
+        print '---'
 
         isl_TILE2.append(isl_BPREV)
 
+        #isl_TILEprim.append(isl_TILE1[i])
         isl_TILEprim.append(isl_TILE1[i].union(isl_TILE2[i]).coalesce())
 
         #poprawka intersect z IS - EKSPERYMENTALNA !!!!

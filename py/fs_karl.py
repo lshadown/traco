@@ -38,7 +38,12 @@ def FSwithoutRG(r):
 
     # ---------------------------------------------------
 
+    print '-----------'
+    print rp
+
     uds = r.domain().subtract(r.range()).coalesce()
+
+    print uds
     #print uds
 
     # ---------------------------------------------------
@@ -65,7 +70,7 @@ def FSwithoutRG(r):
         r0p_plus = rp.transitive_closure()
         if r0p_plus[1] == 0:
             print 'Rp+ not exact !'
-            sys.exit(0)
+            #sys.exit(0)
         r0p_plus = r0p_plus[0]
     else:
         r0p_plus = relation_util.oc_IterateClosure(rp)
