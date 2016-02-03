@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     }
 */
 int c1,c3,c4,c7,c9,c10,c11,c5;
-    for (c1 = 0; c1 <= floord(N - 1, 32); c1 += 1)
+ /*   for (c1 = 0; c1 <= floord(N - 1, 32); c1 += 1)
       for (c3 = 0; c3 <= min(c1, floord(N - 2, 32)); c3 += 1)
         for (c4 = 2; c4 <= 3; c4 += 1) {
           if (c4 == 3) {
@@ -74,7 +74,21 @@ int c1,c3,c4,c7,c9,c10,c11,c5;
                 for (c11 = 32 * c5; c11 <= min(32 * c3, 32 * c5 + 31); c11 += 1)
                   S[N-1-c7][N+32*c3-c7]=MAX(S[N-1-c7][c11+N-c7-1]+S[c11+N-c7][N+32*c3-c7],S[N-1-c7][N+32*c3-c7]);
         }
-
+*/
+for (c1 = 0; c1 <= floord(N - 1, 32); c1 += 1)
+  for (c3 = 0; c3 <= min(c1, floord(N - 2, 32)); c3 += 1)
+    for (c4 = 2; c4 <= 3; c4 += 1) {
+      if (c4 == 3) {
+        for (c5 = 0; c5 <= min(1, N - 32 * c3 - 2); c5 += 1)
+          for (c7 = max(32 * c1, 32 * c3 + c5 + 1); c7 <= min(N - 1, 32 * c1 + 31); c7 += 1)
+            for (c9 = N + 32 * c3 + c5 - c7; c9 <= min(N - 1, N + 32 * c3 + 31 * c5 - c7); c9 += 1)
+              S[N-1-c7][c9]=MAX(S[N-1-c7][c9],S[N-c7][c9-1]+can_pair(RNA, i, j));
+      } else
+        for (c5 = 0; c5 <= c3; c5 += 1)
+          for (c7 = max(32 * c1, 32 * c3 + 1); c7 <= min(N - 1, 32 * c1 + 31); c7 += 1)
+            for (c11 = 32 * c5; c11 <= min(32 * c3, 32 * c5 + 31); c11 += 1)
+              S[N-1-c7][N+32*c3-c7]=MAX(S[N-1-c7][c11+N-c7-1]+S[c11+N-c7][N+32*c3-c7],S[N-1-c7][N+32*c3-c7]);
+    }
     end = omp_get_wtime();
 	printf("%.6f\n", end - start);
 
