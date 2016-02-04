@@ -78,6 +78,7 @@ class InitTile:
 
             for d in self.cl.deps:
                 print 'S' + str(d.source) + ' -> ' + 'S' + str(d.destination)
+                print 'delta: ' + str(d.delta)
                 print d.relation
 
             self.block = block.split(',')
@@ -100,3 +101,16 @@ class InitTile:
         self.cl.loop_path = self.input_file
         self.cl.Load()
         self.cl.DepAnalysis()
+
+
+
+
+# klasa do tilingu
+# zrob tile
+# zrob lt gt
+# sprawdz czy sa same +
+# wywal zaleznosci jesli blok = 1 na gniezdzie
+#policz R+ i inne
+# zrob bis, generuj kod
+
+#wykryj rownoleglosc

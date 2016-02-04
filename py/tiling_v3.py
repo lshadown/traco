@@ -740,7 +740,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-
     if len(instrukcje)==0:
         print 'blad - brak instrukcji'
         sys.exit()

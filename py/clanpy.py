@@ -183,6 +183,11 @@ class ClanPy:
 
                 d = Dependence()
                 d.relation = r
+                if r.dim(isl.dim_type.in_) == r.dim(isl.dim_type.out):
+                    d.delta = r.deltas()
+                else:
+                    d.delta = "-1"   # obliczyc potem jak petit
+                print d.delta
                 d.source = b.rc.GetSourceStatement()
                 d.destination = b.rc.GetDestinationStatement()
                 d.kind = b.rc.KindDep()
@@ -204,6 +209,7 @@ class Dependence:
     sourceref = ""
     destinationref = ""
     depth = ""
+    delta = ""
 
 
 class ReadCandl:
