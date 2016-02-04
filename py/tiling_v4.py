@@ -11,6 +11,7 @@
 
 import glob, os
 import clanpy
+from termcolor import colored
 
 DEBUG = True
 
@@ -50,10 +51,10 @@ class InitTile:
         if(DEBUG):
 
             print ''
-            print '/\__  _\ /\  == \   /\  __ \   /\  ___\   /\  __ \   '
-            print '\/_/\ \/ \ \  __<   \ \  __ \  \ \ \____  \ \ \/\ \  '
-            print '   \ \_\  \ \_\ \_\  \ \_\ \_\  \ \_____\  \ \_____\ '
-            print '    \/_/   \/_/ /_/   \/_/\/_/   \/_____/   \/_____/ '
+            print colored('/\__  _\ /\  == \   /\  __ \   /\  ___\   /\  __ \   ', 'green')
+            print colored('\/_/\ \/ \ \  __<   \ \  __ \  \ \ \____  \ \ \/\ \  ', 'green')
+            print colored('   \ \_\  \ \_\ \_\  \ \_\ \_\  \ \_____\  \ \_____\ ', 'green')
+            print colored('    \/_/   \/_/ /_/   \/_/\/_/   \/_____/   \/_____/ ', 'green')
             print ''
             print '       An Automatic Parallelizer and Optimizer'
             print ' based on the TRansitive ClOsure of dependence graph'
@@ -91,6 +92,9 @@ class InitTile:
             print 'OK. The loop to transform is ready.'
             print '===  TRACO GO  ==='
 
+            bstile = BaseTile(self.cl)
+
+            print bstile.tile_statements[0].tile_iterators
 
 
 
@@ -101,6 +105,29 @@ class InitTile:
         self.cl.loop_path = self.input_file
         self.cl.Load()
         self.cl.DepAnalysis()
+
+
+class Tile_Statement:
+    tile_iterators = []
+    TILE = None
+    cl_statement = None # Reference
+
+    def __init__(self, st):
+        self.cl_statement = st
+
+        for iterator in self.cl_statement.original_iterators:
+            self.tile_iterators.append(iterator * 2)
+
+class BaseTile:
+    tile_statements = []
+    cl = None
+
+    def __init__(self, cl):
+        self.cl = cl
+
+        for st in cl.statements:
+            tile_st = Tile_Statement(st)
+            self.tile_statements.append(tile_st)
 
 
 

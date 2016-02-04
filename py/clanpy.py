@@ -174,7 +174,10 @@ class ClanPy:
 
         self.RunCandl()
 
+
         lines = ''.join(self.candl_out).split('\n')  # convert array of characters to array of strings
+
+
 
         for line in lines:
             if '->' in line:
