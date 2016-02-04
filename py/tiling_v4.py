@@ -13,6 +13,13 @@ import glob, os
 import clanpy
 from termcolor import colored
 
+try:
+    import islpy as isl
+except ImportError, e:
+    print e
+    print "pip install ispy"
+    sys.exit()
+
 DEBUG = True
 
 
@@ -94,7 +101,7 @@ class InitTile:
 
             bstile = BaseTile(self.cl)
 
-            print bstile.tile_statements[0].tile_iterators
+            bstile.CreateTILE(self.block)
 
 
 
@@ -109,14 +116,18 @@ class InitTile:
 
 class Tile_Statement:
     tile_iterators = []
+    iterators = []  # copy orygina_iterators
     TILE = None
     cl_statement = None # Reference
 
     def __init__(self, st):
         self.cl_statement = st
 
+        self.iterators = self.cl_statement.original_iterators
+
         for iterator in self.cl_statement.original_iterators:
-            self.tile_iterators.append(iterator * 2)
+            self.tile_iterators.append(iterator.encode('ascii', 'ignore') * 2)
+
 
 class BaseTile:
     tile_statements = []
@@ -129,6 +140,39 @@ class BaseTile:
             tile_st = Tile_Statement(st)
             self.tile_statements.append(tile_st)
 
+
+    def CreateTILE(self, BLOCK):
+        i = 0
+
+        is_i = isl.Set(self.cl.statements[i].domain_map)
+        print is_i
+
+        tile = is_i
+
+        j =0
+        for symvar in self.tile_statements[i].tile_iterators:
+            tile = tile.add_dims(isl.dim_type.param, 1)
+            tile = tile.set_dim_name(isl.dim_type.param, tile.dim(isl.dim_type.param)-1, symvar)
+
+            c = isl.Constraint.ineq_from_names(tile.get_space(), {symvar: 1, 1:0})
+            tile = tile.add_constraint(c)
+
+            bl = int(BLOCK[j])                                                                          #  j <= 15 + 16jj
+            c = isl.Constraint.ineq_from_names(tile.get_space(), {self.tile_statements[i].iterators[j]: -1, symvar:bl,  1:bl-1})
+            tile = tile.add_constraint(c)
+
+            c = isl.Constraint.ineq_from_names(tile.get_space(), {self.tile_statements[i].iterators[j]: 1, symvar:-bl})
+            tile = tile.add_constraint(c)
+
+            j = j+1
+
+
+
+
+
+
+
+        print tile
 
 
 
