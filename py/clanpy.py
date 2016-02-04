@@ -47,6 +47,8 @@ class ClanPy:
     loop_path = ''
     candl_out = ''
     arr = []
+    deps = []
+    maxdim = 0
 
     def __init__(self):
         self.no_statements = 0
@@ -93,6 +95,10 @@ class ClanPy:
 
             if "# List of original iterators" == lines[i]:
                 self.statements[st].original_iterators = lines[i+1].split(' ')
+
+                #ile zagniezdzen poziom najwiekszy
+                if (len(self.statements[st].original_iterators)) > self.maxdim:
+                    self.maxdim = len(self.statements[st].original_iterators)
 
                 # Zbuduj domene
                 _w = ''
@@ -164,9 +170,41 @@ class ClanPy:
         cmd = "candl test.clan"
         self.candl_out = Proc(cmd).call(timeout=5).stdout
 
+    def DepAnalysis(self):
+
+        self.RunCandl()
+
+        lines = ''.join(self.candl_out).split('\n')  # convert array of characters to array of strings
+
+        for line in lines:
+            if '->' in line:
+                b = BuildRelation(line, self)
+                r = b.GetRelation()
+
+                d = Dependence()
+                d.relation = r
+                d.source = b.rc.GetSourceStatement()
+                d.destination = b.rc.GetDestinationStatement()
+                d.kind = b.rc.KindDep()
+                d.sourceref = b.rc.GetSourceRef()
+                d.destinationref = b.rc.GetDestinationRef()
+                d.depth = b.rc.GetDepth()
+
+                self.deps.append(d)
+
 
 # --------------------------------------------------------------------------------------------------------
 # CANDL CLASSES
+
+class Dependence:
+    kind =""
+    relation = None
+    source = ""
+    destination =""
+    sourceref = ""
+    destinationref = ""
+    depth = ""
+
 
 class ReadCandl:
 
@@ -308,12 +346,14 @@ class BuildRelation:
         # dodaj lex
 
 
-        lex = CreateLex(self.rc.GetDepth(), self.cp.statements[si].original_iterators, self.cp.statements[so].original_iterators, so-si, self.cp.statements[si].scatering)
-
+        if self.rc.GetDepth() > 0:
+            lex = CreateLex(self.rc.GetDepth(), self.cp.statements[si].original_iterators, self.cp.statements[so].original_iterators, so-si, self.cp.statements[si].scatering)
+        else:
+            lex = ' 1=1 '
 
         rel += " && " + lex +  " } "
 
-        print rel
+        #print rel
         #if(debug):
             #print self.rc.line
             #print self.rc.GetDepth()

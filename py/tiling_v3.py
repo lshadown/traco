@@ -199,8 +199,10 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
         else:
             min_nest = i+1
 
-
-    #print dane2["path"]
+    print "============================ ==========================="
+    print dane["path"]
+    print dane2["path"]
+    print par_vars
     #print "===================================" + str(min_nest)
     if(dane["nest_id"] == dane2["nest_id"]):  # ta sama petla licz stara metoda
         for i in range(n-1,n):    # od 0 ????????????????????????????????????????????????????????
@@ -641,6 +643,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # ==========
 
 
+
     # jesli zmienne prywatne sa w obrebie jednego S1 to mozna 
         
     start = time.time()
@@ -670,12 +673,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
+
     dane.remove(rel)  
     dane = list(set(dane))
 
     if(DEBUG):
         print rel
-
 
 
     # Create LD
@@ -1023,6 +1026,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             BLGT = MakeBLTandBGT_v2(_SYM, vars, sym_exvars, im_par_vars, varsprim, exvars, stuff, BLOCK, instrukcje[j], instrukcje[i], par_tiling)   # porownaj zagniezdzenia instrukcji
             print '-------LT ----------'
             print BLGT[0]
+            print '-------GT ----------'
+            print BLGT[1]
             isltmp = isl.Set(str(BLGT[0]).replace("_BLT := ", ""))
             if(bltc==0):
                 isl_TILE_LT.append(isltmp)
@@ -1303,7 +1308,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print "Cloog start..."
         start = time.time()
 
-        isl_ast = True
+        isl_ast = False
         barv = 1
 
         if(barv == 1):

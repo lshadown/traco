@@ -8,7 +8,9 @@
 # Object programming.
 # LT and GT as hyperplanes.
 # Cleaning!!!
+
 import glob, os
+import clanpy
 
 DEBUG = True
 
@@ -25,6 +27,8 @@ class InitTile:
     output_file = ""
     SIMPLIFY = False
     parallel = False
+
+    cl = False  # clan & candl data
 
     # Let's start
     def __init__(self, input_file, block, permute=False, output_file="", SIMPLIFY=False, parallel_option = False):
@@ -60,3 +64,39 @@ class InitTile:
             print 'Input file   ' + self.input_file
             print 'Output file  ' + self.output_file
 
+
+        # structure & dependence analysis
+        self.ClanAndCandl()
+
+        if(DEBUG):
+            print 'Statements:  ' + str(len(self.cl.statements))
+            for st in self.cl.statements:
+                print '  -> ' + st.body
+                print '     ' + ','.join(st.scatering)
+
+            print 'Dependences: ' + str(len(self.cl.deps))
+
+            for d in self.cl.deps:
+                print 'S' + str(d.source) + ' -> ' + 'S' + str(d.destination)
+                print d.relation
+
+            self.block = block.split(',')
+            for i in range(len(self.block),self.cl.maxdim):
+                self.block.append(self.block[len(self.block)-1])
+
+            print 'Tile block: ' + ','.join(self.block)
+
+
+            print 'OK. The loop to transform is ready.'
+            print '===  TRACO GO  ==='
+
+
+
+
+
+    def ClanAndCandl(self):
+
+        self.cl = clanpy.ClanPy()
+        self.cl.loop_path = self.input_file
+        self.cl.Load()
+        self.cl.DepAnalysis()

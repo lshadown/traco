@@ -10,6 +10,7 @@ import gen
 import shutil
 import tiling_v2
 import tiling_v3
+import tiling_v4
 import tiling
 import scc
 import iscc
@@ -124,6 +125,10 @@ if len(sys.argv) > 3:
 
         if('--tiling3' in sys.argv[3] or partile):
             tiling_v3.tile(sys.argv[1], block, permute, "", "0", SIMPLIFY, perfect_mode, partile, rplus_file)
+            sys.exit()
+
+        if('--tile' in sys.argv[3] or partile):
+            tiling_v4.tile(sys.argv[1], block, permute, "", "0", SIMPLIFY, perfect_mode, partile, rplus_file)
             sys.exit()
             
         if('--slicing' in sys.argv[3]):
