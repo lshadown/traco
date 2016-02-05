@@ -12,6 +12,8 @@
 import glob, os
 import clanpy
 from termcolor import colored
+import iscc
+
 
 try:
     import islpy as isl
@@ -102,6 +104,7 @@ class InitTile:
             bstile = BaseTile(self.cl)
 
             bstile.CreateTILE(self.block)
+            bstile.CreateTILEbis()
 
 
 
@@ -118,6 +121,8 @@ class Tile_Statement:
     tile_iterators = []
     iterators = []  # copy orygina_iterators
     TILE = None
+    TILE_VLD = None
+    TILE_bis = None
     cl_statement = None # Reference
 
     def __init__(self, st):
@@ -167,12 +172,56 @@ class BaseTile:
             j = j+1
 
 
-
-
-
-
-
+        self.tile_statements[i].TILE = tile
         print tile
+
+
+    def CreateTILEbis(self):
+        i = 0
+
+        self.tile_statements[i].TILE_VLD = self.tile_statements[i].TILE
+
+        tilevld = self.tile_statements[i].TILE
+
+        Rapply = self.GetRapply(self.tile_statements[i].iterators, self.tile_statements[i].tile_iterators, self.cl.params)
+
+        print Rapply
+
+
+        tilebis = self.Project(tilevld.apply(Rapply).coalesce(), self.tile_statements[i].tile_iterators).coalesce()
+
+        print tilebis
+
+        loop_x = iscc.isl_ast_codegen(tilebis)
+
+        print loop_x
+
+
+
+    # usun zmienne symb
+    def Project(self, S, sym_exvars):
+        for s in sym_exvars:
+            isl_symb = S.get_var_names(isl.dim_type.param)
+            S = S.project_out(isl._isl.dim_type.param, isl_symb.index(s), 1)
+
+        return S
+
+    # symb do przedzialow
+    def GetRapply(self, vars, sym_exvars, _SYM):
+
+        sym = ','.join(_SYM) +',' + ','.join(sym_exvars)
+        R = "[" + sym + "] -> {["
+
+        R = R + ','.join(vars)
+
+        R = R + "] -> ["
+        R = R +  ','.join(sym_exvars) + ','
+        R = R + ','.join(vars)
+        R = R + "] : "
+        R = R + " true };\n"
+
+        isl_Rapply = isl.Map(R)
+        return isl_Rapply
 
 
 
