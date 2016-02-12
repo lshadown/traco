@@ -14,6 +14,7 @@ import clanpy
 from termcolor import colored
 import iscc
 import sys
+import vis
 
 
 try:
@@ -171,9 +172,6 @@ class BaseTile:
             c = isl.Constraint.ineq_from_names(tile.get_space(), {self.tile_statements[i].iterators[j]: 1, symvar:-bl})
             tile = tile.add_constraint(c)
 
-
-
-
             j = j+1
 
         # add bounds
@@ -215,6 +213,9 @@ class BaseTile:
 
         print loop_x
 
+        vis.Vis(tilebis)
+
+
 
 
     # usun zmienne symb
@@ -228,7 +229,12 @@ class BaseTile:
     # symb do przedzialow
     def GetRapply(self, vars, sym_exvars, _SYM):
 
-        sym = ','.join(_SYM) +',' + ','.join(sym_exvars)
+        sym = ','.join(_SYM)
+
+        if(len(_SYM) > 0):
+            sym = sym +','
+
+        sym = sym + ','.join(sym_exvars)
         R = "[" + sym + "] -> {["
 
         R = R + ','.join(vars)

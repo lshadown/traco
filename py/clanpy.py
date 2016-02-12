@@ -179,7 +179,7 @@ class ClanPy:
                 if l < 0:
                     break
 
-        print self.statements[0].bounds
+        #print self.statements[0].bounds
 
 
         #print self.statements[st].read_write[0].op

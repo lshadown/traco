@@ -104,6 +104,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     IND = IS.subtract(DOM_RAN).coalesce()
 
+
     n = rel.dim(isl.dim_type.in_)
 
     inp = []
@@ -183,7 +184,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print "### Rstar"
     print RRstar
 
-    REPR = D # .union(DOM_RAN.subtract(W)).coalesce()
+    REPR = D.union(DOM_RAN.subtract(W)).coalesce()
 
     # poprawka
 
@@ -194,7 +195,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print REPR2
     REPR = REPR.union(REPR2).coalesce()
 
-    REPR =imperf_tile.SimplifySlice(REPR)
+    #REPR =imperf_tile.SimplifySlice(REPR)
 
     print "### REPR"
     print REPR
@@ -305,6 +306,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
             slice = slice_
 
 
+        print slice
         #if(SIMPLIFY):
         #slice = imperf_tile.SimplifySlice(slice)
 
