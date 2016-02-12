@@ -3,6 +3,7 @@
 from easyprocess import Proc
 import sys
 import re
+import convert_loop
 
 try:
     import islpy as isl
@@ -29,6 +30,7 @@ class ClanStatement:
     read_write = []
     nest = []
     scatering = []
+    bounds = []
 
 
     def __init__(self):
@@ -151,7 +153,33 @@ class ClanPy:
                 #print self.statements[st].scatering
 
 
+        # dopisz teraz granice
 
+        linestring = open(self.loop_path, 'r').read()
+        lines = linestring.split('\n')
+        start_search = 0
+        for st in self.statements:
+
+            for i in range(start_search, len(lines)):
+                if st.body in lines[i]:
+                    start_search = i
+                    break
+
+            l = len(st.original_iterators)-1
+            for i in range(start_search, 0, -1):
+
+
+                if 'for' in lines[i]:
+                    stuff = convert_loop.functions.Loop(lines[i])
+                    if stuff['var'] == st.original_iterators[l]:
+                        st.bounds.insert(0, stuff)
+                        l = l-1
+
+
+                if l < 0:
+                    break
+
+        print self.statements[0].bounds
 
 
         #print self.statements[st].read_write[0].op
