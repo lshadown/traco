@@ -213,7 +213,7 @@ class BaseTile:
 
         print loop_x
 
-        vis.Vis(tilebis, self.cl.statements[0].bounds)
+        vis.Vis(tilebis, self.cl.statements[0].bounds, self.cl.deps)
 
 
 

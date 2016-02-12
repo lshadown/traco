@@ -15,7 +15,7 @@ except ImportError, e:
 
 
 
-def Vis(tilebis,stuff):
+def Vis(tilebis,stuff, deps):
 
     if tilebis.dim(isl.dim_type.param) > 0:
         sys.exit()
@@ -30,6 +30,29 @@ def Vis(tilebis,stuff):
     tilex = -1
     tiley = -1
     tilept = []
+
+
+    for dep2 in deps:
+        dep = dep2.relation
+        while(not dep.is_empty()):
+            s = dep.sample()
+            dep = dep.subtract(s)
+
+            doms = s.domain()
+            ranges = s.range()
+            doms = doms.sample_point()
+            ranges = ranges.sample_point()
+            doms = integer_list(doms)
+            ranges = integer_list(ranges)
+
+            ax.annotate("",
+                    xy=(ranges[0], ranges[1]), xycoords='data',
+                    xytext=(doms[0], doms[1]), textcoords='data',
+                    arrowprops=dict(arrowstyle="->",
+                                    connectionstyle="arc3"),
+                    )
+
+
 
     while(not tilebis.is_empty()):
         s = tilebis.lexmin()
@@ -72,8 +95,9 @@ def Vis(tilebis,stuff):
         print 'Error. Change upper bounds with <= to < in the source loops.'
         sys.exit(0);
 
-    ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
 
+
+    ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
     # Get current size
     fig_size = plt.rcParams["figure.figsize"]
 
@@ -83,12 +107,7 @@ def Vis(tilebis,stuff):
     fig_size[1] = 11
     plt.rcParams["figure.figsize"] = fig_size
 
-    ax.annotate("",
-            xy=(1, 1), xycoords='data',
-            xytext=(0, 0), textcoords='data',
-            arrowprops=dict(arrowstyle="->",
-                            connectionstyle="arc3"),
-            )
+
 
     plt.show()
 
@@ -119,3 +138,15 @@ def convex_hull(points):
         if q != hull[0]:
             hull.append(q)
     return hull
+
+# ----------------------------------------
+
+def integer_list(point):
+    point = str(point)
+    point = point.replace('[', '')
+    point = point.replace(']', '')
+    point = point.replace(' ', '')
+    point = point.split(',')
+    point = [int(i) for i in point]
+
+    return point
