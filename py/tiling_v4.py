@@ -13,6 +13,7 @@ import glob, os
 import clanpy
 from termcolor import colored
 import iscc
+import sys
 
 
 try:
@@ -117,6 +118,7 @@ class InitTile:
         self.cl.DepAnalysis()
 
 
+
 class Tile_Statement:
     tile_iterators = []
     iterators = []  # copy orygina_iterators
@@ -169,11 +171,28 @@ class BaseTile:
             c = isl.Constraint.ineq_from_names(tile.get_space(), {self.tile_statements[i].iterators[j]: 1, symvar:-bl})
             tile = tile.add_constraint(c)
 
+
+
+
             j = j+1
 
+        # add bounds
+        constr = '  '
+        for j in range(0, len(self.cl.statements[i].bounds)):
+            stuff = self.cl.statements[i].bounds
+            constr = constr + ' and ' +  ' 0 <= ' + self.tile_statements[i].tile_iterators[j] + '*' + BLOCK[j]  + ' <= ' + stuff[j]['ub'] + '-' + stuff[j]['lb'] + ' '
+
+
+        str_tile = str(tile)
+        str_tile = str_tile.replace('}', constr + ' }')
+
+        print str_tile
+
+        tile = isl.Set(str_tile)
+        # --------------------------------------
 
         self.tile_statements[i].TILE = tile
-        print tile
+
 
 
     def CreateTILEbis(self):
