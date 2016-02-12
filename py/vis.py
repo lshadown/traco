@@ -83,6 +83,13 @@ def Vis(tilebis,stuff):
     fig_size[1] = 11
     plt.rcParams["figure.figsize"] = fig_size
 
+    ax.annotate("",
+            xy=(1, 1), xycoords='data',
+            xytext=(0, 0), textcoords='data',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3"),
+            )
+
     plt.show()
 
 
