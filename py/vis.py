@@ -74,6 +74,15 @@ def Vis(tilebis,stuff):
 
     ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
 
+    # Get current size
+    fig_size = plt.rcParams["figure.figsize"]
+
+
+    # Set figure width to 12 and height to 9
+    fig_size[0] = 11
+    fig_size[1] = 11
+    plt.rcParams["figure.figsize"] = fig_size
+
     plt.show()
 
 
