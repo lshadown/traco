@@ -19,6 +19,7 @@ import scc
 from pygraph.algorithms.accessibility import mutual_accessibility
 from pygraph.algorithms.cycles import find_cycle
 from multiprocessing import Pool
+import vis
 
 import imperf_tile
 import test_isl
@@ -499,6 +500,7 @@ def getIS(plik, rel, dane):
     cl.loop_path = plik
     cl.Load()
     cl.RunCandl()
+    cl.DepAnalysis()
 
     IS = DOM_RAN
     for i in range(0, len(cl.statements)):
@@ -544,7 +546,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print 'Perfectly nested loop mode: enabled'
 
 
-    simpl_ub = False
+    simpl_ub = True
 
     BLOCK = block.split(',')
     par_tiling = False
@@ -1224,7 +1226,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
 
-
+    print cl.deps
+    vis.Vis(isl_TILEbis[0], stuff, cl.deps)
+    sys.exit(0)
 
 
     if(Extend):

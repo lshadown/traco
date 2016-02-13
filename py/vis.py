@@ -97,9 +97,9 @@ def Vis(tilebis,stuff, deps):
         print 'Error. Change upper bounds with <= to < in the source loops.'
         sys.exit(0);
 
+    ax.axis([-1, 32, -1, 32])
 
-
-    ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
+    #ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
     # Get current size
     fig_size = plt.rcParams["figure.figsize"]
 
