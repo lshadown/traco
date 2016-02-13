@@ -45,12 +45,14 @@ def Vis(tilebis,stuff, deps):
             doms = integer_list(doms)
             ranges = integer_list(ranges)
 
+
             ax.annotate("",
                     xy=(ranges[0], ranges[1]), xycoords='data',
                     xytext=(doms[0], doms[1]), textcoords='data',
                     arrowprops=dict(arrowstyle="->",
                                     connectionstyle="arc3"),
                     )
+
 
 
 

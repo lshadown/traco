@@ -15,6 +15,7 @@ from termcolor import colored
 import iscc
 import sys
 import vis
+import tiling_schedule
 
 
 try:
@@ -212,6 +213,10 @@ class BaseTile:
         loop_x = iscc.isl_ast_codegen(tilebis)
 
         print loop_x
+
+        rtile = []
+        for dep in self.cl.deps:
+            rtile.append(tiling_schedule.get_RTILE(tilebis, self.tile_statements[0].tile_iterators, dep.relation, False, 1))
 
         vis.Vis(tilebis, self.cl.statements[0].bounds, self.cl.deps)
 

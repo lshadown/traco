@@ -649,7 +649,7 @@ def tile_par(isl_TILEprim, isl_TILEbis, sym_exvars, symb, isl_rel, isl_relplus, 
         slice_tiling(fsloop, bl_2half, sym_exvars , 1)
 
 
-def get_RTILE(isl_TILEbis, sym_exvars, isl_rel, Extend):
+def get_RTILE(isl_TILEbis, sym_exvars, isl_rel, Extend, opt=0):
 
     x = 1
     if(Extend):
@@ -658,22 +658,37 @@ def get_RTILE(isl_TILEbis, sym_exvars, isl_rel, Extend):
     rbis = isl.Map.from_domain_and_range(isl_TILEbis,isl_TILEbis)
     rel_ = tiling_v3.ExtendMap(isl_rel, sym_exvars, Extend)
 
-    Rel_W = "{["
-    for i in range(0, x*len(sym_exvars)):
-        Rel_W = Rel_W + "i" + str(i) + ","
-    Rel_W = Rel_W + "m1] -> ["
-    for i in range(0, x*len(sym_exvars)):
-        Rel_W = Rel_W + "o" + str(i) + ","
-    Rel_W = Rel_W + "m2] : not ("
-    for i in range(0, x*len(sym_exvars)):
-        Rel_W = Rel_W + "i" + str(i) + " = " + "o" + str(i) + " and "
-    Rel_W = Rel_W[:-4] + ")}"
+
+    if(opt==0):
+        Rel_W = "{["
+        for i in range(0, x*len(sym_exvars)):
+            Rel_W = Rel_W + "i" + str(i) + ","
+        Rel_W = Rel_W + "m1] -> ["
+        for i in range(0, x*len(sym_exvars)):
+            Rel_W = Rel_W + "o" + str(i) + ","
+        Rel_W = Rel_W + "m2] : not ("
+        for i in range(0, x*len(sym_exvars)):
+            Rel_W = Rel_W + "i" + str(i) + " = " + "o" + str(i) + " and "
+        Rel_W = Rel_W[:-4] + ")}"
+    else:
+        Rel_W = "{["
+        for i in range(0, x*len(sym_exvars)):
+            Rel_W = Rel_W + "i" + str(i) + ","
+        Rel_W = Rel_W[:-1] + "] -> ["
+        for i in range(0, x*len(sym_exvars)):
+            Rel_W = Rel_W + "o" + str(i) + ","
+        Rel_W = Rel_W[:-1] + "] : not ("
+        for i in range(0, x*len(sym_exvars)):
+            Rel_W = Rel_W + "i" + str(i) + " = " + "o" + str(i) + " and "
+        Rel_W = Rel_W[:-4] + ")}"
 
 
     rel_simple = rbis.intersect(rel_)
     rel_simple = rel_simple.project_out(isl.dim_type.in_, x*len(sym_exvars),x*len(sym_exvars))
     rel_simple = rel_simple.project_out(isl.dim_type.out, x*len(sym_exvars),x*len(sym_exvars))
+
     relw = isl.Map(Rel_W)
+
     rel_simple = rel_simple.intersect(relw).coalesce()
 
     rel_simple = rel_simple.coalesce()
