@@ -23,7 +23,7 @@ def Vis(tilebis,stuff, deps):
     #colors_ = list(six.iteritems(colors.cnames))
     colors_ = ['r', 'b','g','c','y']
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(facecolor="white")
 
     patches = []
 
@@ -97,9 +97,9 @@ def Vis(tilebis,stuff, deps):
         print 'Error. Change upper bounds with <= to < in the source loops.'
         sys.exit(0);
 
-    ax.axis([-1, 32, -1, 32])
+    #ax.axis([-1, 10, -1, 10])
 
-    #ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
+    ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
     # Get current size
     fig_size = plt.rcParams["figure.figsize"]
 
@@ -114,6 +114,8 @@ def Vis(tilebis,stuff, deps):
     plt.show()
 
 
+# --------------------------------------------------------------------------------------------
+# The Jarvis algorithm (gift wrapping)
 
 TURN_LEFT, TURN_RIGHT, TURN_NONE = (1, -1, 0)
 def turn(p, q, r):
@@ -141,7 +143,7 @@ def convex_hull(points):
             hull.append(q)
     return hull
 
-# ----------------------------------------
+# --------------------------------------------------------------------------------------------
 
 def integer_list(point):
     point = str(point)

@@ -546,7 +546,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print 'Perfectly nested loop mode: enabled'
 
 
-    simpl_ub = True
+    simpl_ub = False
 
     BLOCK = block.split(',')
     par_tiling = False
@@ -1226,7 +1226,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
 
-    print cl.deps
+
     vis.Vis(isl_TILEbis[0], stuff, cl.deps)
     sys.exit(0)
 
