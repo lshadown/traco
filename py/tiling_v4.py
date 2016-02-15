@@ -218,7 +218,7 @@ class BaseTile:
         for dep in self.cl.deps:
             rtile.append(tiling_schedule.get_RTILE(tilebis, self.tile_statements[0].tile_iterators, dep.relation, False, 1))
 
-        vis.Vis(tilebis, self.cl.statements[0].bounds, self.cl.deps)
+        vis.Vis(tilebis, self.cl.statements[0].bounds, self.cl.deps, isl.Set(self.cl.statements[0].domain_map))
 
 
 

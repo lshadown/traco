@@ -5,6 +5,7 @@ from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 import random
 import matplotlib
+from islplot.plotter import *
 
 try:
     import islpy as isl
@@ -15,7 +16,7 @@ except ImportError, e:
 
 
 
-def Vis(tilebis,stuff, deps):
+def Vis(tilebis,stuff, deps, domain, Ext=False):
 
     if tilebis.dim(isl.dim_type.param) > 0:
         sys.exit()
@@ -31,6 +32,11 @@ def Vis(tilebis,stuff, deps):
     tiley = -1
     tilept = []
 
+
+    #for dep2 in deps:
+    #    plot_map(dep2.relation)
+
+    plot_set_points((domain), marker=".", size=5, color="gray")
 
     for dep2 in deps:
         dep = dep2.relation
@@ -56,13 +62,15 @@ def Vis(tilebis,stuff, deps):
 
 
 
-    while(not tilebis.is_empty()):
+    '''while(not tilebis.is_empty()):
         s = tilebis.lexmin()
         tilebis = tilebis.subtract(s)
         point =  s.sample_point()
         point = str(point)
         point = point.replace('[', '')
         point = point.replace(']', '')
+        point = point.replace('{', '')
+        point = point.replace('}', '')
         point = point.replace(' ', '')
         point = point.split(',')
         point = [int(i) for i in point]
@@ -91,7 +99,38 @@ def Vis(tilebis,stuff, deps):
     p = PatchCollection(patches, cmap=matplotlib.cm.jet, alpha=0.4)
 
 
-    ax.add_collection(p)
+    ax.add_collection(p)'''
+
+    sufix = ''
+    if(Ext):
+        sufix = ',v'
+
+    reduce_map = isl.Map('{[ii,jj,i,j'+sufix+'] -> [i,j]}')
+
+    while(not tilebis.is_empty()):
+        s = tilebis.lexmin()
+    #    tilebis = tilebis.subtract(s)
+        point =  s.sample_point()
+        point = str(point)
+        point = point.replace('[', '')
+        point = point.replace(']', '')
+        point = point.replace('{', '')
+        point = point.replace('}', '')
+        point = point.replace(' ', '')
+        point = point.split(',')
+        point = [int(i) for i in point]
+        settile = isl.Set("{[ii,jj,i,j"+sufix+"] : ii = " + str(point[0]) + " and jj = " + str(point[1]) + "}").intersect(tilebis).coalesce()
+        tile_points = settile.apply(reduce_map)
+
+        plot_set_shapes((tile_points ), color="blue", alpha=0.3, vertex_size=0)
+        #print tile_points
+        #print settile
+        tilebis = tilebis.subtract(settile)
+
+
+
+
+
 
     if '-' in stuff[0]['ub'] or '-' in stuff[1]['ub']:
         print 'Error. Change upper bounds with <= to < in the source loops.'
@@ -147,6 +186,8 @@ def convex_hull(points):
 
 def integer_list(point):
     point = str(point)
+    point = point.replace('{', '')
+    point = point.replace('}', '')
     point = point.replace('[', '')
     point = point.replace(']', '')
     point = point.replace(' ', '')

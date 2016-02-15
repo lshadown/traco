@@ -1227,7 +1227,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
 
 
-    vis.Vis(isl_TILEbis[0], stuff, cl.deps)
+    vis.Vis(isl_TILEbis[0], stuff, cl.deps, isl.Set(cl.statements[0].domain_map), True)
     sys.exit(0)
 
 
