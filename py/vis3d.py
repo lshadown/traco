@@ -42,7 +42,7 @@ plot.plot([0],[0],[0], 'ro')
 
 
 
-a = Arrow3D([0, 0], [0, 0], [0, 1], mutation_scale=20, lw=1, arrowstyle="-|>", color="k", alpha=0.3)
+a = Arrow3D([0, 0], [0, 1], [0, 1], mutation_scale=20, lw=1, arrowstyle="-|>", color="k", alpha=0.3)
 plot.add_artist(a)
 
 d = Domain(poly | poly2)
