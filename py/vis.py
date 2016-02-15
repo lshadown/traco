@@ -36,7 +36,7 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
     #for dep2 in deps:
     #    plot_map(dep2.relation)
 
-    plot_set_points((domain), marker=".", size=5, color="gray")
+    plot_set_points((domain), marker=".", size=5, color="blue")
 
     for dep2 in deps:
         dep = dep2.relation
