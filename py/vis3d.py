@@ -26,7 +26,7 @@ x, y, z = symbols('x y z')
 fig = plt.figure()
 
 plot = fig.add_subplot(1, 1, 1, projection='3d', aspect='equal')
-plot.set_title('Chamfered cube')
+#plot.set_title('Chamfered cube')
 
 
 
@@ -42,11 +42,11 @@ plot.plot([0],[0],[0], 'ro')
 
 
 
-a = Arrow3D([0, 0], [0, 1], [0, 1], mutation_scale=20, lw=1, arrowstyle="-|>", color="k", alpha=0.3)
+a = Arrow3D([0, 0], [1, 2], [0, 1], mutation_scale=20, lw=1, arrowstyle="-|>", color="k", alpha=0.3)
 plot.add_artist(a)
 
 d = Domain(poly | poly2)
-#d.plot(plot, facecolor='red', alpha=0.3)
+d.plot(plot, facecolor='red', alpha=0.3)
 
 poly3.plot(plot, facecolor='blue', alpha=0.3)
 

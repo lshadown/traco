@@ -62,7 +62,7 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
 
 
 
-    '''while(not tilebis.is_empty()):
+    while(not tilebis.is_empty()):
         s = tilebis.lexmin()
         tilebis = tilebis.subtract(s)
         point =  s.sample_point()
@@ -99,33 +99,34 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
     p = PatchCollection(patches, cmap=matplotlib.cm.jet, alpha=0.4)
 
 
-    ax.add_collection(p)'''
+    ax.add_collection(p)
 
-    sufix = ''
-    if(Ext):
-        sufix = ',v'
+    if(1==0):
+        sufix = ''
+        if(Ext):
+            sufix = ',v'
 
-    reduce_map = isl.Map('{[ii,jj,i,j'+sufix+'] -> [i,j]}')
+        reduce_map = isl.Map('{[ii,jj,i,j'+sufix+'] -> [i,j]}')
 
-    while(not tilebis.is_empty()):
-        s = tilebis.lexmin()
-    #    tilebis = tilebis.subtract(s)
-        point =  s.sample_point()
-        point = str(point)
-        point = point.replace('[', '')
-        point = point.replace(']', '')
-        point = point.replace('{', '')
-        point = point.replace('}', '')
-        point = point.replace(' ', '')
-        point = point.split(',')
-        point = [int(i) for i in point]
-        settile = isl.Set("{[ii,jj,i,j"+sufix+"] : ii = " + str(point[0]) + " and jj = " + str(point[1]) + "}").intersect(tilebis).coalesce()
-        tile_points = settile.apply(reduce_map)
+        while(not tilebis.is_empty()):
+            s = tilebis.lexmin()
+        #    tilebis = tilebis.subtract(s)
+            point =  s.sample_point()
+            point = str(point)
+            point = point.replace('[', '')
+            point = point.replace(']', '')
+            point = point.replace('{', '')
+            point = point.replace('}', '')
+            point = point.replace(' ', '')
+            point = point.split(',')
+            point = [int(i) for i in point]
+            settile = isl.Set("{[ii,jj,i,j"+sufix+"] : ii = " + str(point[0]) + " and jj = " + str(point[1]) + "}").intersect(tilebis).coalesce()
+            tile_points = settile.apply(reduce_map)
 
-        plot_set_shapes((tile_points ), color="blue", alpha=0.3, vertex_size=0)
-        #print tile_points
-        #print settile
-        tilebis = tilebis.subtract(settile)
+            plot_set_shapes((tile_points ), color="blue", alpha=0.3, vertex_size=0)
+            #print tile_points
+            #print settile
+            tilebis = tilebis.subtract(settile)
 
 
 
