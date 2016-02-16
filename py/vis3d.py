@@ -52,7 +52,7 @@ for line in lines:
     line = line.replace('\n', '')
     items = line.split(',')
     items = list((int(x) for x in items))
-    a = Arrow3D([items[0], items[3]], [items[1], items[4]], [items[2], items[5]], mutation_scale=20, lw=1, arrowstyle="-|>", color="k")
+    a = Arrow3D([items[0], items[3]], [items[1], items[4]], [items[2], items[5]], mutation_scale=20, lw=1, arrowstyle="-|>", color="k", alpha=0.4)
     plot.add_artist(a)
 
 
@@ -84,6 +84,6 @@ for line in lines:
     line = line.replace(':', '')  #exists to points only
     items = line.split(']')
     poly = Polyhedron(items[len(items)-1])
-    poly.plot(plot, facecolor='blue', alpha=0.3)
+    poly.plot(plot, facecolor='blue', alpha=0.2)
 
 pylab.show()
