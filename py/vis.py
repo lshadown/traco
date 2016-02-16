@@ -6,6 +6,9 @@ from matplotlib.collections import PatchCollection
 import random
 import matplotlib
 from islplot.plotter import *
+from subprocess import call
+
+
 
 try:
     import islpy as isl
@@ -20,6 +23,13 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
 
     if tilebis.dim(isl.dim_type.param) > 0:
         sys.exit()
+
+
+    sufix = ''
+    if(Ext):
+        sufix = ',v'
+
+    ile = int(stuff[0]['ub']) - int(stuff[0]['lb'])
 
     #colors_ = list(six.iteritems(colors.cnames))
     colors_ = ['r', 'b','g','c','y']
@@ -38,6 +48,10 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
 
     plot_set_points((domain), marker=".", size=5, color="blue")
 
+
+    f = open("deps.txt", "w")
+
+
     for dep2 in deps:
         dep = dep2.relation
         while(not dep.is_empty()):
@@ -51,6 +65,8 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
             doms = integer_list(doms)
             ranges = integer_list(ranges)
 
+            f.write(','.join(str(x) for x in doms) + ',' + ','.join(str(x) for x in ranges) + '\n')
+
 
             ax.annotate("",
                     xy=(ranges[0], ranges[1]), xycoords='data',
@@ -59,8 +75,30 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
                                     connectionstyle="arc3"),
                     )
 
+    f.close()
+
+    # ------------------------------------------------------------
+
+    if(domain.dim(isl.dim_type.set) == 3):
+        reduce_map = isl.Map('{[ii,jj,kk,i,j,k'+sufix+'] -> [i,j,k]}')
+        f = open("tiles.txt", "w")
+        while(not tilebis.is_empty()):
+            s = tilebis.lexmin()
+            point = s.sample_point()
+            point = integer_list(point)
+            settile = isl.Set("{[ii,jj,kk,i,j,k"+sufix+"] : ii = " + str(point[0]) + " and jj = " + str(point[1]) + " and kk = " + str(point[2]) + "}").intersect(tilebis).coalesce()
+            tile_points = settile.apply(reduce_map)
+            f.write(str(tile_points) + '\n')
+            tilebis = tilebis.subtract(settile)
 
 
+        f.close()
+        call(['python3','/home/marek/traco/py/vis3d.py'])
+        sys.exit(0);
+
+
+
+    # --------------------------------------------------------------
 
     while(not tilebis.is_empty()):
         s = tilebis.lexmin()
@@ -102,9 +140,7 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
     ax.add_collection(p)
 
     if(1==0):
-        sufix = ''
-        if(Ext):
-            sufix = ',v'
+
 
         reduce_map = isl.Map('{[ii,jj,i,j'+sufix+'] -> [i,j]}')
 
