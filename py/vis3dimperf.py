@@ -108,7 +108,7 @@ def imperf_vis(tilebises,dep):
             rv = 1
         # --------------------------
 
-        a = Arrow3D([doms[0], ranges[0]], [dv, rv], [doms[1], ranges[1]], mutation_scale=20, lw=1, arrowstyle="-|>", color="k", alpha=0.4)
+        a = Arrow3D([doms[0], ranges[0]], [dv, rv], [doms[1], ranges[1]], mutation_scale=10, lw=1, arrowstyle="-|>", color="k", alpha=0.4)
         ax.add_artist(a)
 
         ax.annotate("",
