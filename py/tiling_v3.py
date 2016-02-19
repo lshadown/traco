@@ -28,6 +28,8 @@ import relation_util
 import Dependence
 import clanpy
 
+import vis3dimperf
+
 
 from CPython import codegen
 
@@ -1175,6 +1177,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
+
             # correct upper bounds for simpl_ub
 
         if simpl_ub:
@@ -1222,13 +1225,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     #print imperf
 
+    vis3dimperf.imperf_vis(isl_TILEbis, isl_rel)
 
 
     _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
 
 
-    vis.Vis(isl_TILEbis[0], stuff, cl.deps, isl.Set(cl.statements[0].domain_map), True)
-    sys.exit(0)
+    #vis.Vis(isl_TILEbis[0], stuff, cl.deps, isl.Set(cl.statements[0].domain_map), True)
+    #sys.exit(0)
 
 
     if(Extend):
