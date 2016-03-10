@@ -118,7 +118,7 @@ if (N8 >= 1 && N11 >= 1) {
 
   }
 }
-}
+
 else
 {
 int ub = floord(-N1 + N2, 32);
