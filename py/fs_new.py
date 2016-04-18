@@ -20,6 +20,7 @@ import iscc
 import imperf_tile
 import re
 import correct
+import copyconstr
 
 def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact):
 
@@ -129,6 +130,11 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     re_rel = re_rel.intersect(rlex.subtract(rel_plus).subtract(rip)).coalesce()
 
     print re_rel
+
+
+    # oblicz Re1
+
+
 
     W = re_rel.domain().union(re_rel.range()).coalesce()
     D = re_rel.domain().subtract(re_rel.range()).coalesce()
@@ -387,3 +393,17 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
 
+def GetRe1(re, relplus):
+
+    isl_symb = relplus.get_var_names(isl.dim_type.param)
+    dim = relplus.dim(isl.dim_type.out)
+
+
+
+    sys.exit(0)
+
+
+
+
+
+    return ''
