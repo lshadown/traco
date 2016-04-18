@@ -97,12 +97,12 @@ def imperf_vis(tilebises,dep):
         dv = 0
         rv = 0
         # to trzeba zautomatyzowac
-        if doms[2] == 7:
+        if doms[2] == 10:
             dv = 0
         else:
             dv = 1
 
-        if ranges[2] == 7:
+        if ranges[2] == 10:
             rv = 0
         else:
             rv = 1
@@ -119,9 +119,9 @@ def imperf_vis(tilebises,dep):
                 )
 
 
-    ax.set_xlim3d(0,16)
+    ax.set_xlim3d(-1,8)
     ax.set_ylim3d(0,1)
-    ax.set_zlim3d(0,16)
+    ax.set_zlim3d(-1,8)
 
     plt.show()
 
