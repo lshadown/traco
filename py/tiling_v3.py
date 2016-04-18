@@ -798,11 +798,26 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     isl_ident = isl_rel.identity(isl_rel.get_space())
 
 
+    # k6 only
+    print isl_rel
+    rel_plus = isl_rel.transitive_closure()[0]
+    isl_rel = isl_rel.subtract(rel_plus.apply_range(isl_rel))
+    rel = isl.Map(str("{[i,j,v]->[i,j',v]}"))
+    #isl_rel = isl_rel.subtract(rel)
+    print isl_rel
+    #exit(0)
+
+    # -------------
+
+
     if(perfect_mode):
         print "Removing internal dependences for perfect nested loop"
         isl_rel = isl_rel.subtract(isl_ident)
 
     print isl_rel
+
+
+
 
     z = isl_rel.dim(isl.dim_type.out)
     zz = maxl - z  + 1
@@ -1210,8 +1225,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-        #if(SIMPLIFY):
-        #    isl_TILEbis[i] = imperf_tile.SimplifySlice(isl_TILEbis[i])
+        if(SIMPLIFY):
+            isl_TILEbis[i] = imperf_tile.SimplifySlice(isl_TILEbis[i])
 
 
         #print "TILE''" + "dla s" + str(i) + "\n" +  str(isl_TILEbis[i])
@@ -1225,7 +1240,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     #print imperf
 
-    vis3dimperf.imperf_vis(isl_TILEbis, isl_rel)
+    #vis3dimperf.imperf_vis(isl_TILEbis, isl_rel)
 
 
     _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
@@ -1318,7 +1333,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print "Cloog start..."
         start = time.time()
 
-        isl_ast = False
+        isl_ast = True
         barv = 1
 
         if(barv == 1):
