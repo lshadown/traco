@@ -138,6 +138,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print "### RE2"
     re_rel = re_rel.subtract(Re1).coalesce()
     print re_rel
+    re2 = re_rel
 
     W = re_rel.domain().union(re_rel.range()).coalesce()
     D = re_rel.domain().subtract(re_rel.range()).coalesce()
@@ -196,18 +197,30 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     REPR = D.union(DOM_RAN.subtract(W)).coalesce()
 
     # poprawka
+    REPR = re2.domain().subtract(re2.range()).coalesce()
+    print '#REPR1'
+    print REPR
+
 
     tmp = REPR.apply(RRstar).coalesce()
     REPR2 = DOM_RAN.subtract(tmp).coalesce()
 
-    print REPR
+    print '#REPR2'
     print REPR2
     REPR = REPR.union(REPR2).coalesce()
 
     #REPR =imperf_tile.SimplifySlice(REPR)
 
+    #####
+    #REPR1:= domain    RE2 - range    RE2;
+    #REPR2:= (domain    R    union    R) -RR * (REPR1);
+
+
+
     print "### REPR"
     print REPR
+
+
 
     if(1==0):
         Rtmp = REPR.polyhedral_hull()
