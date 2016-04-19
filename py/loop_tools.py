@@ -234,7 +234,7 @@ def ReadStatementNests(plik, dane):
                 st.append(i)
                 instrukcje.append({'st' : st, 'nest' : nest, 'path' : nest_arr[:], 'vars': var_arr[:], 'max_loop' : max_loop, 'nest_id' : nest_id, 'scatter' : []})
                 i = i + 1
-                newloop = 0
+                #newloop = 0
                 continue
             if(newloop == 1):  # nest != instrukcje[-1]['nest']
                 nest_id = nest_id + 1
