@@ -7,6 +7,8 @@ import random
 import matplotlib
 from islplot.plotter import *
 from subprocess import call
+import matplotlib.patches as mpatches
+
 
 
 
@@ -29,7 +31,7 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
     if(Ext):
         sufix = ',v'
 
-    ile = int(stuff[0]['ub']) - int(stuff[0]['lb'])
+    #ile = int(stuff[0]['ub']) - int(stuff[0]['lb'])
 
     #colors_ = list(six.iteritems(colors.cnames))
     colors_ = ['r', 'b','g','c','y']
@@ -51,9 +53,16 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
 
     f = open("deps.txt", "w")
 
+    j=0
 
     for dep2 in deps:
+        j=j+1
+        print dep2.relation
+
         dep = dep2.relation
+        #dep = isl.Map("{ [i, j] -> [i', -i + i'] : 0 <= i <= 8 and 0 <= j <= i and i' > i and 0 <= i' <= 8 }")
+        #depx = isl.Map("{[i,j] -> [i+1,1] : j < i && j > 1 }")
+        #dep = dep.subtract(depx)
         while(not dep.is_empty()):
             s = dep.sample()
             dep = dep.subtract(s)
@@ -137,6 +146,22 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
     p = PatchCollection(patches, cmap=matplotlib.cm.jet, alpha=0.4)
 
 
+    if(1==0):
+        # facecolors=['red','green','green','green','blue','yellow','red','red','yellow','magenta','gray','blue','magenta','gray','#dd6600', '#aaefff']
+        classes = ['0','1','2','3','4','5','6','7']
+        class_colours = ['green','red','blue','yellow','magenta','gray','#dd6600', '#aaefff']
+        recs = []
+        for i in range(0,len(class_colours)):
+            recs.append(mpatches.Rectangle((0,0),1,1,fc=class_colours[i], alpha=0.4))
+
+
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+
+        # Put a legend below current axis
+        ax.legend(recs,classes,loc='upper center', bbox_to_anchor=(0.5, -0.05),fancybox=True, shadow=True, ncol=4)
+
+
     ax.add_collection(p)
 
     if(1==0):
@@ -173,9 +198,9 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
         print 'Error. Change upper bounds with <= to < in the source loops.'
         sys.exit(0);
 
-    #ax.axis([-1, 10, -1, 10])
+    ax.axis([-1, 8, -1, 8])
 
-    ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
+    #ax.axis([int(stuff[0]['lb'])-1, int(stuff[0]['ub'])+1, int(stuff[1]['lb'])-1, int(stuff[1]['ub'])+1])
     # Get current size
     fig_size = plt.rcParams["figure.figsize"]
 
