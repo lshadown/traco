@@ -133,8 +133,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     # oblicz Re1
+    Re1 = GetRe1(re_rel, rel_plus)
 
-
+    re_rel = re_rel.subtract(Re1).coalesce()
 
     W = re_rel.domain().union(re_rel.range()).coalesce()
     D = re_rel.domain().subtract(re_rel.range()).coalesce()
@@ -269,7 +270,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     #if(SIMPLIFY):
 
 
-    #D =  imperf_tile.SimplifySlice(D)
+    D =  imperf_tile.SimplifySlice(D)
 
     print "# DOMAIN RSCHED"
 
@@ -398,12 +399,48 @@ def GetRe1(re, relplus):
     isl_symb = relplus.get_var_names(isl.dim_type.param)
     dim = relplus.dim(isl.dim_type.out)
 
+    in_ = []
+    out_= []
+    ex_ = []
+
+    for i in range(0, dim):
+        in_.append('_in'+str(i))
+        out_.append('_out' + str(i))
+        ex_.append('_ex' + str(i))
 
 
-    sys.exit(0)
+    symb = ','.join(isl_symb)
+
+    Re1 = ''
+
+    # symbolic variables
+    if(len(isl_symb) > 0):
+        Re1 = Re1 + '['+symb+'] -> { '
+    else:
+        Re1 = Re1 + '{ '
+    #tuple variables
+    Re1 = Re1 + '[' + ','.join(in_) + '] -> [' + ','.join(out_) + '] : '
+
+    #s2 in Re(s1)
+    Re1 = Re1 +  copyconstr.GetConstr(in_, out_, re)
+
+    #exists s1' :
+    Re1 = Re1 + 'and exists ' + ','.join(ex_) + ' : ('
+
+    # s1' in Re(s1)
+    Re1 = Re1 + copyconstr.GetConstr(in_, ex_, re)
+
+    # s2 in R+(s1')
+    Re1 = Re1 + ' and ' + copyconstr.GetConstr(ex_, out_, relplus)
+
+    Re1 = Re1 + ') }'
 
 
 
+    Re1 = isl.Map(Re1)
+    Re1.coalesce()
 
+    print "### Re1"
+    print Re1
 
-    return ''
+    return Re1

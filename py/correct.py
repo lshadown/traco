@@ -26,6 +26,9 @@ def Korekta(plik, lines = []):
     bloki = []
     
     for line in lines:
+        if '#pragma' in line:
+            lines2.append(line)
+            continue
         tab = whites(line)
         for item in reversed(bloki):
             if item >= len(tab):

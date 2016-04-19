@@ -7,7 +7,7 @@ def GetConstr(list_in, list_out, rel):   #lista zmiennych wej, lista zmiennych w
     sep = '] :'
     conj_sep = 'union'
 
-    rel = isl.Map(rel)
+    #rel = isl.Map(rel)
 
 
     for i in range(0, len(list_in)):
@@ -37,10 +37,10 @@ def GetConstr(list_in, list_out, rel):   #lista zmiennych wej, lista zmiennych w
 
 
 
-rel = "{ [i, j, 6] -> [i', j', 6] : i >= 0 and j >= 8 + i and i' <= 9 and j <= j' <= 9 and j' <= 7 + i'; [i, 5, 6] -> [i', j', 6] : i >= 0 and i' <= 9 and 7 + i <= j' <= 9 and j' <= 7 + i'; [i, j, 6] -> [i', 5, 6] : i >= 0 and 8 + i <= j <= 9 and -7 + j <= i' <= 9; [i, j, 6] -> [i', j, 6] : i >= 0 and 0 <= j <= 9 and i < i' <= 9; [i, j, v] -> [i, j, v] }"
+#rel = "{ [i, j, 6] -> [i', j', 6] : i >= 0 and j >= 8 + i and i' <= 9 and j <= j' <= 9 and j' <= 7 + i'; [i, 5, 6] -> [i', j', 6] : i >= 0 and i' <= 9 and 7 + i <= j' <= 9 and j' <= 7 + i'; [i, j, 6] -> [i', 5, 6] : i >= 0 and 8 + i <= j <= 9 and -7 + j <= i' <= 9; [i, j, 6] -> [i', j, 6] : i >= 0 and 0 <= j <= 9 and i < i' <= 9; [i, j, v] -> [i, j, v] }"
 
-in_ = ["_i0", "_i1", "_i2"]
-out_ = ["_o0", "_o1", "_o2"]
+#in_ = ["_i0", "_i1", "_i2"]
+#out_ = ["_o0", "_o1", "_o2"]
 
 
-print GetConstr(in_, out_, rel)
+#print GetConstr(in_, out_, rel)
