@@ -48,7 +48,7 @@ def Vis(tilebis,stuff, deps, domain, Ext=False):
     #for dep2 in deps:
     #    plot_map(dep2.relation)
 
-    plot_set_points((domain), marker=".", size=5, color="blue")
+    plot_set_points((domain), marker=".", size=5, color="blue")  #
 
 
     f = open("deps.txt", "w")
