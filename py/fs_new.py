@@ -135,7 +135,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     # oblicz Re1
     Re1 = GetRe1(re_rel, rel_plus)
 
+    print "### RE2"
     re_rel = re_rel.subtract(Re1).coalesce()
+    print re_rel
 
     W = re_rel.domain().union(re_rel.range()).coalesce()
     D = re_rel.domain().subtract(re_rel.range()).coalesce()
