@@ -1114,12 +1114,19 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         # print isl_TILEprim[0]
 
+        isl_TILEbis.append(Project(isl_TILEprim[i].apply(Rapply).coalesce(), sym_exvars).coalesce())
+        isl_TILEorig.append(Project(isl_TILE[i].apply(Rapply).coalesce(), sym_exvars).coalesce())
+
         ############################################################################
         if(par_tiling):
             idx_bylo = []
 
-            S = "["
-            S1 = ",".join(sym_exvars) + "] -> {[" + ",".join(vars) + ",v] :"
+            if(len(symb)>0):
+                S = "[" + ",".join(symb) + ","
+            else:
+                S = "["
+
+            S1 = "{[" + ",".join(sym_exvars) + ","  +  ",".join(vars) + ",v] :"
             for j in range(0,len(instrukcje[i]['path'])):
 
                 idx = str(instrukcje[i]['path'][j])
@@ -1142,12 +1149,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                     idx_bylo.append(idx)
                 S1 = S1 + " " + sym_exvars[j] + "<= fff" + idx + " and "
 
-            S = S + S1 + " true }"
+            S = S[:-1] + "] -> " + S1 + " true }"
 
             print S
+
             S = isl.Set(S)
 
-            isl_TILEprim[i] = isl_TILEprim[i].intersect(S).coalesce()
+
+            isl_TILEbis[i] = isl_TILEbis[i].intersect(S).coalesce()
         #########################################################################
 
 
@@ -1159,8 +1168,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 isl_TILEprim[i] = isl_TILEprim[i].apply(RP)
                 #print isl_TILEprim[i]
 
-        isl_TILEbis.append(Project(isl_TILEprim[i].apply(Rapply).coalesce(), sym_exvars).coalesce())
-        isl_TILEorig.append(Project(isl_TILE[i].apply(Rapply).coalesce(), sym_exvars).coalesce())
+
 
 
 
