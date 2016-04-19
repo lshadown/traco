@@ -863,7 +863,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
 
     
-    Exp = False
+    Exp = True
     TMP2 = TILE_SOUR
     if(Exp and fs != 1):
         rel_simple = rbis.intersect(rel_)
@@ -906,7 +906,7 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
         srepr,rucs = slicing.Create_Srepr(rel_simple, rel_simple_plus)
 
         print srepr
-        sys.exit(0)
+
 
         # NAPRAWIC
 
@@ -1123,11 +1123,11 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
 
 
         # FS z RK
-        #sk = fs_rk.fs_rk1(rel_, SIMPLIFY, indt)
+        sk = fs_rk.fs_rk1(rel_, SIMPLIFY, indt)
 
 
         # FS bez RK
-        sk = fs_karl.FSwithoutRG(rel_)
+        #sk = fs_karl.FSwithoutRG(rel_)
 
         sk = sk.insert_dims(isl.dim_type.set, x*len(sym_exvars)+1,x*len(sym_exvars))
 
