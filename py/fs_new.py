@@ -153,7 +153,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     # R = R compose RINV
 
-    RR = rel.apply_range(rel_inv)
+    #RR = rel.apply_range(rel_inv)
+    RR = rel_inv.apply_range(rel)
 
 
     # ------ Jesli RCHECK ----------
