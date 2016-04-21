@@ -548,7 +548,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print 'Perfectly nested loop mode: enabled'
 
 
-    simpl_ub = False
+    simpl_ub = True
 
     BLOCK = block.split(',')
     par_tiling = False
@@ -627,7 +627,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # Proba prywatyzacji zmiennych w instrukcjach w gniazdach
     priv_stuff = priv_engine.PrivEng(LDeps)
-    if(imperf == 1):
+    priv_box=1
+    if(imperf == 0):
         priv_box = 1
 
         dane = []
@@ -651,7 +652,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # jesli zmienne prywatne sa w obrebie jednego S1 to mozna 
         
     start = time.time()
-    if((imperf == 1 and priv_box == 0)):
+    if((imperf == 0 and priv_box == 0)):
         dane = gen.RelPrint(LPetit, flag)
     else:
         if(len(priv_stuff[1]) > 0 and (priv_stuff[2] == 1 or False)):
@@ -973,9 +974,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     cl.RunCandl()
 
     j = 0
-    for i in range(0, len(instrukcje)):
-        instrukcje[i]['scatter'] = cl.statements[j].scatering[:]
-        j = j + len(instrukcje[i]['st'])
+
+
+    if(len(cl.statements)>0):
+        for i in range(0, len(instrukcje)):
+            instrukcje[i]['scatter'] = cl.statements[j].scatering[:]
+            j = j + len(instrukcje[i]['st'])
 
 
 
