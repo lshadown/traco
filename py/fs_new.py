@@ -348,7 +348,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
         print slice
         #if(SIMPLIFY):
-        slice = imperf_tile.SimplifySlice(slice)
+        #slice = imperf_tile.SimplifySlice(slice)
 
 
         # EKSPERIMENTAL CODE wywal z RE instrukcje nie nalezace do RE
