@@ -175,7 +175,13 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     IND_lexmin = IND.lexmin()
 
 
-    R2 = isl.Map.from_domain_and_range(IND_lexmin, IND).coalesce()
+    #R2 = isl.Map.from_domain_and_range(IND_lexmin, IND).coalesce()
+
+    RRPLUS = RR.transitive_closure()[0]
+
+    # sprawdz dokladnosc
+
+    R2 = GetR2(re_rel, RRPLUS)
 
 
     RRstar = RR.transitive_closure()
@@ -198,7 +204,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     REPR = D.union(DOM_RAN.subtract(W)).coalesce()
 
     # poprawka
-    REPR = re2.domain().subtract(re2.range()).coalesce()
+    REPR = R2.domain().subtract(R2.range()).coalesce()
     print '#REPR1'
     print REPR
 
@@ -210,7 +216,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print REPR2
     REPR = REPR.union(REPR2).coalesce()
 
-    #REPR =imperf_tile.SimplifySlice(REPR)
+    REPR =imperf_tile.SimplifySlice(REPR)
 
     #####
     #REPR1:= domain    RE2 - range    RE2;
@@ -460,3 +466,52 @@ def GetRe1(re, relplus):
     print Re1
 
     return Re1
+
+
+def GetR2(re, rrplus):
+
+    isl_symb = re.get_var_names(isl.dim_type.param)
+    dim = re.dim(isl.dim_type.out)
+
+    in_ = []
+    out_= []
+    ex_ = []
+
+    for i in range(0, dim):
+        in_.append('_in'+str(i))
+        out_.append('_out' + str(i))
+        ex_.append('_ex' + str(i))
+
+
+    symb = ','.join(isl_symb)
+
+    R2 = ''
+
+    # symbolic variables
+    if(len(isl_symb) > 0):
+        R2 = R2 + '['+symb+'] -> { '
+    else:
+        R2 = R2 + '{ '
+    #tuple variables
+    R2 = R2 + '[' + ','.join(in_) + '] -> [' + ','.join(out_) + '] : '
+
+    #s2 in Re(s1)
+    R2 = R2 +  copyconstr.GetConstr(in_, out_, re) + ' and '
+
+    #s2 in RR+(s1)
+    R2 = R2 +  copyconstr.GetConstr(in_, out_, rrplus) + ' and '
+
+    #s1 in Domain(Re)
+    R2 = R2 + copyconstr.GetConstrSet(in_, re.domain())
+
+    R2 = R2 + '}'
+
+    print R2
+
+    R2 = isl.Map(R2)
+    R2.coalesce()
+
+    print "### R2"
+    print R2
+
+    return R2
