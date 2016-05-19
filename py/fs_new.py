@@ -106,6 +106,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     IND = IS.subtract(DOM_RAN).coalesce()
 
 
+
+
     n = rel.dim(isl.dim_type.in_)
 
     inp = []
@@ -135,9 +137,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     # oblicz Re1
     Re1 = GetRe1(re_rel, rel_plus)
 
-    print "### RE2"
-    re_rel = re_rel.subtract(Re1).coalesce()
-    print re_rel
+    #print "### RE2"
+    #re_rel = re_rel.subtract(Re1).coalesce()
+    #print re_rel
     re2 = re_rel
 
     W = re_rel.domain().union(re_rel.range()).coalesce()
@@ -175,13 +177,22 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     IND_lexmin = IND.lexmin()
 
 
-    #R2 = isl.Map.from_domain_and_range(IND_lexmin, IND).coalesce()
+    IND0ToIND = isl.Map.from_domain_and_range(IND_lexmin, IND).coalesce()
 
     RRPLUS = RR.transitive_closure()[0]
 
     # sprawdz dokladnosc
 
     R2 = GetR2(re_rel, RRPLUS)
+
+    print '### RRPLUS'
+    print RRPLUS
+
+    print '### R2'
+    print R2
+
+    R2 = R2.coalesce()
+    print R2
 
 
     RRstar = RR.transitive_closure()
@@ -242,14 +253,14 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print 'RSCHED obliczanie :'
     print R1
     print "IND0->IND"
-    print R2
+    print IND0ToIND
     #print R3
     print "i razem"
 
 
 
 
-    RSCHED = R1.union(R2).coalesce()
+    RSCHED = R1.union(IND0ToIND).coalesce()
 
     print RSCHED
 
@@ -337,7 +348,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
         print slice
         #if(SIMPLIFY):
-        #slice = imperf_tile.SimplifySlice(slice)
+        slice = imperf_tile.SimplifySlice(slice)
 
 
         # EKSPERIMENTAL CODE wywal z RE instrukcje nie nalezace do RE
@@ -471,7 +482,7 @@ def GetRe1(re, relplus):
 def GetR2(re, rrplus):
 
     isl_symb = re.get_var_names(isl.dim_type.param)
-    dim = re.dim(isl.dim_type.out)
+    dim = rrplus.dim(isl.dim_type.out)
 
     in_ = []
     out_= []
@@ -506,12 +517,12 @@ def GetR2(re, rrplus):
 
     R2 = R2 + '}'
 
-    print R2
+    #print R2
 
     R2 = isl.Map(R2)
-    R2.coalesce()
+    #R2.coalesce()
 
-    print "### R2"
-    print R2
+    #print "### R2"
+    #print R2
 
     return R2
