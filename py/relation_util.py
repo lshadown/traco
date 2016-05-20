@@ -38,7 +38,11 @@ def oc_IterateClosure(R):
         outFile.write('symbolic ' + sym + ";")
 
     outFile.write('R :=')
-    outFile.write(islMaptoOmegaStr(R))
+    str = islMaptoOmegaStr(R)
+
+    str = str.replace('_', 'ul0')
+    outFile.write(str)
+    #sys.exit(0)
     outFile.write(';IterateClosure R;')
     #outFile.write(';R^+;')
     outFile.close()
@@ -64,6 +68,8 @@ def oc_IterateClosure(R):
 
     w = symprefix + relcl
     w = w.replace('} union {', ';')
+
+    #print w
 
     rcl = isl.Map(w)
 

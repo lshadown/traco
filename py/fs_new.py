@@ -21,6 +21,7 @@ import imperf_tile
 import re
 import correct
 import copyconstr
+import relation_util
 
 def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact):
 
@@ -45,10 +46,18 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     if(exact):
         print 'R+ exact!'
     else:
-        print 'R+ approximated. Exit!'
-        file = open('lu_rplus.txt', 'r')
-        isl_relclosure = isl.Map(file.read())
-        print isl_relclosure
+        print 'R+ approximated. Iterate way...!'
+
+        r0p_plus = relation_util.oc_IterateClosure(rel)
+        isl_relclosure = r0p_plus
+
+
+
+
+
+        #file = open('lu_rplus.txt', 'r')
+        #isl_relclosure = isl.Map(file.read())
+        #print isl_relclosure
 
 
 
@@ -56,6 +65,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     print rel
+
+    print '## R+'
+    print isl_relclosure
 
     rel = rel.subtract(rel_plus.apply_range(rel))
 

@@ -77,6 +77,8 @@ def FSwithoutRG(r):
 
 
 
+
+
     isl_ident = isl.Map.identity(rp.get_space())
     r0p_star = r0p_plus.union(isl_ident).coalesce()
 

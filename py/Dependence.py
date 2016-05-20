@@ -85,18 +85,34 @@ class Kernel_Loop:
         lines = Petit_Rel(self.plik).split('\n')
         lines2 = []
 
-        for line in lines:
-            if 'must' in line:
-                continue
-            else:
-                lines2.append(line)
+
+        if (False):
+            for line in lines:
+                if 'must' in line:
+                    continue
+                else:
+                    lines2.append(line)
+
+        else:
+            allow_to_add = True
+
+            for i in range(0, len(lines)):
+                if 'must' in lines[i]:
+                    allow_to_add = False  # nie dodawaj lini po must chyba ze bedzie  nowa zaleznosc
+
+                if '-->' in lines[i]:
+                    allow_to_add = True
+
+                if allow_to_add:
+                    lines2.append(lines[i])
 
         lines = lines2
+
 
         for i in range(0, len(lines),4):
             dep = Dependence()
             info = lines[i].split()
-            #print lines[i]
+            print lines[i]
             dep.kind = info[0]
             dep.var_in = info[2]
             #print info
