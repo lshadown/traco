@@ -49,11 +49,20 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
         print 'R+ approximated. Iterate way...!'
 
         r0p_plus = relation_util.oc_IterateClosure(rel)
-        isl_relclosure = r0p_plus
+        rel_plus = r0p_plus
 
+        isl_relclosure =  rel_plus
+        isl_ident = rel.identity(rel.get_space())
+        isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
 
+        print 'Checking (the Pugh method)'
 
+        # R = R compose RINV
 
+        if (rel_plus.subtract(rel_plus.apply_range(rel).union(rel)).coalesce().is_empty()):
+            print ' .... OK !!'
+        else:
+            print 'R+ failed.'
 
         #file = open('lu_rplus.txt', 'r')
         #isl_relclosure = isl.Map(file.read())
@@ -67,7 +76,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print rel
 
     print '## R+'
-    print isl_relclosure
+    print rel_plus
 
     rel = rel.subtract(rel_plus.apply_range(rel))
 
@@ -147,7 +156,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     # oblicz Re1
-    Re1 = GetRe1(re_rel, rel_plus)
+    #Re1 = GetRe1(re_rel, rel_plus)
 
     #print "### RE2"
     #re_rel = re_rel.subtract(Re1).coalesce()
@@ -191,7 +200,14 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     IND0ToIND = isl.Map.from_domain_and_range(IND_lexmin, IND).coalesce()
 
-    RRPLUS = RR.transitive_closure()[0]
+    RRPLUS = RR.transitive_closure()
+    RR_EXACT = RRPLUS[1]
+    RRPLUS = RRPLUS[0]
+
+    if not RR_EXACT:
+        print 'RR+ not exact'
+        sys.exit(0)
+
 
     # sprawdz dokladnosc
 
@@ -201,22 +217,11 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print RRPLUS
 
     print '### R2'
-    print R2
-
     R2 = R2.coalesce()
     print R2
 
 
-    RRstar = RR.transitive_closure()
-    if not RRstar[1]:
-        print 'RR* not exact'
-    #    sys.exit(0)
-
-
-
-    RRstar = RR.transitive_closure()[0].coalesce()
-
-
+    RRstar = RRPLUS
     RR_ident = RR.identity(RR.get_space())
     RRstar = RRstar.union(RR_ident).coalesce()  # R* = R+ u I
 
