@@ -110,42 +110,62 @@ int c = 0;
 /* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /
    Unicode 6.0.  */
 /* We do not support C11 <threads.h>.  */
-  int t1, t2, t3;
+  int t1, t2, t3, t4, t5, t6;
  int lb, ub, lbp, ubp, lb2, ub2;
  register int lbv, ubv;
 /* Start of CLooG code */
 if (N >= 2) {
-  lbv=1;
-  ubv=N-1;
-#pragma ivdep
-#pragma vector always
-  for (t3=lbv;t3<=ubv;t3++) {
-    a[0][t3] = a[0][t3]/a[0][0];;
-  }
-  for (t1=1;t1<=2*N-4;t1++) {
-    if (t1%2 == 0) {
-      lbv=ceild(t1+2,2);
-      ubv=N-1;
-#pragma ivdep
-#pragma vector always
-      for (t3=lbv;t3<=ubv;t3++) {
-        a[(t1/2)][t3] = a[(t1/2)][t3]/a[(t1/2)][(t1/2)];;
-      }
-    }
-    lbp=ceild(t1+1,2);
-    ubp=min(t1,N-1);
-#pragma omp parallel for private(lbv,ubv,t3)
+  for (t1=0;t1<=floord(N-2,16);t1++) {
+    lbp=ceild(t1,2);
+    ubp=min(floord(N-1,32),t1);
+#pragma omp parallel for private(lbv,ubv,t3,t4,t5,t6)
     for (t2=lbp;t2<=ubp;t2++) {
-      lbv=t1-t2+1;
-      ubv=N-1;
+      for (t3=t1-t2;t3<=floord(N-1,32);t3++) {
+        if (t1 == t2+t3) {
+          for (t4=32*t1-32*t2;t4<=min(N-2,32*t1-32*t2+30);t4++) {
+            lbv=max(32*t2,t4+1);
+            ubv=min(N-1,32*t2+31);
 #pragma ivdep
 #pragma vector always
-      for (t3=lbv;t3<=ubv;t3++) {
-        a[t2][t3] = a[t2][t3] - a[t2][(t1-t2)]*a[(t1-t2)][t3];;
+            for (t6=lbv;t6<=ubv;t6++) {
+              a[t4][t6] = a[t4][t6]/a[t4][t4];;
+            }
+            for (t5=t4+1;t5<=min(N-1,32*t1-32*t2+31);t5++) {
+              lbv=max(32*t2,t4+1);
+              ubv=min(N-1,32*t2+31);
+#pragma ivdep
+#pragma vector always
+              for (t6=lbv;t6<=ubv;t6++) {
+                a[t5][t6] = a[t5][t6] - a[t5][t4]*a[t4][t6];;
+              }
+            }
+          }
+        }
+        if ((t1 == t2+t3) && (t1 <= 2*t2-1)) {
+          lbv=32*t2;
+          ubv=min(N-1,32*t2+31);
+#pragma ivdep
+#pragma vector always
+          for (t6=lbv;t6<=ubv;t6++) {
+            a[(32*t1-32*t2+31)][t6] = a[(32*t1-32*t2+31)][t6]/a[(32*t1-32*t2+31)][(32*t1-32*t2+31)];;
+          }
+        }
+        if (t1 <= t2+t3-1) {
+          for (t4=32*t1-32*t2;t4<=min(32*t2+30,32*t1-32*t2+31);t4++) {
+            for (t5=32*t3;t5<=min(N-1,32*t3+31);t5++) {
+              lbv=max(32*t2,t4+1);
+              ubv=min(N-1,32*t2+31);
+#pragma ivdep
+#pragma vector always
+              for (t6=lbv;t6<=ubv;t6++) {
+                a[t5][t6] = a[t5][t6] - a[t5][t4]*a[t4][t6];;
+              }
+            }
+          }
+        }
       }
     }
   }
-  a[(N-1)][(N-1)] = a[(N-1)][(N-1)] - a[(N-1)][(N-2)]*a[(N-2)][(N-1)];;
 }
 /* End of CLooG code */
 
