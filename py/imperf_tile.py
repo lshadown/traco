@@ -10,6 +10,8 @@ import sys
 import loop_tools
 import islpy as isl
 import re
+import tqdm, time
+
 ctx = isl.Context()
 
 def GetIT(instrukcje, stuff_reduced, _SYM, vars, sym_exvars, BLOCK, l):
@@ -268,17 +270,18 @@ def Get_ST(plik, dane):
 def SimplifySlice(slice):
     sets =  slice.get_basic_sets()
 
-    for i in range(0, len(sets)):
+    print 'Please wait, simplification... '
+    for i in tqdm.tqdm(range(0, len(sets))):
         for j in range(0, len(sets)):
             if(i!=j and not sets[i].is_equal(sets[j])):
                 tmp = sets[i].union(sets[j])
                 tmp2 = tmp.polyhedral_hull()
                 if(tmp.is_equal(tmp2) and len(tmp2.get_basic_sets()) == 1):
-                    print "i j " + str(i) + " " + str(j) + "joinable"
+                    #print "i j " + str(i) + " " + str(j) + "joinable"
                     sets[i] = tmp2
                     sets[j] = tmp2
-                else:
-                    print "i j " + str(i) + " " + str(j) + "--"
+                #else:
+                    #print "i j " + str(i) + " " + str(j) + "--"
 
     slice = sets[0]
     for i in range(1, len(sets)):
@@ -290,17 +293,18 @@ def SimplifySlice(slice):
 def SimplifyMap(slice):
     sets =  slice.get_basic_maps()
 
-    for i in range(0, len(sets)):
+    print 'Please wait, simplification... '
+    for i in tqdm.tqdm(range(0, len(sets))):
         for j in range(0, len(sets)):
             if(i!=j and not sets[i].is_equal(sets[j])):
                 tmp = sets[i].union(sets[j])
                 tmp2 = tmp.polyhedral_hull()
                 if(tmp.is_equal(tmp2) and len(tmp2.get_basic_maps()) == 1):
-                    print "i j " + str(i) + " " + str(j) + "joinable"
+                    #print "i j " + str(i) + " " + str(j) + "joinable"
                     sets[i] = tmp2
                     sets[j] = tmp2
-                else:
-                    print "i j " + str(i) + " " + str(j) + "--"
+                #else:
+                    #print "i j " + str(i) + " " + str(j) + "--"
 
     slice = sets[0]
     for i in range(1, len(sets)):
