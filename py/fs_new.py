@@ -23,6 +23,9 @@ import correct
 import copyconstr
 import relation_util
 
+
+
+
 def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact):
 
     #floyd
@@ -31,17 +34,13 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     # R = R - R+ compose R
 
-    #print '#RAP'
-    #print rap
-
 
     # do zrobienia
-    # 1. restore statements, zapis do pliku
-    # 2. poprawic was_par   ok
-    # 3. wczytanie R+
     # 4. perf imperf rozroznic
 
 
+    #codegen = 'barvinok'
+    codegen = 'isl'
 
     if(exact):
         print 'R+ exact!'
@@ -63,6 +62,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
             print ' .... OK !!'
         else:
             print 'R+ failed.'
+            sys.exit(0)
 
         #file = open('lu_rplus.txt', 'r')
         #isl_relclosure = isl.Map(file.read())
@@ -77,6 +77,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     print '## R+'
     print rel_plus
+
 
     rel = rel.subtract(rel_plus.apply_range(rel))
 
@@ -97,7 +98,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     IS = DOM_RAN
     for i in range(0, len(cl.statements)):
         IS_ =  isl.Set(cl.statements[i].domain_map).coalesce()
-
+        print IS_
         set_size = IS_.dim(isl.dim_type.set)
 
         for j in range(set_size, global_size-1):
@@ -124,9 +125,13 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print "IS"
     print IS
 
+
+
+
     IND = IS.subtract(DOM_RAN).coalesce()
 
-
+    print "IND"
+    print IND
 
 
     n = rel.dim(isl.dim_type.in_)
@@ -251,7 +256,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     #REPR2:= (domain    R    union    R) -RR * (REPR1);
 
 
-
+    #REPR = REPR.intersect(IS)
     print "### REPR"
     print REPR
 
@@ -265,6 +270,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     R1 = RRstar.intersect_domain(REPR.coalesce())
 
+  #  R1 = R1.intersect_range(IS)
 
 
     print 'RSCHED obliczanie :'
@@ -278,8 +284,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     RSCHED = R1.union(IND0ToIND).coalesce()
+    RSCHED = R1
 
-    print RSCHED
+
 
 
 
@@ -332,7 +339,13 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
 
-    looprepr = iscc.isl_ast_codegen(D)
+
+
+    if (codegen == 'barvinok'):
+        looprepr = iscc.iscc_communicate("L :=" + str(D) + "; codegen L;")
+
+    else:  # isl
+        looprepr = iscc.isl_ast_codegen(D)
 
     for i in range(0,20):
         looprepr = re.sub('\\b'+'c' + str(i) +'\\b', 't' + str(i), looprepr)
@@ -362,7 +375,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
             slice = slice.union(slice_).coalesce()
             slice = slice_
 
-
+        print '-------- IS --------'
+        print IS
+        #slice = slice.intersect(IS).coalesce()
         print slice
         #if(SIMPLIFY):
         #slice = imperf_tile.SimplifySlice(slice)
@@ -386,7 +401,6 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     for line in looprepr:
         if(st_reg.match(line)):
             #print slices[i]
-            codegen = 'barvinok'
             if (codegen == 'barvinok'):
                 petla = iscc.iscc_communicate("L :=" + str(slices[i]) + "; codegen L;")
                 petla = petla.split('\n')
