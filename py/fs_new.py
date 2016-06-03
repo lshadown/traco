@@ -283,7 +283,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
 
-    RSCHED = R1.union(IND0ToIND).coalesce()
+    #RSCHED = R1.union(IND0ToIND).coalesce()
     RSCHED = R1
 
 
@@ -300,9 +300,6 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     #RSCHED = imperf_tile.SimplifyMap(RSCHED)
 
 
-
-
-
     print "### RSCHED"
     print RSCHED
 
@@ -311,7 +308,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     print "### Check "
     Check_set = RSCHED.domain().union(RSCHED.range()).coalesce()
-    Check_set = IS.subtract(Check_set).coalesce()
+
+    Check_set = IS.subtract(IND).subtract(Check_set).coalesce()
 
     if Check_set.is_empty():
         print "OK"
