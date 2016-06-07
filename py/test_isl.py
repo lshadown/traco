@@ -4,7 +4,7 @@ import os
 
 folder =  os.path.dirname(os.path.realpath(__file__))[:-3]
 
-sys.path.insert(0, folder + '/barvinok-0.36/')
+sys.path.insert(0, folder + '/barvinok-0.39/')
 
 import isl
 
