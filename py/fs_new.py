@@ -211,12 +211,14 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     if not RR_EXACT:
         print 'RR+ not exact'
-        sys.exit(0)
+        #sys.exit(0)
 
 
     # sprawdz dokladnosc
 
     R2 = GetR2(re_rel, RRPLUS)
+
+
 
     print '### RRPLUS'
     print RRPLUS
@@ -539,7 +541,8 @@ def GetR2(re, rrplus):
     R2 = R2 +  copyconstr.GetConstr(in_, out_, re) + ' and '
 
     #s2 in RR+(s1)
-    R2 = R2 +  copyconstr.GetConstr(in_, out_, rrplus) + ' and '
+    if not rrplus.is_empty():
+        R2 = R2 +  copyconstr.GetConstr(in_, out_, rrplus) + ' and '
 
     #s1 in Domain(Re)
     R2 = R2 + copyconstr.GetConstrSet(in_, re.domain())
