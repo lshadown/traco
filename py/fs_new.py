@@ -538,14 +538,16 @@ def GetR2(re, rrplus):
     R2 = R2 + '[' + ','.join(in_) + '] -> [' + ','.join(out_) + '] : '
 
     #s2 in Re(s1)
-    R2 = R2 +  copyconstr.GetConstr(in_, out_, re) + ' and '
+    if not re.is_empty():
+        R2 = R2 +  copyconstr.GetConstr(in_, out_, re) + ' and '
 
     #s2 in RR+(s1)
     if not rrplus.is_empty():
         R2 = R2 +  copyconstr.GetConstr(in_, out_, rrplus) + ' and '
 
     #s1 in Domain(Re)
-    R2 = R2 + copyconstr.GetConstrSet(in_, re.domain())
+    if not re.is_empty():
+        R2 = R2 + copyconstr.GetConstrSet(in_, re.domain())
 
     R2 = R2 + '}'
 
