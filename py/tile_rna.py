@@ -51,3 +51,12 @@ print TILE_S1
 print '---'
 
 print TILE_S2
+
+#######################################################################
+# [S1 | S2]
+# TILE_LT_S1
+# TILE_GT_S1
+# TILE_LT_S2
+# TILE_GT_S2
+
+# iloczyny
