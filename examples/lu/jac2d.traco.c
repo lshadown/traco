@@ -6,8 +6,8 @@
 #include <omp.h> 
 #include <assert.h>
 
-#define N 2000
-#define T 1000
+#define N 200
+#define T 100
 
 #define ceild(n,d)  ceil(((double)(n))/((double)(d)))
 #define floord(n,d) floor(((double)(n))/((double)(d)))
@@ -17,7 +17,11 @@
 #pragma declarations
 double a[N][N];
 double b[N][N];
+double a1[N][N];
+double b1[N][N];
+
 #pragma enddeclarations
+
 
 #ifdef TIME
 #define IF_TIME(foo) foo;
@@ -34,6 +38,7 @@ void init_array()
     for (i=0; i<N; i++) {
         for (j=0; j<N; j++) {
             a[i][j] = ((double)j)/N;
+            a1[i][j] = ((double)j)/N;
         }
     }
 }
@@ -56,8 +61,31 @@ int main()
     double t_start, t_end;
 
     init_array();
+
+
+#pragma scop
+    for (t=0; t<T; t++) {
+        for (i=2; i<N-1; i++) {
+            for (j=2; j<N-1; j++) {
+                b1[i][j]= 0.2*(a1[i][j]+a1[i][j-1]+a1[i][1+j]+a1[1+i][j]+a1[i-1][j]);
+            }
+        }
+        for (i=2; i<N-1; i++) {
+            for (j=2; j<N-1; j++)   {
+                a1[i][j]=b1[i][j];
+            }
+        }
+    }
+#pragma endscop
+
 int t1, c3, c5, t3, t5;
     t_start = rtclock();
+
+
+
+
+
+omp_set_num_threads(1);
 
 
 
@@ -78,8 +106,9 @@ if (N >= 4)
           if (N == 4) {
             b[2][2]=0.2*(a[2][2]+a[2][2-1]+a[2][1+2]+a[1+2][2]+a[2-1][2]);
           }
-        } else
+        } else{
           b[2][2]=0.2*(a[2][2]+a[2][2-1]+a[2][1+2]+a[1+2][2]+a[2-1][2]);
+       }
       }
     } else
       for (t3 = 2; t3 < N - 1; t3 += 1)
@@ -96,6 +125,22 @@ if (N >= 4)
       }
     }
   }
+
+
+for(i=0; i<N; i++)
+for(j=0; j<N; j++)
+if(!(isnan(a[i][j]) && isnan(a1[i][j]))){
+ if(a[i][j] != a1[i][j]) { 
+   printf("Error %i %i %f %f\n", i, j, a[i][j], a1[i][j]); 
+   exit(0);
+ }
+ if(b[i][j] != b1[i][j]) { 
+   printf("Error %i %i %f %f\n", i, j, b[i][j], b1[i][j]); 
+   exit(0);
+ }
+}
+
+
 
 
     t_end = rtclock();
