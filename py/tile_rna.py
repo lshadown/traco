@@ -60,3 +60,71 @@ print TILE_S2
 # TILE_GT_S2
 
 # iloczyny
+
+lex_s1 = ' ( (ii > iip) or (ii = iip && jj > jjp) or (ii=iip && jj=jjp & kk > kkp) ) '
+lex_s2 = ' ( (ii > iip) or (ii = iip && jj > jjp) ) '
+lex_s1s2 = ' ( (ii > iip) or (ii = iip && jj > jjp) or (ii=iip && jj=jjp)  ) '
+
+lex_s1_g = ' ( (ii < iip) or (ii = iip && jj < jjp) or (ii=iip && jj=jjp & kk < kkp) ) '
+lex_s2_g = ' ( (ii < iip) or (ii = iip && jj < jjp) ) '
+lex_s1s2_g = ' ( (ii < iip) or (ii = iip && jj < jjp) or (ii=iip && jj=jjp)  ) '
+
+iig0 = ' ii >= 0 && jj >= 0 && kk>= 0 && iip >= 0 && jjp >= 0 && kkp>= 0 && '
+
+bilb1 = ' N-1 - b1*ii >= 0 && '
+bilb1p = ' N-1 - b1*iip >= 0 && '
+
+bilb2 = '(i+1) + b2 * jj <= N-1 && '
+bilb2p = '(i+1) + b2 * jjp <= N-1 && '
+
+bilb3 = 'b3*kk + 0 <= j-i-1 && '
+bilb3p = 'b3*kkp + 0 <= j-i-1 && '
+
+tile_ip_s1 = tile_i_s1.replace('ii', 'iip')
+tile_jp_s1 = tile_j_s1.replace('jj', 'jjp')
+tile_kp_s1 = tile_k_s1.replace('kk', 'kkp')
+
+template = '[N,ii,jj,kk] -> {[i,j,k,1] : exists iip,jjp,kkp : ('
+
+#######################################################################
+
+TILE_LT_S1_S1 = template
+TILE_LT_S1_S1 += lex_s1 + ' && ' + iig0
+TILE_LT_S1_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3 + bilb3p
+
+IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
+
+TILE_LT_S1_S1 += IinTILE + ')}'
+
+TILE_LT_S1_S1 = TILE_LT_S1_S1.replace('b1', b1)
+TILE_LT_S1_S1 = TILE_LT_S1_S1.replace('b2', b2)
+TILE_LT_S1_S1 = TILE_LT_S1_S1.replace('b3', b3)
+
+TILE_LT_S1_S1 = isl.Set(TILE_LT_S1_S1)
+
+print '---'
+
+print TILE_LT_S1_S1
+
+#######################################################################
+
+TILE_LT_S1_S2 = template
+TILE_LT_S1_S2 += lex_s2 + ' && ' + iig0
+TILE_LT_S1_S2 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3
+
+IinTILE = tile_ip_s1 + tile_jp_s1
+TILE_LT_S1_S2 += IinTILE + ' 1=1  )}'  #s2
+
+TILE_LT_S1_S2 = TILE_LT_S1_S2.replace('b1', b1)
+TILE_LT_S1_S2 = TILE_LT_S1_S2.replace('b2', b2)
+TILE_LT_S1_S2 = TILE_LT_S1_S2.replace('b3', b3)
+
+print TILE_LT_S1_S2
+
+TILE_LT_S1_S2 = isl.Set(TILE_LT_S1_S2)
+
+print '---'
+
+print TILE_LT_S1_S2
+
+#######################################################################
