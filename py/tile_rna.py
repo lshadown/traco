@@ -29,22 +29,24 @@ TILE_S2 += tile_i_s1 + tile_j_s1 + tile_k_s2 + '}'
 
 #######################################################################
 
-b1 = '32'
-b2 = '32'
-b3 = '32'
+B = ['32', '32', '32']
 
-TILE_S1 = TILE_S1.replace('b1', b1)
-TILE_S1 = TILE_S1.replace('b2', b2)
-TILE_S1 = TILE_S1.replace('b3', b3)
+def ReplaceB(str, B):
+    str = str.replace('b1', B[0])
+    str = str.replace('b2', B[1])
+    str = str.replace('b3', B[2])
+    return str
 
-TILE_S2 = TILE_S2.replace('b1', b1)
-TILE_S2 = TILE_S2.replace('b2', b2)
+
+
+TILE_S1 = ReplaceB(TILE_S1, B)
+TILE_S2 = ReplaceB(TILE_S2, B)
 
 
 #######################################################################
 
-TILE_S1 = isl.Set(TILE_S1)
-TILE_S2 = isl.Set(TILE_S2)
+TILE_S1 = isl.Set(TILE_S1).coalesce()
+TILE_S2 = isl.Set(TILE_S2).coalesce()
 
 print TILE_S1
 
@@ -84,11 +86,14 @@ tile_ip_s1 = tile_i_s1.replace('ii', 'iip')
 tile_jp_s1 = tile_j_s1.replace('jj', 'jjp')
 tile_kp_s1 = tile_k_s1.replace('kk', 'kkp')
 
-template = '[N,ii,jj,kk] -> {[i,j,k,1] : exists iip,jjp,kkp : ('
+def template(a):
+    return '[N,ii,jj,kk] -> {[i,j,k,'+str(a)+'] : exists iip,jjp,kkp : ('
 
 #######################################################################
+# LT
+#######################################################################
 
-TILE_LT_S1_S1 = template
+TILE_LT_S1_S1 = template(1)
 TILE_LT_S1_S1 += lex_s1 + ' && ' + iig0
 TILE_LT_S1_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3 + bilb3p
 
@@ -96,11 +101,9 @@ IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
 
 TILE_LT_S1_S1 += IinTILE + ')}'
 
-TILE_LT_S1_S1 = TILE_LT_S1_S1.replace('b1', b1)
-TILE_LT_S1_S1 = TILE_LT_S1_S1.replace('b2', b2)
-TILE_LT_S1_S1 = TILE_LT_S1_S1.replace('b3', b3)
+TILE_LT_S1_S1 = ReplaceB(TILE_LT_S1_S1, B)
 
-TILE_LT_S1_S1 = isl.Set(TILE_LT_S1_S1)
+TILE_LT_S1_S1 = isl.Set(TILE_LT_S1_S1).coalesce()
 
 print '---'
 
@@ -108,23 +111,136 @@ print TILE_LT_S1_S1
 
 #######################################################################
 
-TILE_LT_S1_S2 = template
+TILE_LT_S1_S2 = template(2)
 TILE_LT_S1_S2 += lex_s2 + ' && ' + iig0
 TILE_LT_S1_S2 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3
 
 IinTILE = tile_ip_s1 + tile_jp_s1
 TILE_LT_S1_S2 += IinTILE + ' 1=1  )}'  #s2
 
-TILE_LT_S1_S2 = TILE_LT_S1_S2.replace('b1', b1)
-TILE_LT_S1_S2 = TILE_LT_S1_S2.replace('b2', b2)
-TILE_LT_S1_S2 = TILE_LT_S1_S2.replace('b3', b3)
+TILE_LT_S1_S2 = ReplaceB(TILE_LT_S1_S2, B)
 
-print TILE_LT_S1_S2
-
-TILE_LT_S1_S2 = isl.Set(TILE_LT_S1_S2)
+TILE_LT_S1_S2 = isl.Set(TILE_LT_S1_S2).coalesce()
 
 print '---'
 
 print TILE_LT_S1_S2
 
 #######################################################################
+
+TILE_LT_S2_S1 = template(1)
+TILE_LT_S2_S1 += lex_s1s2 + ' && ' + iig0
+TILE_LT_S2_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3p
+
+IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
+TILE_LT_S2_S1 += IinTILE + ')}'
+
+TILE_LT_S2_S1 = ReplaceB(TILE_LT_S2_S1, B)
+
+TILE_LT_S2_S1 = isl.Set(TILE_LT_S2_S1).coalesce()
+
+print '---'
+print TILE_LT_S2_S1
+
+#######################################################################
+
+TILE_LT_S2_S2 = template(2)
+TILE_LT_S2_S2 += lex_s2 + ' && ' + iig0
+TILE_LT_S2_S2 += bilb1 + bilb1p + bilb2 + bilb2p
+
+IinTILE = tile_ip_s1 + tile_jp_s1
+TILE_LT_S2_S2 += IinTILE + ' 1=1)}'
+
+TILE_LT_S2_S2 = ReplaceB(TILE_LT_S2_S2, B)
+
+TILE_LT_S2_S2 = isl.Set(TILE_LT_S2_S2).coalesce()
+
+print '---'
+print TILE_LT_S2_S2
+
+#######################################################################
+
+#######################################################################
+# GT
+#######################################################################
+
+TILE_GT_S1_S1 = template(1)
+TILE_GT_S1_S1 += lex_s1_g + ' && ' + iig0
+TILE_GT_S1_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3 + bilb3p
+
+IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
+
+TILE_GT_S1_S1 += IinTILE + ')}'
+
+TILE_GT_S1_S1 = ReplaceB(TILE_GT_S1_S1, B)
+
+TILE_GT_S1_S1 = isl.Set(TILE_GT_S1_S1).coalesce()
+
+print '---'
+
+print TILE_GT_S1_S1
+
+#######################################################################
+
+TILE_GT_S1_S2 = template(2)
+TILE_GT_S1_S2 += lex_s1s2_g + ' && ' + iig0
+TILE_GT_S1_S2 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3
+
+IinTILE = tile_ip_s1 + tile_jp_s1
+TILE_GT_S1_S2 += IinTILE + ' 1=1  )}'  #s2
+
+TILE_GT_S1_S2 = ReplaceB(TILE_GT_S1_S2, B)
+
+TILE_GT_S1_S2 = isl.Set(TILE_GT_S1_S2).coalesce()
+
+print '---'
+
+print TILE_GT_S1_S2
+
+#######################################################################
+
+TILE_GT_S2_S1 = template(1)
+TILE_GT_S2_S1 += lex_s2_g + ' && ' + iig0
+TILE_GT_S2_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3p
+
+IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
+TILE_GT_S2_S1 += IinTILE + ')}'
+
+TILE_GT_S2_S1 = ReplaceB(TILE_GT_S2_S1, B)
+
+TILE_GT_S2_S1 = isl.Set(TILE_GT_S2_S1).coalesce()
+
+print '---'
+print TILE_GT_S2_S1
+
+#######################################################################
+
+TILE_GT_S2_S2 = template(2)
+TILE_GT_S2_S2 += lex_s2_g + ' && ' + iig0
+TILE_GT_S2_S2 += bilb1 + bilb1p + bilb2 + bilb2p
+
+IinTILE = tile_ip_s1 + tile_jp_s1
+TILE_GT_S2_S2 += IinTILE + ' 1=1)}'
+
+TILE_GT_S2_S2 = ReplaceB(TILE_GT_S2_S2, B)
+
+TILE_GT_S2_S2 = isl.Set(TILE_GT_S2_S2).coalesce()
+
+print '---'
+print TILE_LT_S2_S2
+
+#######################################################################
+
+TILE_LT_S1 = TILE_LT_S1_S1.union(TILE_LT_S1_S2).coalesce()
+TILE_LT_S2 = TILE_LT_S2_S1.union(TILE_LT_S2_S2).coalesce()
+TILE_GT_S1 = TILE_GT_S1_S1.union(TILE_GT_S1_S2).coalesce()
+TILE_GT_S2 = TILE_GT_S2_S1.union(TILE_GT_S2_S2).coalesce()
+
+print TILE_LT_S1
+print TILE_LT_S2
+print TILE_GT_S1
+print TILE_GT_S2
+
+#######################################################################
+
+

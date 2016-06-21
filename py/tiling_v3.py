@@ -548,6 +548,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print 'Perfectly nested loop mode: enabled'
 
 
+
+
     simpl_ub = True
 
     BLOCK = block.split(',')
@@ -616,7 +618,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-
+    # na podstawie stuff zbuduj tablice inkrementacji i dekremnatacji poziomu
 
 
 
@@ -800,12 +802,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     # k6 only
-    print isl_rel
-    rel_plus = isl_rel.transitive_closure()[0]
-    isl_rel = isl_rel.subtract(rel_plus.apply_range(isl_rel))
-    rel = isl.Map(str("{[i,j,v]->[i,j',v]}"))
+    #print isl_rel
+    #rel_plus = isl_rel.transitive_closure()[0]
+    #isl_rel = isl_rel.subtract(rel_plus.apply_range(isl_rel))
+    #rel = isl.Map(str("{[i,j,v]->[i,j',v]}"))
     #isl_rel = isl_rel.subtract(rel)
-    print isl_rel
+    #print isl_rel
     #exit(0)
 
     # -------------
@@ -849,7 +851,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #if maxl > isl_rel:
 
     start = time.time()
-
+    print '!!!!!!!!!!'
     # **************************************************************************
     exact_rplus = '-1'
     islrp = True
