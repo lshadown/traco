@@ -550,7 +550,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    simpl_ub = True
+    simpl_ub = False
 
     BLOCK = block.split(',')
     par_tiling = False
@@ -854,7 +854,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print '!!!!!!!!!!'
     # **************************************************************************
     exact_rplus = '-1'
-    islrp = True
+    islrp = False
     isl_relclosure = isl_rel
     if(rplus_file != ''):
         with open (rplus_file, "r") as myfile:
@@ -875,6 +875,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print "Transitive closure: time taken: ", elapsed, "seconds."  
 
     isl_ident = isl_rel.identity(isl_rel.get_space())
+
+    print 'R+'
+    print isl_relclosure
+
     isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
 
     if(_debug_):

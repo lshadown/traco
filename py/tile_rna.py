@@ -1,4 +1,6 @@
 import sys
+import iscc
+import imperf_tile
 
 try:
     import islpy as isl
@@ -243,4 +245,80 @@ print TILE_GT_S2
 
 #######################################################################
 
+# TILE_ITR = TILE - R+(TILE_GT)
 
+#TILE_ITR_S1 = TILE_S1 - R+(TILE_GT)
+
+
+#exact iteration method
+Rplus = " [N] -> { [i, j, k, 1] -> [i', j', k', 1] : (k <= -1 - i + j and k >= 0 and i' >= 0 and i' <= -1 + i and j' <= -1 + N and k' >= 1 + j - i' and k' <= -1 - i' + j') or " \
+        "(k <= -1 - i + j and k >= 0 and i' >= 0 and i' <= -1 + i and j' >= 1 + j and j' <= -1 + N and k' >= 0 and k' <= j - i'); [i, j, k, 1] -> [i, j, 0, 2] : i >= 0 and j <= -1 + N " \
+        "and k <= -1 - i + j and k >= 0; [i, j, k, 1] -> [i', j', 0, 2] : (k <= -1 - i + j and k >= 1 and i' >= 0 and i' <= -2 + i and j' >= 1 + i + j - i' and j' <= -1 + N) " \
+        "or (k <= -1 - i + j and k >= 1 and i' >= 0 and j' >= 1 + j and j' <= -1 + i + j - i' and j' <= -1 + N); [i, j, k, 1] -> [-1 + i, j, 0, 2] : i >= 1 and j <= -1 + N and k <= -1 - i + j " \
+        "and k >= 0; [i, j, 0, 2] -> [i', j', k, 1] : (j >= 1 + i and i' >= 0 and i' <= -1 + i and j' <= -1 + N and k >= 1 + j - i' and k <= -1 - i' + j') or (j >= 1 + i and i' >= 0 " \
+        "and i' <= -1 + i and j' >= 1 + j and j' <= -1 + N and k >= 0 and k <= j - i'); [i, j, 0, 2] -> [-1 + i, j', 0, 2] : i >= 1 and j >= 1 + i and j' >= 1 + j and j' <= -1 + N; " \
+        "[i, j, k, 1] -> [i, j', k', 1] : i >= 0 and k <= -1 - i + j and k >= 0 and j' <= -1 + N and k' <= -1 - i + j' and k' >= -i + j; [i, j, k, 1] -> [i', j, k', 1] : j <= -1 + N " \
+        "and k <= -1 - i + j and k >= 0 and i' >= 0 and i' <= -1 + i and k' >= 0 and k' <= -1 + j - i'; [i, j, 0, 2] -> [i', j', 0, 2] : (j >= 1 + i and i' >= 0 and j' >= 2 + j and " \
+        "j' <= -1 + i + j - i' and j' <= -1 + N) or (j >= 1 + i and i' >= 0 and i' <= -2 + i and j' >= i + j - i' and j' <= -1 + N); [i, j, 0, 2] -> [-1 + i, j, 0, 2] : i >= 1 and " \
+        "j >= 1 + i and j <= -1 + N; [i, j, 0, 1] -> [i', j', 0, 2] : j >= 1 + i and i' >= 0 and i' <= -1 + i and j' >= 1 + j and j' <= -1 + N; [i, j, k, 1] -> [i', i + j - i', 0, 2] : " \
+        "k <= -1 - i + j and k >= 1 and i' >= 0 and i' <= -2 + i and i' >= 1 - N + i + j; [i, j, k, 1] -> [i, j', 0, 2] : i >= 0 and k <= -1 - i + j and k >= 0 and j' >= 1 + j and " \
+        "j' <= -1 + N; [i, j, k, 1] -> [i', j, 0, 2] : j <= -1 + N and k <= -1 - i + j and k >= 0 and i' >= 0 and i' <= -2 + i; [i, j, k, 1] -> [-1 + i, j', 0, 2] : i >= 1 and k <= -1 - i + j " \
+        "and k >= 1 and j' >= 2 + j and j' <= -1 + N; [i, j, 0, 2] -> [i, j', k, 1] : i >= 0 and j >= 1 + i and j' <= -1 + N and k <= -1 - i + j' and k >= -i + j; " \
+        "[i, j, 0, 2] -> [i', j, k, 1] : j >= 1 + i and j <= -1 + N and i' >= 0 and i' <= -1 + i and k >= 0 and k <= -1 + j - i'; [i, j, k, 1] -> [i, j, k', 1] : i >= 0 and j <= -1 + N and k >= 0 " \
+        "and k' <= -1 - i + j and k' >= 1 + k; [i, j, 0, 2] -> [i', 1 + j, 0, 2] : j >= 1 + i and j <= -2 + N and i' >= 0 and i' <= -2 + i; [i, j, k, 1] -> [-1 + i, 1 + j, 0, 2] : i >= 1 and j <= -2 + N " \
+        "and k <= -1 - i + j and k >= 1; [i, j, 0, 2] -> [i, j', 0, 2] : i >= 0 and j >= 1 + i and j' >= 1 + j and j' <= -1 + N; [i, j, 0, 2] -> [i', j, 0, 2] : j >= 1 + i and j <= -1 + N and i' >= 0 and i' <= -2 + i }"
+
+Rplus = isl.Map(Rplus)
+
+print Rplus
+
+TILE_ITR1 = TILE_S1.subtract(TILE_GT_S1.apply(Rplus)).coalesce()
+TILE_ITR2 = TILE_S2.subtract(TILE_GT_S2.apply(Rplus)).coalesce()
+
+print TILE_ITR1
+print TILE_ITR2
+
+# TVLD_LT = (R+(TILE_ITR) and TILE_LT) -R+(TILE_GT)
+
+TVLD_LT1 = (TILE_LT_S1.intersect(TILE_ITR1.apply(Rplus))).subtract(TILE_GT_S1.apply(Rplus)).coalesce()
+TVLD_LT2 = (TILE_LT_S2.intersect(TILE_ITR2.apply(Rplus))).subtract(TILE_GT_S2.apply(Rplus)).coalesce()
+
+print TVLD_LT1
+print TVLD_LT2
+
+
+TILE_VLD1 = TVLD_LT1.union(TILE_ITR1).coalesce()
+TILE_VLD2 = TVLD_LT2.union(TILE_ITR2).coalesce()
+
+print TILE_VLD1
+print TILE_VLD2
+
+TILE_VLD = TILE_VLD1.union(TILE_VLD2)
+
+
+
+print TILE_VLD
+
+
+
+str_TV = str(TILE_VLD)
+
+str_TV = str_TV.replace('[N, ii, jj, kk] -> ', '')
+str_TV = str_TV.replace('[', '[ii,jj,kk,')
+str_TV = '[N] -> ' + str_TV
+
+print str_TV
+
+TILE_VLD_EXT = isl.Set(str_TV)
+
+Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; [ii,jj,kk,i,j,k,2] -> [0, ii,1, jj,0, kk,0, i,1, j,0,k,2]  } ' )
+
+TILE_VLD_EXT = TILE_VLD_EXT.apply(Rmap).coalesce()
+
+#TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
+
+print TILE_VLD_EXT
+
+loop_x = iscc.isl_ast_codegen(TILE_VLD_EXT)
+
+print loop_x
