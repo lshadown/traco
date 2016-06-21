@@ -318,7 +318,46 @@ TILE_VLD_EXT = TILE_VLD_EXT.apply(Rmap).coalesce()
 #TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
 
 print TILE_VLD_EXT
+print '======================================================'
 
 loop_x = iscc.isl_ast_codegen(TILE_VLD_EXT)
 
-print loop_x
+#print loop_x
+
+S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
+S2 = 'S[i][j] = max(S[i][j] + S[i+1][j-1]);'
+
+lines = loop_x.split('\n')
+
+loop = []
+
+for line in lines:
+    if line.endswith(');'):
+        tab = imperf_tile.get_tab(line)
+        line = line.replace(' ', '')
+        line = line[:-2]
+        line = line[1:]
+
+        arr = line.split(',')
+
+        if(arr[12] == '1'):
+            s = S1
+        else:
+            s = S2
+
+        irep = arr[7]
+        jrep = arr[9]
+        krep = arr[11]
+
+        s = s.replace('i', irep)
+        s = s.replace('j', jrep)
+        s = s.replace('k', krep)
+
+        print tab + s
+        loop.append(tab + s)
+
+    else:
+        print line
+        loop.append(line)
+
+
