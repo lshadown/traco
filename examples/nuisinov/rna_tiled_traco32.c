@@ -39,58 +39,44 @@ int main(int argc, char *argv[])
     int *RNA;
     RNA = (int (*))malloc(DIM * sizeof(float));
 
-
+int z = 0;
     start = omp_get_wtime();
-/*
-    for (i = N-1; i >= 0; i--) {
-     for (j = i+1; j < N; j++) {
-      for (k = 0; k < j-i; k++) {
-         S[i][j] = MAX(S[i][k+i] + S[k+i+1][j], S[i][j]); // s0
+
+    for (i = 0; i <= N-1; i++) {
+     for (j = N-i; j < N; j++) {
+      for (k = 0; k < j-N+i+1; k++) {
+     z++;//   z++; //S[N-i-1][j] = S[N-i-1][k+N-i-1] + S[k+N-i][j] + S[N-i-1][j];
       }
-      S[i][j] = MAX(S[i][j], S[i+1][j-1] +can_pair(RNA, i, j));
+      for (k = 0; k <= 0; k++) {
+  z++;   // S[N-i-1][j] = S[N-i-1][j] + S[N-i][j-1];
+      }
      }
     }
-*/
+	printf("%.6f\n%i\n", end - start,z) ;
+	z=0;
 int c1,c3,c4,c7,c9,c10,c11,c5;
- /*   for (c1 = 0; c1 <= floord(N - 1, 32); c1 += 1)
-      for (c3 = 0; c3 <= min(c1, floord(N - 2, 32)); c3 += 1)
-        for (c4 = 2; c4 <= 3; c4 += 1) {
-          if (c4 == 3) {
-            for (c7 = max(32 * c1, 32 * c3 + 1); c7 <= min(N - 1, 32 * c1 + 62); c7 += 1)
-              for (c9 = max(N - 32 * c1 + 32 * c3 - 31, N + 32 * c3 - c7); c9 <= min(N - 1, N + 32 * c3 - c7 + 31); c9 += 1)
-                for (c10 = max(2, N + 32 * c3 - c7 - c9 + 3); c10 <= min(3, c1 - (-c1 + c7 + 30) / 31 + 4); c10 += 1) {
-                  if (c10 == 3) {
-                    S[N-1-c7][c9]=MAX(S[N-1-c7][c9],S[N-c7][c9-1]+can_pair(RNA, i, j));
-                  } else if (c7 >= 32 * c1 + 1) {
-                    for (c11 = 0; c11 <= -N + c7 + c9; c11 += 1)
-                      S[N-1-c7][c9]=MAX(S[N-1-c7][c11+N-c7-1]+S[c11+N-c7][c9],S[N-1-c7][c9]);
-                  } else
-                    for (c11 = 32 * c3 + 1; c11 <= -N + 32 * c1 + c9; c11 += 1)
-                      S[N-1-32*c1][c9]=MAX(S[N-1-32*c1][c11+N-32*c1-1]+S[c11+N-32*c1][c9],S[N-1-32*c1][c9]);
-                }
-          } else
-            for (c5 = 0; c5 <= c3; c5 += 1)
-              for (c7 = max(32 * c1, 32 * c3 + 1); c7 <= min(N - 1, 32 * c1 + 31); c7 += 1)
-                for (c11 = 32 * c5; c11 <= min(32 * c3, 32 * c5 + 31); c11 += 1)
-                  S[N-1-c7][N+32*c3-c7]=MAX(S[N-1-c7][c11+N-c7-1]+S[c11+N-c7][N+32*c3-c7],S[N-1-c7][N+32*c3-c7]);
-        }
-*/
-for (c1 = 0; c1 <= floord(N - 1, 32); c1 += 1)
-  for (c3 = 0; c3 <= min(c1, floord(N - 2, 32)); c3 += 1)
-    for (c4 = 2; c4 <= 3; c4 += 1) {
-      if (c4 == 3) {
-        for (c5 = 0; c5 <= min(1, N - 32 * c3 - 2); c5 += 1)
-          for (c7 = max(32 * c1, 32 * c3 + c5 + 1); c7 <= min(N - 1, 32 * c1 + 31); c7 += 1)
-            for (c9 = N + 32 * c3 + c5 - c7; c9 <= min(N - 1, N + 32 * c3 + 31 * c5 - c7); c9 += 1)
-              S[N-1-c7][c9]=MAX(S[N-1-c7][c9],S[N-c7][c9-1]+can_pair(RNA, i, j));
-      } else
-        for (c5 = 0; c5 <= c3; c5 += 1)
-          for (c7 = max(32 * c1, 32 * c3 + 1); c7 <= min(N - 1, 32 * c1 + 31); c7 += 1)
-            for (c11 = 32 * c5; c11 <= min(32 * c3, 32 * c5 + 31); c11 += 1)
-              S[N-1-c7][N+32*c3-c7]=MAX(S[N-1-c7][c11+N-c7-1]+S[c11+N-c7][N+32*c3-c7],S[N-1-c7][N+32*c3-c7]);
-    }
+
+
+for (c1 = 0; c1 <= floord(N - 1, 16); c1 += 1)
+  for (c3 = 0; c3 <= min(floord(N - 2, 16), c1); c3 += 1) {
+    for (c5 = 0; c5 <= c3; c5 += 1)
+      for (c7 = max(16 * c1, 16 * c3 + 1); c7 <= min(N - 1, 16 * c1 + 15); c7 += 1)
+        for (c11 = 16 * c5; c11 <= min(16 * c3, 16 * c5 + 15); c11 += 1)
+   z++;//       S[N-c7-1][N+16*c3-c7]=S[N-c7-1][c11+N-c7-1]+S[c11+N-c7][N+16*c3-c7]+S[N-c7-1][N+16*c3-c7];
+    for (c7 = max(16 * c3 + 1, 16 * c1); c7 <= min(N - 1, 16 * c1 + 30); c7 += 1)
+      for (c9 = max(N - 16 * c1 + 16 * c3 - 15, N + 16 * c3 - c7); c9 <= min(N + 16 * c3 - c7 + 15, N - 1); c9 += 1)
+        for (c10 = max(0, N + 16 * c3 - c7 - c9 + 1); c10 <= min(1, c1 - (-c1 + c7 + 14) / 15 + 2); c10 += 1)
+          if (c10 == 1) {
+       z++;//      S[N-c7-1][c9]=S[N-c7-1][c9]+S[N-c7][c9-1];
+          } else {
+            if (c7 + c9 == N + 1 && c3 == 0 && c7 >= 16 * c1 + 1)
+         z++;//      S[N-c7-1][N-c7+1]=S[N-c7-1][0+N-c7-1]+S[0+N-c7][N-c7+1]+S[N-c7-1][N-c7+1];
+            for (c11 = max(max(N + 16 * c3 - c7 - c9 + 2, 16 * c3), 16 * c1 + 16 * c3 - c7 + 1); c11 <= -N + c7 + c9; c11 += 1)
+         z++;//      S[N-c7-1][c9]=S[N-c7-1][c11+N-c7-1]+S[c11+N-c7][c9]+S[N-c7-1][c9];
+          }
+  }
     end = omp_get_wtime();
-	printf("%.6f\n", end - start);
+	printf("%.6f\n%i\n", end - start,z) ;
 
     return 0;
 

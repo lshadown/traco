@@ -4,7 +4,7 @@
 
 #define MAX(x,y)    ((x) > (y)? (x) : (y))
 
-int N = 500;
+int N = 1000;
 
 int can_pair(int *input, int a, int b){
    return ((((input[a] + input[b]) == 3) && (a < b - 1))) ? 1 : 0;
@@ -12,18 +12,20 @@ int can_pair(int *input, int a, int b){
 
 int main(int argc, char *argv[])
 {
-    int num_proc=1;
+    /*int num_proc=1;
     num_proc = atoi(argv[1]);
     int kind;
 
     if(argc > 2)
         N = atoi(argv[2]);
 
-    int DIM = 2*N+2;
+
 
     if(argc > 3)
         kind = atoi(argv[3]);
+*/
 
+    int DIM = 2*N+2;
     int i,j,k;
     double start, end;
 
