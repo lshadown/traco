@@ -31,7 +31,7 @@ TILE_S2 += tile_i_s1 + tile_j_s1 + tile_k_s2 + '}'
 
 #######################################################################
 
-B = ['32', '32', '32']
+B = ['16', '16', '16']
 
 def ReplaceB(str, B):
     str = str.replace('b1', B[0])
@@ -325,7 +325,7 @@ loop_x = iscc.isl_ast_codegen(TILE_VLD_EXT)
 #print loop_x
 
 S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
-S2 = 'S[i][j] = max(S[i][j] + S[i+1][j-1]);'
+S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_par(RNA, i, j));'
 
 lines = loop_x.split('\n')
 
@@ -353,10 +353,14 @@ for line in lines:
         s = s.replace('j', jrep)
         s = s.replace('k', krep)
 
+        s = s.replace('par', 'pair')
+        s = s.replace('for (int', 'for(')
+
         print tab + s
         loop.append(tab + s)
 
     else:
+        line = line.replace('for (int', 'for(')
         print line
         loop.append(line)
 
