@@ -44,11 +44,11 @@ int c1,c2,c3,c4,c5,c6,c7,c8,c9,c11;
 
 for( c1 = 0; c1 <= (N - 1)/16; c1 += 1)
   for( c2 = 0; c2 <= 1; c2 += 1)
-    for( c3 = 0; c3 <= min(c1, floord(N - 2, 16)); c3 += 1) {
+    for( c3 = 0; c3 <= min(c1, (N - 2)/16); c3 += 1) {
       if (c2 == 1) {
         for( c7 = max(0, N - 16 * c1 - 16); c7 < min(N - 16 * c1, N - 16 * c3 - 1); c7 += 1)
           for( c9 = 16 * c3 + c7 + 1; c9 <= min(N - 1, 16 * c3 + c7 + 16); c9 += 1)
-            S[c7][c9] = max(S[c7][c9] + S[c7+1][c9-1],S[c7][c9])  + can_pair(RNA, c7, c9);
+            S[c7][c9] = max(S[c7][c9], S[c7+1][c9-1]  + can_pair(RNA, c7, c9));
       } else
         for( c5 = 0; c5 <= c3; c5 += 1)
           for( c7 = max(0, N - 16 * c1 - 16); c7 < min(N - 16 * c1, N - 15 * c1 - c3 - 1); c7 += 1) {
