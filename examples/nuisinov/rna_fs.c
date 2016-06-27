@@ -40,33 +40,38 @@ int main(int argc, char *argv[])
 
 int t1,t3,c3,c1;
 
-omp_Set_num_threads(4);
+omp_set_num_threads(1);
     start = omp_get_wtime();
 
 
 for (t1 = 0; t1 < N - 1; t1 += 1)
   for (t3 = t1 + 1; t3 < N; t3 += 1) {
     if (N >= t3 + 1 && t3 >= t1 + 1 && t1 >= 0) {
-      S[t1][t3]=S[t1][t3]+S[t1+1][t3-1];
+      S[t1][t3] = max(S[t1][t3], S[t1+1][t3-1] +can_pair(RNA, t1, t3));
     }
     if (t1 >= 0) {
       #pragma omp parallel for
       for (c1 = t1; c1 <= min(min(t3 - 1, N - t3 + t1 - 1), t1 + 1); c1 += 1) {
         if (c1 == t1 + 1) {
           for (c3 = t3 + 1; c3 < N; c3 += 1) {
-            S[t1+1][c3]=S[t1+1][t3-t1-1+t1+1]+S[t3-t1-1+t1+1+1][c3]+S[t1+1][c3];
+             S[t1+1][c3] = max(S[t1+1][t3-t1-1+t1+1] + S[t3-t1-1+t1+1+1][c3], S[t1+1][c3]);
           }
         } else
-          S[t1][t3]=S[t1][0+t1]+S[0+t1+1][t3]+S[t1][t3];
+          S[t1][t3] = max(S[t1][0+t1] + S[0+t1+1][t3], S[t1][t3]);
+
       }
     }
     if (t1 == 0 && t3 >= 2)
       if (t3 >= 1 && N >= t3 + 1) {
-        S[0][t3]=S[0][t3-1+0]+S[t3-1+0+1][t3]+S[0][t3];
+
+           S[0][t3] = max(S[0][t3-1] + S[t3][t3], S[0][t3]); // s0
+
         if (t3 >= 2) {
           #pragma omp parallel for
           for (c3 = t3 + 1; c3 < N; c3 += 1) {
             S[0][c3]=S[0][t3-1+0]+S[t3-1+0+1][c3]+S[0][c3];
+               S[0][c3] = max(S[0][t3-1] + S[t3][c3], S[0][c3]); // s0
+
           }
         }
       }
