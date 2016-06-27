@@ -39,7 +39,10 @@ int main(int argc, char *argv[])
     RNA = (int (*))malloc(DIM * sizeof(float));
 
 int t1,t3,c3,c1;
+
+omp_Set_num_threads(4);
     start = omp_get_wtime();
+
 
 for (t1 = 0; t1 < N - 1; t1 += 1)
   for (t3 = t1 + 1; t3 < N; t3 += 1) {
