@@ -83,7 +83,7 @@ if (N >= 6 && T >= 6)
           }
         } else if (N >= 6 && T >= 6 && N >= t3 + 2 && t1 == 0)
           #pragma omp parallel for private(i)
-          for (c1 = 0; c1 < min(T, floord(t3 + 1, 2)); c1 += 1) {
+          for (c1 = 0; c1 < min(T, (t3 + 1) / 2); c1 += 1) {
             for (j=1; j<=N-2; j++)  {
                 i = t3-2*c1;
                 a[i][j] = (a[i-1][j-1] + a[i-1][j] + a[i-1][j+1] + a[i][j-1] + a[i][j] + a[i][j+1] + a[i+1][j-1] + a[i+1][j] + a[i+1][j+1])/9.0;;
@@ -93,7 +93,7 @@ if (N >= 6 && T >= 6)
       for (t3 = 1; t3 < N - 1; t3 += 1)
         if (N >= 6 && T >= 6 && N >= t3 + 2) {
           #pragma omp parallel for private(i)
-          for (c1 = 0; c1 < min(T, floord(t3 + 1, 2)); c1 += 1) {
+          for (c1 = 0; c1 < min(T, (t3 + 1) / 2); c1 += 1) {
             for (j=1; j<=N-2; j++)  {
                 i = t3-2*c1;
                 a[i][j] = (a[i-1][j-1] + a[i-1][j] + a[i-1][j+1] + a[i][j-1] + a[i][j] + a[i][j+1] + a[i+1][j-1] + a[i+1][j] + a[i+1][j+1])/9.0;;
