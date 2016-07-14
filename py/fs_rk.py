@@ -116,8 +116,8 @@ def fs_rk(rel, rel_plus, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
         sk = sk.union(uds).coalesce()
 
 
-    if(SIMPLIFY):
-        sk = imperf_tile.SimplifySlice(sk)
+    #if(SIMPLIFY):
+    sk = imperf_tile.SimplifySlice(sk)
 
     rap = rap.insert_dims(isl.dim_type.in_, 0, 1)
     rap = rap.insert_dims(isl.dim_type.out, 0, 1)
@@ -134,10 +134,17 @@ def fs_rk(rel, rel_plus, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop):
 
     print sk
 
-    if(sk.is_bounded() and aprox == 1):
-        print "Approximation (no perfect FS) but Sk is bounded"
+    if(aprox == 1):
+        if(sk.is_bounded()):
+            print "Approximation (no perfect FS) but Sk is bounded"
+        else:
+            print "Sk is not bounded. The result may not be valid!"
     else:
-        print "Sk is not bounded. The result may not be valid!"
+        print 'Rk exact'
+        if (sk.is_bounded()):
+            print 'Sk bounded.'
+        else:
+            print 'Sk NOT bounded'
 
     nloop = iscc.iscc_communicate("L :=" + str(sk) + "; codegen L;")
 

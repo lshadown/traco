@@ -854,7 +854,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print '!!!!!!!!!!'
     # **************************************************************************
     exact_rplus = '-1'
-    islrp = False
+    islrp = True
     isl_relclosure = isl_rel
     if(rplus_file != ''):
         with open (rplus_file, "r") as myfile:

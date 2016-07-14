@@ -42,6 +42,13 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     #codegen = 'barvinok'
     codegen = 'isl'
 
+    #rel = "[n, loop] -> { [l, i, k, 13] -> [l, i+1, k', 13] : k'=0 && k = i-1 && 1<=l<=loop && 1<=i<n-1;" \
+    #      "[l, i, 0, 13] -> [l, i, k', 13] : 1<=l<=loop && 1<=i<n &&  0 < k' <=i;" \
+    #      "[l, n-1, n-2, 13] -> [l+1, 1, 0, 13] : 1 <=l < loop } "
+    #rel = "{[i,k,8] -> [i+1,k',8] : k'=0 && k=i-1 && 1<=i<6; [i,0,8] -> [i,k',8] : 0 < k' <= i && 1 <= i <= 6}"
+    #rel = isl.Map(rel)
+    #rel_plus = rel.transitive_closure()[0]
+
     if(exact):
         print 'R+ exact!'
     else:
@@ -74,6 +81,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     print rel
+
 
     print '## R+'
     print rel_plus
@@ -112,6 +120,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
         IS_= IS_.insert_dims(isl.dim_type.set, set_size, 1)
         IS_ = IS_.set_dim_name(isl.dim_type.set, set_size, "v")
 
+        #print cl.statements[i].body
         c= isl.Constraint.eq_from_names(IS_.get_space(), {"v": -1, 1:int(dane[i])})
         IS_ = IS_.add_constraint(c).coalesce()
 
@@ -205,6 +214,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     IND0ToIND = isl.Map.from_domain_and_range(IND_lexmin, IND).coalesce()
 
+
+
     RRPLUS = RR.transitive_closure()
     RR_EXACT = RRPLUS[1]
     RRPLUS = RRPLUS[0]
@@ -215,6 +226,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
     # sprawdz dokladnosc
+
+
 
     R2 = GetR2(re_rel, RRPLUS)
 
@@ -327,7 +340,8 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     #if(SIMPLIFY):
 
 
-    D =  imperf_tile.SimplifySlice(D)
+
+
 
     print "# DOMAIN RSCHED"
 
@@ -337,9 +351,10 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     D = D.apply(rap)
 
-
-
-
+    D = imperf_tile.SimplifySlice(D)
+    D = D.coalesce()
+    print rap
+    print D
 
     if (codegen == 'barvinok'):
         looprepr = iscc.iscc_communicate("L :=" + str(D) + "; codegen L;")
@@ -351,7 +366,10 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
         looprepr = re.sub('\\b'+'c' + str(i) +'\\b', 't' + str(i), looprepr)
 
     print looprepr
+
     looprepr  = looprepr.split('\n')
+
+
 
 
 
@@ -377,7 +395,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
         print '-------- IS --------'
         print IS
-        #slice = slice.intersect(IS).coalesce()
+        slice = slice.intersect(IS).coalesce()
         print slice
         #if(SIMPLIFY):
         #slice = imperf_tile.SimplifySlice(slice)
@@ -548,10 +566,12 @@ def GetR2(re, rrplus):
     #s1 in Domain(Re)
     if not re.is_empty():
         R2 = R2 + copyconstr.GetConstrSet(in_, re.domain())
+    else:
+        R2 = R2 + ' 1=1 '
 
     R2 = R2 + '}'
 
-    #print R2
+    print R2
 
     R2 = isl.Map(R2)
     #R2.coalesce()
