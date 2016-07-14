@@ -31,7 +31,7 @@ TILE_S2 += tile_i_s1 + tile_j_s1 + tile_k_s2 + '}'
 
 #######################################################################
 
-B = ['16', '16', '16']
+B = ['16', '16', '1']
 
 def ReplaceB(str, B):
     str = str.replace('b1', B[0])
@@ -272,6 +272,7 @@ Rplus = isl.Map(Rplus)
 
 print Rplus
 
+
 TILE_ITR1 = TILE_S1.subtract(TILE_GT_S1.apply(Rplus)).coalesce()
 TILE_ITR2 = TILE_S2.subtract(TILE_GT_S2.apply(Rplus)).coalesce()
 
@@ -301,6 +302,11 @@ print TILE_VLD
 
 
 
+#TILE_VLD = TILE_VLD.intersect(isl.Set("[N, ii, jj, kk] -> { [i, j, k, l] :  i >= 32 and i <= N-32 and j <= N-32 and j > i + 32 and k > 32 and k < j-1-32 }")).coalesce()
+
+
+
+
 str_TV = str(TILE_VLD)
 
 str_TV = str_TV.replace('[N, ii, jj, kk] -> ', '')
@@ -317,8 +323,6 @@ TILE_VLD_EXT = TILE_VLD_EXT.apply(Rmap).coalesce()
 
 #TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
 
-print TILE_VLD_EXT
-print '======================================================'
 
 loop_x = iscc.isl_ast_codegen(TILE_VLD_EXT)
 
