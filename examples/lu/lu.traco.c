@@ -33,8 +33,8 @@ void init_array()
     for (i=0; i<N; i++) {
         for (j=0; j<N; j++) {
             for (k=0; k<N; k++) {
-                a[i][j] +=  (i+k+1)*(k+j+1);//i==j?1:0;
-                a1[i][j] +=  (i+k+1)*(k+j+1);//i==j?1:0;
+                a[i][j] =  (i+k+1)*(k+j+1);//i==j?1:0;
+                a1[i][j] =  (i+k+1)*(k+j+1);//i==j?1:0;
             }
         }
     }
@@ -70,6 +70,10 @@ int main()
 	int i, j, k;
     double t_start, t_end;
 
+
+  if(argc > 2)
+    N = atoi(argv[2]);
+
 	init_array() ;
 
 #pragma scop
@@ -89,6 +93,12 @@ int main()
 
 	t_start = rtclock();
 
+  int num_proc=1;
+  num_proc = atoi(argv[1]);
+
+
+
+    omp_set_num_threads(num_proc);
 
 
 int t1,t3,t5,c1,c3,c5,n=N,c=0;
