@@ -65,14 +65,12 @@ double rtclock()
     return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	int i, j, k;
     double t_start, t_end;
 
 
-  if(argc > 2)
-    N = atoi(argv[2]);
 
 	init_array() ;
 
