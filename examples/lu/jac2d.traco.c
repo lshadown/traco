@@ -55,7 +55,7 @@ double rtclock()
 }
 #define __PLACE_TO_INSERT_FORWARD_DECLARATIONS
 
-int main()
+int main(int argc, char *argv[])
 {
     int t, i, j;
     double t_start, t_end;
