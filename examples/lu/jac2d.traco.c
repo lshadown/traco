@@ -3,7 +3,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <omp.h> 
+#include <omp.h>
 #include <assert.h>
 
 #define N 200
@@ -82,11 +82,12 @@ int t1, c3, c5, t3, t5;
     t_start = rtclock();
 
 
+  int num_proc=1;
+  num_proc = atoi(argv[1]);
 
 
 
-omp_set_num_threads(1);
-
+    omp_set_num_threads(num_proc);
 
 
 if (N >= 4)
@@ -130,12 +131,12 @@ if (N >= 4)
 for(i=0; i<N; i++)
 for(j=0; j<N; j++)
 if(!(isnan(a[i][j]) && isnan(a1[i][j]))){
- if(a[i][j] != a1[i][j]) { 
-   printf("Error %i %i %f %f\n", i, j, a[i][j], a1[i][j]); 
+ if(a[i][j] != a1[i][j]) {
+   printf("Error %i %i %f %f\n", i, j, a[i][j], a1[i][j]);
    exit(0);
  }
- if(b[i][j] != b1[i][j]) { 
-   printf("Error %i %i %f %f\n", i, j, b[i][j], b1[i][j]); 
+ if(b[i][j] != b1[i][j]) {
+   printf("Error %i %i %f %f\n", i, j, b[i][j], b1[i][j]);
    exit(0);
  }
 }
