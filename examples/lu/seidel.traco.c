@@ -53,7 +53,7 @@ double rtclock()
     return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	int i, j, k,l;
     double t_start, t_end;
@@ -64,6 +64,13 @@ int main()
     n = T = N-1;
 
 	init_array() ;
+
+  int num_proc=1;
+  num_proc = atoi(argv[1]);
+
+
+
+    omp_set_num_threads(num_proc);
 
 	t_start = rtclock();
 int c = 0;
