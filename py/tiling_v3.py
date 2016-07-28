@@ -30,6 +30,11 @@ import clanpy
 
 import vis3dimperf
 
+import fsnew_tiletry
+
+
+import slicing
+
 
 from CPython import codegen
 
@@ -116,7 +121,7 @@ def Constraint(vars, sym_exvars, stuff, BLOCK, dane,par_vars,par_tiling):
 
         # PORAWKA EKSPERYMENTALNA l = i zamiast dane[path][i]
 
-        print par_vars
+
         s = s + Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, i, par_vars[l], dane['path'][i])
         # i przedostatni element
         #
@@ -202,10 +207,7 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
         else:
             min_nest = i+1
 
-    print "============================ ==========================="
-    print dane["path"]
-    print dane2["path"]
-    print par_vars
+
     #print "===================================" + str(min_nest)
     if(dane["nest_id"] == dane2["nest_id"]):  # ta sama petla licz stara metoda
         for i in range(n-1,n):    # od 0 ????????????????????????????????????????????????????????
@@ -372,8 +374,7 @@ def GetRapply3(vars, sym_exvars, _SYM, instrukcje, i, scat = []):
 
     z = ""
 
-    print '--------------------------------------------------------------'
-    print instrukcje[i]['path']
+
 
     j = 0
     for s in sym_exvars:
@@ -536,16 +537,25 @@ def getIS(plik, rel, dane):
 
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
 
+    SIMPLIFY = False
+    DEBUG = False
 
     schedule_mode = parallel_option
+
+    rpp = "[N] -> { [l, i, j,10] -> [l', i', j',10] : i >= 0 and j >= 0 and 2 + l <= l' < N and i' < N and j' < N and ((j <= l and i' > i and j' >= 0) or (i <= l and i' >= 0 and j' > j) or (i < N and j <= l and l' >= 3 + l and i' >= 0 and j' > j) or (i < N and j <= l and l' >= 3 + l and i' >= 0 and j' >= 0) or (i <= l and j < N and l' >= 3 + l and i' > i and j' >= 0) or (i <= l and j < N and l' >= 3 + l and i' >= 0 and j' >= 0) or (l >= 0 and i < N and l' >= 3 + l and i' >= 0 and j' > j) or (l >= 0 and j < N and l' >= 3 + l and i' > i and j' >= 0) or (l >= 0 and i < N and j < N and l' >= 4 + l and i' >= 0 and j' >= 0)); [l, i, j,10] -> [l', i, j',10] : i >= 0 and j >= 0 and l < l' < N and 0 <= j' < N and ((i < N and j <= l) or (i <= l and j < N and l' >= 2 + l) or (l >= 0 and i < N and j < N and l' >= 2 + l)); [l, -1 + N, j,10] -> [1 + l, i', j,10] : l <= -4 + N and l <= i' < N and ((0 <= j < l) or (l >= 0 and l <= j < N)); [l, i, j,10] -> [1 + l, i', j,10] : (i >= 2 + l and 0 <= j <= l and i < i' < N) or (i >= 0 and 2 + l <= j < N and i < i' < l) or (3 + l <= i <= -2 + N and 0 <= j < l and l <= i' < N) or (l <= -2 + N and i >= 0 and 0 <= j <= l and i < i' < l) or (l > 0 and i >= 2 + l and 2 + l <= j < N and i < i' < N) or (l <= -2 + N and 0 <= i <= 1 + l and 0 <= j <= l and 0 <= i' < N) or (l >= 0 and 3 + l <= i <= -2 + N and 2 + l <= j < N and l <= i' < N) or (0 <= l <= -2 + N and 0 <= i <= 1 + l and 0 <= j < N and 0 <= i' < N); [l, i, j,10] -> [l', i', j,10] : i >= 0 and j >= 0 and l < l' < N and 0 <= i' < N and ((i < N and j <= l and l' >= 2 + l) or (i <= l and j < N) or (l >= 0 and i < N and j < N and l' >= 2 + l)); [-2 + N, -1 + N, j,10] -> [-1 + N, -2 + N, j',10] : j >= 0 and j' >= -2 + N and j < j' < N; [0, i, j,10] -> [1, i', j,10] : i >= 2 and 2 <= j < N and i < i' < N; [l, -1 + N, j,10] -> [3 + l, i', j',10] : j' < N and ((4 + l <= j < N and 0 <= i' < l and j' >= l) or (l >= 0 and 4 + l <= j < N and l <= i' < N and j' >= 0) or (0 <= l <= -5 + N and 0 <= j <= 3 + l and 0 <= i' < N and j' >= 0)); [l, -1 + N, j,10] -> [2 + l, -1 + N, j',10] : l >= 0 and 3 + l <= j < N and 0 <= j' < N; [l, i, j,10] -> [3 + l, i', j',10] : j' < N and ((4 + l <= i <= -2 + N and 4 + l <= j < N and 0 <= i' < l and j' >= l) or (l >= 0 and 4 + l <= i <= -2 + N and 4 + l <= j < N and l <= i' < N and j' >= 0) or (l >= 0 and 4 + l <= i <= -2 + N and 0 <= j <= 3 + l and 0 <= i' < N and j' >= 0) or (0 <= l <= -4 + N and 0 <= i <= 3 + l and 0 <= j < N and 0 <= i' < N and j' >= 0)); [l, -1 + N, j,10] -> [1 + l, -1 + N, j',10] : j' < N and ((l <= -3 + N and 0 <= j <= l and j' > j) or (0 <= l <= -3 + N and j >= 0 and j' > j) or (l >= 0 and 2 + l <= j < N and j' >= l) or (0 <= l <= -3 + N and 0 <= j <= 1 + l and j' >= 0)); [l, 2 + l, j,10] -> [2 + l, i', j',10] : l >= 0 and j' < N and ((3 + l <= j < N and 2 + l <= i' < N and j' >= 0) or (3 + l <= j < N and 0 <= i' <= 1 + l and j' >= l) or (l <= -3 + N and 0 <= j <= 1 + l and 0 <= i' < N and j' >= 0)); [0, 0, 0,10] -> [0, i', j',10] : 0 < i' < N and 0 < j' < N; [l, i, j,10] -> [2 + l, i', j',10] : j' < N and ((i < l and 3 + l <= j < N and 0 <= i' < i and j' >= l) or (i >= 0 and 3 + l <= j < N and i < i' < l and j' >= l) or (3 + l <= i <= -2 + N and 0 <= j <= l and l <= i' < N and j' > j) or (3 + l <= i <= -2 + N and 0 <= j <= l and l <= i' < N and j' >= 0) or (0 <= i < l and 3 + l <= j < N and l <= i' < N and j' >= 0) or (l >= 0 and i >= 3 + l and 3 + l <= j < N and i < i' < N and j' >= l) or (l >= 0 and 3 + l <= i <= -2 + N and j >= 3 + l and l <= i' < N and j' > j) or (l >= 0 and i >= 3 + l and 0 <= j <= 2 + l and i < i' < N and j' >= 0) or (l >= 0 and i <= -2 + N and 3 + l <= j < N and 2 + l <= i' < i and j' >= l) or (3 + l <= i <= -2 + N and 0 <= j <= l and 0 <= i' < l and j' >= l and j' > j) or (3 + l <= i <= -2 + N and 0 <= j <= 2 + l and 0 <= i' < l and j' >= l and j' > j) or (l <= -3 + N and 0 <= i < l and 0 <= j <= 2 + l and 0 <= i' < N and j' >= 0) or (l <= -3 + N and 0 <= i <= l and 0 <= j <= 2 + l and i < i' < N and j' >= 0) or (l <= -3 + N and 0 <= i <= 2 + l and 0 <= j <= l and 0 <= i' < N and j' > j) or (l <= -3 + N and 0 <= i <= 2 + l and 0 <= j <= l and 0 <= i' < N and j' >= 0) or (0 <= i <= l and 3 + l <= j < N and i' >= l and i < i' < N and j' >= 0) or (l >= 0 and 3 + l <= i <= -2 + N and 3 + l <= j < N and l <= i' <= 1 + l and j' > l) or (l >= 0 and 3 + l <= i <= -2 + N and 0 <= j <= 2 + l and l <= i' < N and j' > j) or (l >= 0 and 3 + l <= i <= -2 + N and 0 <= j <= 2 + l and l <= i' < N and j' >= 0) or (0 <= l <= -3 + N and 0 <= i <= 2 + l and j >= 0 and 0 <= i' < N and j' > j) or (0 <= l <= -3 + N and 0 <= i <= 2 + l and 0 <= j <= 2 + l and i < i' < N and j' >= 0) or (l >= 0 and 0 <= i <= 2 + l and 3 + l <= j < N and i' >= l and i < i' < N and j' >= 0)); [-1 + N, i, j,10] -> [-1 + N, i, -1 + N,10] : 0 <= i < N and 0 <= j <= -2 + N; [l, 1 + l, j,10] -> [2 + l, i', j',10] : j' < N and ((3 + l <= j < N and 0 <= i' < l and j' >= l) or (l >= 0 and 3 + l <= j < N and l < i' < N and j' >= 0) or (0 <= l <= -3 + N and 0 <= j <= 2 + l and 0 <= i' < N and j' >= 0)); [l, -1 + l, 2 + l,10] -> [1 + l, -1 + l, j',10] : 0 < l <= -3 + N and l <= j' < N; [l, i, j,10] -> [l, i', j,10] : 0 <= i <= l and i' >= l and i < i' < N and ((l < j < N) or (l < j < N) or (l <= -2 + N and 0 <= j <= l)); [l, l, j,10] -> [2 + l, i', j',10] : j' < N and ((3 + l <= j < N and 0 <= i' < l and j' >= l) or (l >= 0 and 3 + l <= j < N and l <= i' < N and j' >= 0) or (0 <= l <= -3 + N and 0 <= j <= 2 + l and 0 <= i' < N and j' >= 0)); [-2 + N, -1 + N, j,10] -> [-1 + N, i', j',10] : j >= 0 and 0 <= i' <= -3 + N and j' >= -2 + N and j < j' < N; [l, -1 + l, j,10] -> [1 + l, -1 + l, j',10] : l > 0 and j' < N and ((3 + l <= j < N and j' >= l) or (l <= -2 + N and 0 <= j <= 1 + l and j' >= 0)); [l, -1 + N, j,10] -> [2 + l, i', j',10] : j' < N and ((l >= 0 and j >= 3 + l and l <= i' < N and j' > j) or (l <= -4 + N and 0 <= j <= l and l <= i' < N and j' > j) or (l <= -4 + N and 0 <= j <= l and l <= i' < N and j' >= 0) or (l >= 0 and 3 + l <= j < N and 2 + l <= i' <= -2 + N and j' >= l) or (l <= -4 + N and 0 <= j <= l and 0 <= i' < l and j' >= l and j' > j) or (l <= -4 + N and 0 <= j <= 2 + l and 0 <= i' < l and j' >= l and j' > j) or (0 <= l <= -4 + N and 0 <= j <= 2 + l and l <= i' < N and j' > j) or (0 <= l <= -4 + N and 0 <= j <= 2 + l and l <= i' < N and j' >= 0)); [-2 + N, -1 + N, j,10] -> [-1 + N, -1 + N, j',10] : j >= 0 and j < j' < N; [l, i, 2 + l,10] -> [2 + l, i', 2 + l,10] : 3 + l <= i <= -2 + N and 0 <= i' < l; [l, 2 + l, 2 + l,10] -> [2 + l, i', j',10] : l <= -4 + N and j' < N and ((0 <= i' < l and j' >= l) or (l >= 0 and l <= i' < N and j' >= 0)); [l, 2 + l, 1 + l,10] -> [1 + l, i', 1 + l,10] : 0 <= l <= -4 + N and l <= i' < N; [l, i, 1 + l,10] -> [2 + l, i', 1 + l,10] : 3 + l <= i <= -2 + N and 0 <= i' < l; [l, i, 1 + l,10] -> [1 + l, i', 1 + l,10] : (l <= -2 + N and i >= 0 and i < i' < l) or (l >= 0 and i >= 2 + l and i < i' < N) or (l >= 0 and 3 + l <= i <= -2 + N and l <= i' < N); [l, 1 + l, 2 + l,10] -> [1 + l, 1 + l, j',10] : 0 <= l <= -3 + N and l <= j' < N; [l, 1 + l, j,10] -> [1 + l, i', j',10] : l >= 0 and 2 + l <= j < N and 2 + l <= i' < N and l <= j' < N; [l, l, j,10] -> [1 + l, i', j',10] : j' < N and ((l >= 0 and j >= 2 + l and l <= i' < N and j' > j) or (l >= 0 and 2 + l <= j < N and l < i' < N and j' >= l) or (l <= -2 + N and 0 <= j <= 1 + l and 0 <= i' < l and j' >= l and j' > j) or (0 <= l <= -2 + N and 0 <= j <= 1 + l and l <= i' < N and j' > j)); [l, 2 + l, l,10] -> [1 + l, i', l,10] : 0 <= l <= -4 + N and l <= i' < N; [l, -1 + N, j,10] -> [2 + l, 1 + l, j',10] : l >= 0 and 3 + l <= j < N and l <= j' < N; [l, 1 + l, j,10] -> [1 + l, 1 + l, j',10] : l >= 0 and j' < N and ((3 + l <= j < N and j' >= l) or (l <= -2 + N and 0 <= j <= 1 + l and j' >= 0)); [l, -1 + N, j,10] -> [1 + l, i', j',10] : l <= -3 + N and 0 <= j <= 1 + l and l <= i' <= -2 + N and j' >= l and j < j' < N and (j <= l or l >= 0); [l, i, j,10] -> [1 + l, i', j',10] : j' < N and ((0 <= i < l and j >= 2 + l and l <= i' < N and j' > j) or (i >= 2 + l and 0 <= j <= l and i < i' < N and j' >= l and j' > j) or (0 <= i < l and 2 + l <= j < N and l < i' < N and j' >= l) or (l >= 0 and l <= i <= 1 + l and j >= 2 + l and i <= i' < N and j' > j) or (2 + l <= i <= -2 + N and 0 <= j <= l and l <= i' < i and j' >= l and j' > j) or (l <= -2 + N and i < l and 0 <= j <= l and 0 <= i' < i and j' >= l and j' > j) or (l <= -2 + N and i < l and 0 <= j <= 1 + l and 0 <= i' < i and j' >= l and j' > j) or (l <= -2 + N and 0 <= i < l and 0 <= j <= l and l <= i' < N and j' > j) or (l <= -2 + N and 0 <= i < l and 0 <= j <= 1 + l and l <= i' < N and j' > j) or (l <= -2 + N and i >= 0 and 0 <= j <= l and i < i' < l and j' >= l and j' > j) or (l <= -2 + N and i >= 0 and 0 <= j <= 1 + l and i < i' < l and j' >= l and j' > j) or (l > 0 and i >= 2 + l and 0 <= j <= 1 + l and i < i' < N and j' >= l and j' > j) or (l <= i <= 1 + l and i <= -2 + N and 0 <= j <= l and i <= i' < N and j' > j) or (l <= -2 + N and 0 <= i <= l and 0 <= j <= 1 + l and i' >= l and i < i' < N and j' >= 0) or (l <= -2 + N and 0 <= i <= 1 + l and 0 <= j <= l and i' >= l and i < i' < N and j' >= 0) or (l > 0 and 2 + l <= i <= -2 + N and 0 <= j <= 1 + l and l <= i' < i and j' >= l and j' > j) or (l <= i <= 1 + l and i <= -2 + N and 0 <= j <= l and 0 <= i' < i and j' >= l and j' > j) or (l <= i <= 1 + l and i <= -2 + N and 0 <= j <= 1 + l and 0 <= i' < i and j' >= l and j' > j) or (l >= 0 and l <= i <= 1 + l and i <= -2 + N and 0 <= j <= 1 + l and i <= i' < N and j' > j) or (0 <= l <= -2 + N and 0 <= i <= 1 + l and 0 <= j <= 1 + l and i' >= l and i < i' < N and j' >= 0)); [l, -1 + N, l,10] -> [1 + l, i', l,10] : 0 <= l <= -4 + N and l <= i' < N; [0, i, j,10] -> [1, i', j',10] : i >= 2 and 0 <= j <= 1 and j < j' < N and ((i < i' < N) or (i <= -2 + N and 0 <= i' < i)); [l, i, j,10] -> [2 + l, 1 + l, l,10] : l >= 0 and 3 + l <= i <= -2 + N and 3 + l <= j < N; [l, i, j,10] -> [1 + l, l, j',10] : 0 <= i < l and 2 + l <= j < N and l <= j' < N; [l, l, j,10] -> [l, i', j',10] : l > 0 and 0 <= j <= l and l < i' < N and j' >= l and j < j' < N; [l, i, j,10] -> [2 + l, i, j',10] : 3 + l <= j < N and 0 <= j' < N and ((0 <= i < l) or (l >= 0 and 3 + l <= i <= -2 + N)); [l, i, l,10] -> [1 + l, i', l,10] : l >= 0 and 3 + l <= i <= -2 + N and l <= i' < N; [l, i, j,10] -> [1 + l, i, j',10] : j' < N and ((0 <= i < l and j >= 2 + l and j' > j) or (2 + l <= i <= -2 + N and 0 <= j <= l and j' > j) or (0 <= i <= -2 + l and 3 + l <= j < N and j' >= l) or (l >= 0 and 2 + l <= i <= -2 + N and j >= 0 and j' > j) or (l <= -2 + N and 0 <= i <= -2 + l and 0 <= j <= 1 + l and j' >= 0) or (l <= -2 + N and 0 <= i < l and 0 <= j <= l and j' > j) or (l <= -2 + N and 0 <= i < l and 0 <= j <= 1 + l and j' > j) or (l >= 0 and 2 + l <= i <= -2 + N and 2 + l <= j < N and j' >= l) or (l >= 0 and 2 + l <= i <= -2 + N and 0 <= j <= 1 + l and j' >= 0)); [l, 1 + l, j,10] -> [2 + l, l, j',10] : l >= 0 and 3 + l <= j < N and l <= j' < N; [l, -1 + N, j,10] -> [2 + l, l, j',10] : l >= 0 and 3 + l <= j < N and l < j' < N; [l, l, j,10] -> [1 + l, l, j',10] : l >= 0 and j' < N and ((3 + l <= j < N and j' >= l) or (l <= -2 + N and 0 <= j <= 1 + l and j' >= 0)); [l, l, 2 + l,10] -> [1 + l, l, j',10] : 0 <= l <= -3 + N and l <= j' < N; [l, i, 2 + l,10] -> [1 + l, i, j',10] : l <= -3 + N and 0 <= i <= -2 + l and l <= j' < N; [l, -1 + N, j,10] -> [2 + l, i', j,10] : 0 <= i' < l and ((3 + l <= j < N) or (l <= -4 + N and 0 <= j <= l) or (l <= -4 + N and 0 <= j <= 2 + l)); [-1 + N, i, j,10] -> [-1 + N, -1 + N, j,10] : 0 <= i <= -2 + N and 0 <= j < N; [-3 + N, -1 + N, -1 + N,10] -> [-1 + N, i', j',10] : i' < N and j' < N and ((0 <= i' <= -4 + N and j' >= -3 + N) or (N >= 3 and i' >= -3 + N and j' >= 0)); [l, i, j,10] -> [l, i, j',10] : 0 <= j <= l and j' >= l and j < j' < N and ((l < i < N) or (l <= -2 + N and 0 <= i < N) or (l <= -2 + N and 0 <= i <= l)); [l, 2 + l, j,10] -> [1 + l, i', j,10] : l <= -4 + N and l <= i' < N and ((0 <= j < l) or (l >= 0 and 2 + l <= j < N)); [-3 + N, -1 + N, j,10] -> [-2 + N, i', j,10] : 0 <= j < N and -3 + N <= i' < N and (j <= -3 + N or N >= 3); [l, i, j,10] -> [l, i', j',10] : 0 <= i < l and 0 <= j <= l and l <= i' < N and j' >= l and j < j' < N; [l, i, j,10] -> [2 + l, i', j,10] : 3 + l <= i <= -2 + N and 0 <= i' < l and ((3 + l <= j < N) or (0 <= j <= l)) }"
+
+    rpp = isl.Map(rpp)
+
+   # rpp = imperf_tile.SimplifyMap(rpp)
 
     #print "********** another version **************"
     LPetit = "tmp/tmp_petit"+L+".t"
     LDeps = "tmp/deps"+L+".txt"
 
     # strong perfect
-    if perfect_mode:
-        print 'Perfectly nested loop mode: enabled'
+    if(DEBUG):
+        if perfect_mode:
+            print 'Perfectly nested loop mode: enabled'
 
 
 
@@ -630,6 +640,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # Proba prywatyzacji zmiennych w instrukcjach w gniazdach
     priv_stuff = priv_engine.PrivEng(LDeps)
     priv_box=1
+
+
     if(imperf == 0):
         priv_box = 1
 
@@ -650,15 +662,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # ==========
 
 
-
     # jesli zmienne prywatne sa w obrebie jednego S1 to mozna 
         
     start = time.time()
     if((imperf == 0 and priv_box == 0)):
         dane = gen.RelPrint(LPetit, flag)
     else:
-        if(len(priv_stuff[1]) > 0 and (priv_stuff[2] == 1 or False)):
+        if(len(priv_stuff[1]) > 0):
             dane = gen.RelPrint_WithPriv(LPetit, priv_stuff[1])
+
         else:
             dane = gen.RelPrint(LPetit, flag)
 
@@ -666,6 +678,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     end = time.time()
     elapsed = end - start
+
     print "Dependence analysis: time taken: ", elapsed, "seconds."
 
     if(DEBUG):
@@ -681,7 +694,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    dane.remove(rel)  
+    dane.remove(rel)
     dane = list(set(dane))
 
     if(DEBUG):
@@ -814,10 +827,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     if(perfect_mode):
-        print "Removing internal dependences for perfect nested loop"
+        if (DEBUG):
+            print "Removing internal dependences for perfect nested loop"
         isl_rel = isl_rel.subtract(isl_ident)
 
-    print isl_rel
+    if (DEBUG):
+        print isl_rel
 
 
 
@@ -825,8 +840,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     z = isl_rel.dim(isl.dim_type.out)
     zz = maxl - z  + 1
     if(zz >0):
-        print "Error. Dimensions of dependencies are not equal to an amount of loop nests"
-        print "Relations will be extended."
+        if (DEBUG ):
+            print "Error. Dimensions of dependencies are not equal to an amount of loop nests"
+            print "Relations will be extended."
         isl_rel = isl_rel.insert_dims(isl.dim_type.in_, z-1, zz)
         isl_rel = isl_rel.insert_dims(isl.dim_type.out, z-1, zz)
 
@@ -851,7 +867,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #if maxl > isl_rel:
 
     start = time.time()
-    print '!!!!!!!!!!'
+    if (DEBUG):
+        print '!!!!!!!!!!'
     # **************************************************************************
     exact_rplus = '-1'
     islrp = True
@@ -876,22 +893,29 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     isl_ident = isl_rel.identity(isl_rel.get_space())
 
-    print 'R+'
-    print isl_relclosure
+    if (DEBUG):
+        print 'R+'
+        print isl_relclosure
+
+    #isl_relclosure = rpp
+    print "!! exact_rplus " + str(exact_rplus)
 
     isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
 
     if(_debug_):
-        print "R*"
-        print isl_relclosure
-        print exact_rplus
+        if (DEBUG):
+            print "R*"
+            print isl_relclosure
+            print exact_rplus
     # **************************************************************************
        
     isl_symb = isl_rel.get_var_names(isl.dim_type.param)
     symb = isl_symb
 
     end = time.time()
-    print end - start
+
+    if (DEBUG):
+        print end - start
 
 
     
@@ -966,7 +990,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     delta = delta.subtract(chkc)
     if(delta.is_empty()):
         par_tiled = 1
-        print "Parallel tiling detected."
+        if (DEBUG):
+            print "Parallel tiling detected."
 
 
 
@@ -1019,9 +1044,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         Bij = MakeBij(_SYM, vars, sym_exvars, im_par_vars, stuff, BLOCK, instrukcje[i], par_tiling)
         isl_TILE.append(isl.Set(str(Bij).replace("_Bij := ", "")))
 
-        print 'T --------------------------------------------'
-        print stuff
-        print isl_TILE[i]
+        if (DEBUG):
+            print 'T --------------------------------------------'
+            print stuff
+            print isl_TILE[i]
 
 
         # oblicz II_SET
@@ -1036,10 +1062,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 ii_set = ii_set + sym_exvars[l] + ' >= 0 and '
                 ii_set = ii_set + BLOCK[l] + '*' + sym_exvars[l] + ' + ' + stuff[l]['lb']  + ' <= ' + stuff[l]['ub'] + ' and '
             ii_set = ii_set + ' 1=1}'
-            print ii_set
+            if (DEBUG):
+                print ii_set
             ii_set = isl.Set(ii_set)
-            print 'II_SET ' + str(ii_set)
-            print 'CARD II_SET ' + test_isl.StringToCard(str(ii_set))
+            if (DEBUG):
+                print 'II_SET ' + str(ii_set)
+                print 'CARD II_SET ' + test_isl.StringToCard(str(ii_set))
         # ------------------------------
 
 
@@ -1052,10 +1080,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         
         for j in range(0, len(instrukcje)):
             BLGT = MakeBLTandBGT_v2(_SYM, vars, sym_exvars, im_par_vars, varsprim, exvars, stuff, BLOCK, instrukcje[j], instrukcje[i], par_tiling)   # porownaj zagniezdzenia instrukcji
-            print '-------LT ----------'
-            print BLGT[0]
-            print '-------GT ----------'
-            print BLGT[1]
+            if (DEBUG):
+                print '-------LT ----------'
+                print BLGT[0]
+                print '-------GT ----------'
+                print BLGT[1]
             isltmp = isl.Set(str(BLGT[0]).replace("_BLT := ", ""))
             if(bltc==0):
                 isl_TILE_LT.append(isltmp)
@@ -1090,14 +1119,16 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         isl_TILE1.append(isl_BCUR)
 
-        print '---------bcur-----'
-        print isl_BCUR.apply(isl_relclosure)
+        if (DEBUG):
+            print '---------bcur-----'
+            print isl_BCUR.apply(isl_relclosure)
 
         isl_BPREV = isl_BCUR.apply(isl_relclosure).intersect(isl_TILE_LT[i]).coalesce()
         isl_BPREV = isl_BPREV.subtract(X).coalesce()    # changed according to ACM TOPLAS reviewer
 
-        print isl_BPREV
-        print '---'
+        if (DEBUG):
+            print isl_BPREV
+            print '---'
 
         isl_TILE2.append(isl_BPREV)
 
@@ -1108,9 +1139,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         IS = getIS(plik, isl_rel, dane)
         DOMRAN = isl_rel.domain().union(isl_rel.range()).coalesce()
         INDDD = IS.subtract(DOMRAN).coalesce()
-        print '----------'
-        print INDDD
-        print IS
+
+        if (DEBUG):
+            print '----------'
+            print INDDD
+            print IS
         #print IS
         # sys.exit(0)
         #isl_TILEprim[i] = isl_TILEprim[i].intersect(IS).coalesce()
@@ -1118,7 +1151,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         #for ll in range(0,i):
         #    isl_TILEprim[i] = isl_TILEprim[i].subtract(isl_TILEprim[ll]).coalesce()
         #############################
-
+        print '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 
         #isl_TILEprim.append(isl_TILE[i])
 
@@ -1161,7 +1194,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
             S = S[:-1] + "] -> " + S1 + " true }"
 
-            print S
+            if (DEBUG):
+                print S
 
             S = isl.Set(S)
 
@@ -1186,22 +1220,23 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
         if(_debug_):
-            print "TILE"
-            print isl_TILE[i]
-            print "TILE_LT"
-            print isl_TILE_LT[i]
-            print "TILE_GT"
-            print isl_TILE_GT[i]
-            print "TILE_ITR (TILE1)"
-            print isl_TILE1[i]
-            print "TVLD_LT (TILE2)"
-            print isl_TILE2[i]
-            print "TILE_VLD (TILE')"
-            print isl_TILEprim[i]
+            if (DEBUG):
+                print "TILE"
+                print isl_TILE[i]
+                print "TILE_LT"
+                print isl_TILE_LT[i]
+                print "TILE_GT"
+                print isl_TILE_GT[i]
+                print "TILE_ITR (TILE1)"
+                print isl_TILE1[i]
+                print "TVLD_LT (TILE2)"
+                print isl_TILE2[i]
+                print "TILE_VLD (TILE')"
+                print isl_TILEprim[i]
           #  print "card"
           #  print test_isl.StringToCard(str(isl_TILEprim[i]))
-            print "TILE_VLD_ext (TILE'')"
-            print isl_TILEbis[i]
+                print "TILE_VLD_ext (TILE'')"
+                print isl_TILEbis[i]
 
 
 
@@ -1249,7 +1284,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         #print "TILE''" + "dla s" + str(i) + "\n" +  str(isl_TILEbis[i])
     #eksepeymentalnie dodaj pozycje do tilebis jesli wiele gniazd na roznych poziomach
-    
+
     Extend = False
     if(imperf == 1):
         Extend = True
@@ -1275,7 +1310,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     
     for j in range(1, len(isl_TILEbis)):
         _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, j)
-        print _rap
+        if (DEBUG):
+            print _rap
         if(Extend):
             z = z.union(isl_TILEbis[j].apply(_rap))
         else:
@@ -1333,9 +1369,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             nazwapar = os.path.splitext(base)[0] + "_partiling" + os.path.splitext(base)[1]
 
     if(perfect_mode):
-        print z
+        if (DEBUG):
+            print z
         chang = str(tmp_st[0]) + "]"
-        print chang
+        if (DEBUG):
+            print chang
 
         for i in range(1, len(tmp_st)):
             zz = str(z).replace(chang, str(tmp_st[i]) + "]")
@@ -1453,14 +1491,27 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     par_tiled = 0
 
-    print '!!!!'
-    print zorig
+    if (DEBUG):
+        print '!!!!'
+        print zorig
 
     if(schedule_mode and  par_tiled != 1):
         if(False):
             tiling_schedule.tile_par(isl_TILEprim, isl_TILEbis, sym_exvars, symb, isl_rel, isl_relplus, isl_relclosure)
         else:
-            tiling_schedule.tile_par3(z, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Extend, _rap, Dodatek,SIMPLIFY, ii_SET)
+
+            # Rk
+            #tiling_schedule.tile_par3(z, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Extend, _rap, Dodatek,SIMPLIFY, ii_SET)
+
+
+            # fsnew - uporzoadkowac !!!!
+            rtile = tiling_schedule.get_RTILE(z, sym_exvars, isl_rel, Extend)
+            rtileplus = rtile.transitive_closure()
+            rapp = _rap
+            rapp = rapp.remove_dims(isl._isl.dim_type.in_, 0, len(sym_exvars))
+            rapp = rapp.remove_dims(isl._isl.dim_type.out, 0, len(sym_exvars)*2)
+            fsnew_tiletry.fs_new(rtile, rtileplus[0], '', '',  LPetit, dane, plik, SIMPLIFY, rapp, '', '', rtileplus[1],z.apply(_rap),sym_exvars,maxl,step)
+            # ----------------------------------------------------------
 
 
 

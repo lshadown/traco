@@ -26,7 +26,7 @@ import relation_util
 
 
 
-def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact):
+def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact, isl_TILEbis, sym_exvars,maxl, step):
 
     #floyd
     #rel_ = isl.Map(str('{[i,j,k,v]->[i,jj,kk,v]}'))
@@ -419,6 +419,16 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
         slice = slice.apply(rap)
 
 
+        wlen = len(sym_exvars)
+        slice = slice.insert_dims(isl.dim_type.set, 2*wlen, wlen*2)
+        print slice
+
+        print isl_TILEbis
+
+
+        slice = slice.intersect(isl_TILEbis)
+
+
         slices.append(slice.coalesce())
 
 
@@ -471,7 +481,9 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
 
-    loop = imperf_tile.RestoreStatements(lines, LPetit, dane, 0, 1, [])
+    loop = imperf_tile.RestoreStatements(lines, LPetit, dane, wlen, 1, [])
+
+    #loop = imperf_tile.RestoreStatements(lines, LPetit, dane, maxl, step, permutate_list)
 
     print "=========================="
     print "OUTPUT CODE"
@@ -655,6 +667,8 @@ def GetConstraint(line):
 
     print newset
 
+
+
     return newset
 
 # zadziala na x/y
@@ -666,3 +680,6 @@ def fix_div(exp, i):
     return constr
 
 
+# co dalej
+
+# slice polaczyc z tilebis

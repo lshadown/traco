@@ -218,7 +218,7 @@ class ClanPy:
                     d.delta = r.deltas()
                 else:
                     d.delta = "-1"   # obliczyc potem jak petit
-                print d.delta
+                #print d.delta
                 d.source = b.rc.GetSourceStatement()
                 d.destination = b.rc.GetDestinationStatement()
                 d.kind = b.rc.KindDep()
