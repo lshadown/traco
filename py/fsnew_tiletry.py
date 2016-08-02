@@ -25,29 +25,108 @@ import relation_util
 
 
 
-
-def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap, acc, loop, exact, isl_TILEbis, sym_exvars,maxl, step):
-
-    #floyd
-    #rel_ = isl.Map(str('{[i,j,k,v]->[i,jj,kk,v]}'))
-    #rel = rel.intersect(rel_).coalesce()
-
-    # R = R - R+ compose R
+def GetRTilePlus(rel_plus, isl_tilevld, sym_exvars,vars):
 
 
-    # do zrobienia
-    # 4. perf imperf rozroznic
+
+    isl_symb = rel_plus.get_var_names(isl.dim_type.param)
+    symb = ','.join(isl_symb)
+
+    Rel = ''
+
+    # symbolic variables
+    if (len(isl_symb) > 0):
+        Rel = Rel + '[' + symb + '] -> { '
+    else:
+        Rel = Rel + '{ '
+
+    sym_exvars_out = []
+    for s in sym_exvars:
+        sym_exvars_out.append(s + "'")
 
 
-    #codegen = 'barvinok'
+    vars_set = vars  #rel_plus.get_var_names(isl.dim_type.in_)
+    vars_set.append('v')
+
+
+
+    vars_setp = []
+
+    for s in vars_set:
+        vars_setp.append(s + "'")
+
+    w1 = sym_exvars[:]
+    w2 = sym_exvars_out[:]
+
+    w1.append('v')
+    w2.append('v\'')
+
+
+
+    #tuple variables
+    Rel = Rel + '[' + ','.join(sym_exvars) + ',v] -> [' + ','.join(sym_exvars_out) + ',v\'] : '
+
+    Rel = Rel + tiling_v3.CreateLex(w2, w1) + ' &&  exists '
+    Rel = Rel + ','.join(vars_set[:-1]) + ',' + ','.join(vars_setp[:-1]) + ' : ( '
+
+    if not rel_plus.is_empty():
+        Rel = Rel +  copyconstr.GetConstr(vars_set, vars_setp, rel_plus) + ' and '
+
+    VLD = isl_tilevld[0]
+    for v in isl_tilevld:
+        VLD = VLD.union(v).coalesce()
+
+
+    if not VLD.is_empty():
+        Rel = Rel + copyconstr.GetConstrSet(vars_set, VLD) + ' and '
+
+    # VLD' zamien II na II'
+    VLDP = VLD
+    isl_symb = VLDP.get_var_names(isl.dim_type.param)
+    for s in sym_exvars:
+        for i in range(0, len(isl_symb)):
+            if (s == isl_symb[i]):
+                VLDP = VLDP.set_dim_name(isl.dim_type.param, i, s + '\'')
+
+
+
+    if not VLD.is_empty():
+        Rel = Rel + copyconstr.GetConstrSet(vars_setp, VLDP)
+
+    Rel = Rel + ' ) }'
+
+
+
+    Rel = isl.Map(Rel)
+
+    return Rel
+
+
+
+
+
+
+
+
+
+
+def fs_new(rel, rel_plus, rtile, LPetit, dane, plik, SIMPLIFY, rap,  exact, isl_TILEbis, sym_exvars,maxl, step, isl_tilevld,vars):
+
     codegen = 'isl'
 
-    #rel = "[n, loop] -> { [l, i, k, 13] -> [l, i+1, k', 13] : k'=0 && k = i-1 && 1<=l<=loop && 1<=i<n-1;" \
-    #      "[l, i, 0, 13] -> [l, i, k', 13] : 1<=l<=loop && 1<=i<n &&  0 < k' <=i;" \
-    #      "[l, n-1, n-2, 13] -> [l+1, 1, 0, 13] : 1 <=l < loop } "
-    #rel = "{[i,k,8] -> [i+1,k',8] : k'=0 && k=i-1 && 1<=i<6; [i,0,8] -> [i,k',8] : 0 < k' <= i && 1 <= i <= 6}"
-    #rel = isl.Map(rel)
-    #rel_plus = rel.transitive_closure()[0]
+    # compute rtile_plus
+
+   # podmien exact, rel na tile, rel_plus na rtile_plus
+
+
+
+    #wq = rtile.transitive_closure()[0]
+
+
+    #print wp.subtract(wq).coalesce()
+    #print wq.subtract(wp).coalesce()
+
+
 
     if(exact):
         print 'R+ exact!'
@@ -77,17 +156,21 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
 
 
-    print '## R'
+    wp = GetRTilePlus(rel_plus, isl_tilevld, sym_exvars,vars).coalesce()
+    rel = rtile
+    rel_plus = wp
 
+    print '## R'
 
     print rel
 
-
     print '## R+'
-    print rel_plus
 
+    print wp
 
     rel = rel.subtract(rel_plus.apply_range(rel))
+
+
 
     print '### R = R - R+ compose R'
     print rel

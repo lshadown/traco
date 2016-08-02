@@ -1302,9 +1302,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #vis.Vis(isl_TILEbis[0], stuff, cl.deps, isl.Set(cl.statements[0].domain_map), True)
     #sys.exit(0)
 
+    # zne takie jak z ale bez ext
 
     if(Extend):
         z = isl_TILEbis[0].apply(_rap)
+        zne = isl_TILEbis[0]
     else:
         z = isl_TILEbis[0]
     
@@ -1314,14 +1316,20 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             print _rap
         if(Extend):
             z = z.union(isl_TILEbis[j].apply(_rap))
+            zne = zne.union(isl_TILEbis[j])
         else:
             z = z.union(isl_TILEbis[j])
+
+    if(not Extend):
+        zne = z
 
 
 
     # -----------------------------------------------------------------
 
     _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
+
+
 
     if(Extend):
         zorig = isl_TILEorig[0].apply(_rap)
@@ -1504,14 +1512,23 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             #tiling_schedule.tile_par3(z, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Extend, _rap, Dodatek,SIMPLIFY, ii_SET)
 
 
-            # fsnew - uporzoadkowac !!!!
-            rtile = tiling_schedule.get_RTILE(z, sym_exvars, isl_rel, Extend)
-            rtileplus = rtile.transitive_closure()
+            # fsnew
+
+
+            rtile = tiling_schedule.get_RTILE(zne, sym_exvars, isl_rel, False)
+            #rtileplus = rtile.transitive_closure()
+
+
             rapp = _rap
             rapp = rapp.remove_dims(isl._isl.dim_type.in_, 0, len(sym_exvars))
             rapp = rapp.remove_dims(isl._isl.dim_type.out, 0, len(sym_exvars)*2)
-            fsnew_tiletry.fs_new(rtile, rtileplus[0], '', '',  LPetit, dane, plik, SIMPLIFY, rapp, '', '', rtileplus[1],z.apply(_rap),sym_exvars,maxl,step)
-            # ----------------------------------------------------------
+
+            if not Extend:
+                z = z.apply(_rap)
+
+
+
+            fsnew_tiletry.fs_new(isl_rel, isl_relplus, rtile, LPetit, dane, plik, SIMPLIFY, rapp, exact_rplus,z,sym_exvars,maxl,step, isl_TILEprim,vars)
 
 
 
