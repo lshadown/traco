@@ -1,17 +1,17 @@
 #!/bin/bash
 echo "C++ packages..."
-sudo apt-get install libgmp-dev libntl-dev flex bison
-if [ ! -f barvinok-0.36.tar.gz ]
+sudo apt-get install libgmp-dev libntl-dev flex bison libffi6 libffi-dev
+if [ ! -f barvinok-0.39.tar.gz ]
 then
  echo "Barvinok download..."
- wget http://barvinok.gforge.inria.fr/barvinok-0.36.tar.gz
+ wget http://barvinok.gforge.inria.fr/barvinok-0.39.tar.gz
  echo "Barvinok unpack..."
- tar xvzf barvinok-0.36.tar.gz
+ tar xvzf barvinok-0.39.tar.gz
 fi
-if [ ! -f barvinok-0.36/iscc ]
+if [ ! -f barvinok-0.39/iscc ]
 then
  echo "Barvinok setup..."
- cd barvinok-0.36
+ cd barvinok-0.39
  ./configure --enable-shared-barvinok
  make
  sudo make install
