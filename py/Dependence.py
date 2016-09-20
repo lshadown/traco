@@ -126,6 +126,7 @@ class Kernel_Loop:
             self.lines_deps.append(lines[i])   # dla priv
 
 
+
     def Get_ST(self):
         linestring = open(self.plik, 'r').read()
         lines = linestring.split('\n')

@@ -18,6 +18,7 @@ import openacc
 
 import fs_rk
 import fs_new
+import relation_util
 
 
 try:
@@ -138,6 +139,14 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
 
     dane = loop.dane
     isl_rel = loop.isl_rel
+
+    new_rel = relation_util.ReduceR(isl_rel)
+
+    #isl_rel = new_rel
+
+
+
+
 
 
 

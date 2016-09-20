@@ -50,10 +50,11 @@ TILE_S2 = ReplaceB(TILE_S2, B)
 TILE_S1 = isl.Set(TILE_S1).coalesce()
 TILE_S2 = isl.Set(TILE_S2).coalesce()
 
+print 'TILE_S1'
 print TILE_S1
 
 print '---'
-
+print 'TILE_S2'
 print TILE_S2
 
 #######################################################################
@@ -108,7 +109,7 @@ TILE_LT_S1_S1 = ReplaceB(TILE_LT_S1_S1, B)
 TILE_LT_S1_S1 = isl.Set(TILE_LT_S1_S1).coalesce()
 
 print '---'
-
+print 'TILE_LT_S1_S1'
 print TILE_LT_S1_S1
 
 #######################################################################
@@ -126,6 +127,7 @@ TILE_LT_S1_S2 = isl.Set(TILE_LT_S1_S2).coalesce()
 
 print '---'
 
+print 'TILE_LT_S1_S2'
 print TILE_LT_S1_S2
 
 #######################################################################
@@ -142,7 +144,9 @@ TILE_LT_S2_S1 = ReplaceB(TILE_LT_S2_S1, B)
 TILE_LT_S2_S1 = isl.Set(TILE_LT_S2_S1).coalesce()
 
 print '---'
+print 'TILE_LT_S2_S1'
 print TILE_LT_S2_S1
+
 
 #######################################################################
 
@@ -158,6 +162,7 @@ TILE_LT_S2_S2 = ReplaceB(TILE_LT_S2_S2, B)
 TILE_LT_S2_S2 = isl.Set(TILE_LT_S2_S2).coalesce()
 
 print '---'
+print 'TILE_LT_S2_S2'
 print TILE_LT_S2_S2
 
 #######################################################################
@@ -179,7 +184,7 @@ TILE_GT_S1_S1 = ReplaceB(TILE_GT_S1_S1, B)
 TILE_GT_S1_S1 = isl.Set(TILE_GT_S1_S1).coalesce()
 
 print '---'
-
+print 'TILE_GT_S1_S1'
 print TILE_GT_S1_S1
 
 #######################################################################
@@ -196,7 +201,7 @@ TILE_GT_S1_S2 = ReplaceB(TILE_GT_S1_S2, B)
 TILE_GT_S1_S2 = isl.Set(TILE_GT_S1_S2).coalesce()
 
 print '---'
-
+print 'TILE_GT_S1_S2'
 print TILE_GT_S1_S2
 
 #######################################################################
@@ -213,6 +218,7 @@ TILE_GT_S2_S1 = ReplaceB(TILE_GT_S2_S1, B)
 TILE_GT_S2_S1 = isl.Set(TILE_GT_S2_S1).coalesce()
 
 print '---'
+print 'TILE_GT_S2_S1'
 print TILE_GT_S2_S1
 
 #######################################################################
@@ -229,7 +235,8 @@ TILE_GT_S2_S2 = ReplaceB(TILE_GT_S2_S2, B)
 TILE_GT_S2_S2 = isl.Set(TILE_GT_S2_S2).coalesce()
 
 print '---'
-print TILE_LT_S2_S2
+print 'TILE_GT_S2_S2'
+print TILE_GT_S2_S2
 
 #######################################################################
 
@@ -238,9 +245,13 @@ TILE_LT_S2 = TILE_LT_S2_S1.union(TILE_LT_S2_S2).coalesce()
 TILE_GT_S1 = TILE_GT_S1_S1.union(TILE_GT_S1_S2).coalesce()
 TILE_GT_S2 = TILE_GT_S2_S1.union(TILE_GT_S2_S2).coalesce()
 
+print 'TILE_LT_S1'
 print TILE_LT_S1
+print 'TILE_LT_S2'
 print TILE_LT_S2
+print 'TILE_GT_S1'
 print TILE_GT_S1
+print 'TILE_GT_S2'
 print TILE_GT_S2
 
 #######################################################################
@@ -270,13 +281,16 @@ Rplus = " [N] -> { [i, j, k, 1] -> [i', j', k', 1] : (k <= -1 - i + j and k >= 0
 
 Rplus = isl.Map(Rplus)
 
+print 'Rplus'
 print Rplus
 
 
 TILE_ITR1 = TILE_S1.subtract(TILE_GT_S1.apply(Rplus)).coalesce()
 TILE_ITR2 = TILE_S2.subtract(TILE_GT_S2.apply(Rplus)).coalesce()
 
+print 'TILE_ITR1'
 print TILE_ITR1
+print 'TILE_ITR2'
 print TILE_ITR2
 
 # TVLD_LT = (R+(TILE_ITR) and TILE_LT) -R+(TILE_GT)
@@ -284,20 +298,24 @@ print TILE_ITR2
 TVLD_LT1 = (TILE_LT_S1.intersect(TILE_ITR1.apply(Rplus))).subtract(TILE_GT_S1.apply(Rplus)).coalesce()
 TVLD_LT2 = (TILE_LT_S2.intersect(TILE_ITR2.apply(Rplus))).subtract(TILE_GT_S2.apply(Rplus)).coalesce()
 
+print 'TVLD_LT1'
 print TVLD_LT1
+print 'TVLD_LT2'
 print TVLD_LT2
 
 
 TILE_VLD1 = TVLD_LT1.union(TILE_ITR1).coalesce()
 TILE_VLD2 = TVLD_LT2.union(TILE_ITR2).coalesce()
 
+print 'TILE_VLD1'
 print TILE_VLD1
+print 'TILE_VLD2'
 print TILE_VLD2
 
 TILE_VLD = TILE_VLD1.union(TILE_VLD2)
 
 
-
+print 'TILE_VLD'
 print TILE_VLD
 
 
@@ -322,11 +340,14 @@ Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; [ii
 TILE_VLD_EXT = TILE_VLD_EXT.apply(Rmap).coalesce()
 
 #TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
-
+print 'TILE_VLD_EXT'
+print TILE_VLD_EXT
 
 loop_x = iscc.isl_ast_codegen(TILE_VLD_EXT)
 
 #print loop_x
+
+print '-------------'
 
 S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
 S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_par(RNA, i, j));'

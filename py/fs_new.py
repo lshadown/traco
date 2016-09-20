@@ -559,6 +559,9 @@ def GetR2(re, rrplus):
     if not re.is_empty():
         R2 = R2 +  copyconstr.GetConstr(in_, out_, re) + ' and '
 
+      #  if not re.is_empty():
+      #      R2 = R2 + copyconstr.GetConstr(out_, in_, re) + ' and '
+
     #s2 in RR+(s1)
     if not rrplus.is_empty():
         R2 = R2 +  copyconstr.GetConstr(in_, out_, rrplus) + ' and '
