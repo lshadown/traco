@@ -83,7 +83,13 @@ def CreateLex(array1, array2):
             lex = lex + " || ("
         for j in range(0,i):
             lex = lex + array1[j] + " = " + array2[j] + " && "
-        lex = lex + array1[i] + " > " + array2[i]
+
+        if(i==-1):
+            lex = lex + array1[i] + " < " + array2[i]
+        else:
+            lex = lex + array1[i] + " > " + array2[i]
+
+
         if(i>0):
             lex = lex + ")"
         
