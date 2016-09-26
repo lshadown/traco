@@ -12,7 +12,7 @@ if [ ! -f barvinok-0.39/iscc ]
 then
  echo "Barvinok setup..."
  cd barvinok-0.39
- ./configure --enable-shared-barvinok
+ ./configure --enable-shared-barvinok --with-pet=bundled  
  make
  sudo make install
  sudo ln -s /usr/local/lib/libbarvinok.so /usr/lib/libbarvinok.so
