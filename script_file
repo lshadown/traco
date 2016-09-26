@@ -1,4 +1,4 @@
-p := parse_file "test1.c";
+p := parse_file "testw.c";
 
 Domain := p[0];
 
@@ -7,6 +7,9 @@ Write := p[1] + p[2];
 Read := p[3];
 
 Schedule := map p[4];
+
+print "Schedule";
+print Schedule;
 
 Before := Schedule << Schedule;
 
