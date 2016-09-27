@@ -1,6 +1,8 @@
 import sys
 import iscc
 import imperf_tile
+import relation_util
+import copyconstr
 
 try:
     import islpy as isl
@@ -339,13 +341,28 @@ Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; [ii
 
 TILE_VLD_EXT = TILE_VLD_EXT.apply(Rmap).coalesce()
 
+RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
+in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
+RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT) + "}"
+
+Rsched = isl.Map(RSched)
+
+
+
+
 #TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
 print 'TILE_VLD_EXT'
 print TILE_VLD_EXT
 
-loop_x = iscc.isl_ast_codegen(TILE_VLD_EXT)
+#print relation_util.islSettoOmegaStr(TILE_VLD_EXT )
+
+#loop_x = iscc.isl_ast_codegen(TILE_VLD_EXT)
+#loop_x = iscc.isl_ast_codegen(Rsched)
 
 #print loop_x
+
+loop_x = iscc.iscc_communicate("L :=" + RSched + "; codegen L;")
+
 
 print '-------------'
 
