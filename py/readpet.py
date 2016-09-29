@@ -1,8 +1,10 @@
 import iscc
+import islpy as isl
 
 scopfile = 'testw.c'
 
 #######################################################################
+# BARVINOK + PET
 cmd = 'p := parse_file "' + scopfile + '";'
 cmd += 'Domain := p[0];'
 cmd += 'Write := p[1] + p[2];'
@@ -30,7 +32,7 @@ cmd += 'IND := Domain - LDR;'
 cmd += 'print "IND";'
 cmd += 'print IND;'
 #######################################################################
-
+# RESULT TO ISLPY
 
 output = loop_x = iscc.iscc_communicate(cmd)
 
@@ -41,7 +43,23 @@ ld = output[3]
 rel = output[11]
 ind = output[13]
 
-print schedule
+
+ld = isl.UnionSet(ld)
+ind = isl.UnionSet(ind)
+schedule = isl.UnionMap(schedule)
+rel = isl.UnionMap(rel)
+
+print "LD"
 print ld
+print "SCHEDULE"
+print schedule
+print "REL"
 print rel
+print "IND"
 print ind
+
+#######################################################################
+# FINISH
+
+# NEXT CLAN AND MATH LINES TO S_NUMBER
+
