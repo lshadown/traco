@@ -11,7 +11,7 @@ import islpy as isl
 ctx = isl.Context()
 
 
-barv_script = "/home/marek/traco/barvinok-0.36/iscc"
+barv_script = "/home/marek/traco/barvinok-0.39/iscc"
 oc_script = "/home/marek/traco/omega_calc/obj/oc < tmp/oc.txt"
 
     #start = time.time()
