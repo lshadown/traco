@@ -1,5 +1,15 @@
 import iscc
 import islpy as isl
+import clanpy
+import re
+
+##############################################################################
+# HUMAN SORTING   S8 S9 S12
+def natural_sort(l):
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+    return sorted(l, key = alphanum_key)
+##############################################################################
 
 scopfile = 'testw.c'
 
@@ -63,3 +73,20 @@ print ind
 
 # NEXT CLAN AND MATH LINES TO S_NUMBER
 
+cl = clanpy.ClanPy()
+cl.loop_path = scopfile
+
+cl.Load()
+
+#print cl.statements[len(cl.statements)-1].scop+1
+
+statements = re.findall(r'S_\d+', str(ld))
+
+statements = natural_sort(statements)
+
+assert len(cl.statements) == len(statements), "Pet & Clan return found different number of statements"
+
+for i in range(0, len(cl.statements)):
+    cl.statements[i].pet_symbol = statements[i]
+
+#######################################################################

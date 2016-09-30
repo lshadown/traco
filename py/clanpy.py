@@ -31,6 +31,8 @@ class ClanStatement:
     nest = []
     scatering = []
     bounds = []
+    scop = 0
+    pet_symbol = ''
 
 
     def __init__(self):
@@ -76,6 +78,7 @@ class ClanPy:
 
 
         st = -1
+        scop = -1
 
         for i in range(0, len(lines)):
             if "# NULL scop" == lines[i]:
@@ -87,6 +90,7 @@ class ClanPy:
                 self.no_statements = int(lines[i+1])
                 for j in range(0, self.no_statements):
                     self.statements.append(ClanStatement())
+                scop += 1
 
             if '# Parameters are provided' == lines[i]:
                 self.params = lines[i+3].split(' ')
@@ -94,6 +98,7 @@ class ClanPy:
 
             if '== Statement' in lines[i]:
                 st = st + 1
+                self.statements[st].scop = scop
 
             if "# List of original iterators" == lines[i]:
                 self.statements[st].original_iterators = lines[i+1].split(' ')
