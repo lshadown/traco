@@ -62,20 +62,36 @@ ld = output[3]
 rel = output[11]
 ind = output[13]
 
-
 ld = isl.UnionSet(ld)
 ind = isl.UnionSet(ind)
 schedule = isl.UnionMap(schedule)
+strrel = rel
 rel = isl.UnionMap(rel)
 
-print "LD"
-print ld
-print "SCHEDULE"
-print schedule
-print "REL"
-print rel
-print "IND"
-print ind
+
+########################################################################
+rels = strrel.split(';')
+prefix = re.findall(r'[^{]*{', rels[0])[0]
+
+maps = []
+for q in rels:
+    if prefix not in q:
+        q = prefix + q
+    q += '}'
+    maps.append(isl.Map(q))
+
+########################################################################
+
+#rel = isl.UnionMap(rel).coalesce()
+
+#print "LD"
+#print ld
+#print "SCHEDULE"
+#print schedule
+#print "REL"
+#print rel
+# #print "IND"
+#print ind
 
 #######################################################################
 # FINISH
@@ -123,8 +139,9 @@ for i in range(0, scop_number):
     openscop.IND = tmp_set.intersect(ind)
 
     tmp_rel = isl.UnionMap.from_domain_and_range(tmp_set,tmp_set)
-    openscop.R = tmp_rel.intersect(rel).coalesce()
+    openscop.R = tmp_rel.intersect(rel)
     scops.append(openscop)
+
 
 
 #######################################################################
