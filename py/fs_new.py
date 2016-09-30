@@ -156,6 +156,10 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     rlex = "{[" + ",".join(inp) + "] -> [" + ",".join(outp) + "] : " + tiling_v3.CreateLex(outp, inp) + "}"
     rlex = isl.Map(rlex)
 
+
+    print "RLEX"
+    print rlex
+
     rip = rel_plus.fixed_power_val(-1)
 
     re_rel = isl.Map.from_domain_and_range(IS, IS)
