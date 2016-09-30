@@ -11,6 +11,15 @@ def natural_sort(l):
     return sorted(l, key = alphanum_key)
 ##############################################################################
 
+class Scop:
+    R = ''
+    LD = ''
+    IND = ''
+
+
+
+##############################################################################
+
 scopfile = 'testw.c'
 
 #######################################################################
@@ -88,5 +97,36 @@ assert len(cl.statements) == len(statements), "Pet & Clan return found different
 
 for i in range(0, len(cl.statements)):
     cl.statements[i].pet_symbol = statements[i]
+
+#######################################################################
+
+# SPlit all to scops  S_1[i,j]
+
+items = re.findall(r'S_\d+[^\]]*\]', str(ld))
+items = natural_sort(items)
+
+items_ = []
+for item in items:
+    items_.append(isl.Set('{' + item + '}'))
+
+scop_number = cl.statements[len(cl.statements)-1].scop+1
+
+scops = []
+
+for i in range(0, scop_number):
+    openscop = Scop()
+    tmp_set = isl.UnionSet('{[]}')
+    for j in range(0, len(cl.statements)):
+        if(cl.statements[j].scop == i):
+            tmp_set = items_[j].union(tmp_set)
+    openscop.LD = tmp_set.intersect(ld)
+    openscop.IND = tmp_set.intersect(ind)
+
+    tmp_rel = isl.UnionMap.from_domain_and_range(tmp_set,tmp_set)
+    openscop.R = tmp_rel.intersect(rel).coalesce()
+    scops.append(openscop)
+
+#for i in range(0, ld.n_set()):
+#    ld_domains = ld.extract_set(i)
 
 #######################################################################
