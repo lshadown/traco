@@ -126,7 +126,5 @@ for i in range(0, scop_number):
     openscop.R = tmp_rel.intersect(rel).coalesce()
     scops.append(openscop)
 
-#for i in range(0, ld.n_set()):
-#    ld_domains = ld.extract_set(i)
 
 #######################################################################
