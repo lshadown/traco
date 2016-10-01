@@ -3,6 +3,7 @@ import iscc
 import imperf_tile
 import relation_util
 import copyconstr
+import tiling_v3
 
 try:
     import islpy as isl
@@ -26,14 +27,14 @@ TILE_S1 += tile_i_s1 + tile_j_s1 + tile_k_s1 + '}'
 TILE_S2 = '[N,ii,jj,kk] -> '
 TILE_S2 += '{[i,j,k,2] : '
 
-tile_k_s2 = ' k=0 && kk=0 '
+tile_k_s2 = ' k = 0 && kk=0 '
 
 TILE_S2 += tile_i_s1 + tile_j_s1 + tile_k_s2 + '}'
 
 
 #######################################################################
 
-B = ['16', '16', '1']
+B = ['2', '2', '2']
 
 def ReplaceB(str, B):
     str = str.replace('b1', B[0])
@@ -327,17 +328,21 @@ print TILE_VLD
 
 
 
-str_TV = str(TILE_VLD)
+#str_TV = str(TILE_VLD)
 
-str_TV = str_TV.replace('[N, ii, jj, kk] -> ', '')
-str_TV = str_TV.replace('[', '[ii,jj,kk,')
-str_TV = '[N] -> ' + str_TV
+#str_TV = str_TV.replace('[N, ii, jj, kk] -> ', '')
+#str_TV = str_TV.replace('[', '[ii,jj,kk,')
+#str_TV = '[N] -> ' + str_TV
 
-print str_TV
 
-TILE_VLD_EXT = isl.Set(str_TV)
 
-Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; [ii,jj,kk,i,j,k,2] -> [0, ii,1, jj,0, kk,0, i,1, j,0,k,2]  } ' )
+#print str_TV
+
+#TILE_VLD_EXT = isl.Set(str_TV)
+Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,')
+TILE_VLD_EXT = tiling_v3.Project(TILE_VLD.apply(Rapply).coalesce(), ['ii','jj','kk'])
+
+Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; [ii,jj,kk,i,j,k,2] -> [0, ii,0, jj,1, kk,0, i,0, j,1,k,2]  } ' )
 
 TILE_VLD_EXT = TILE_VLD_EXT.apply(Rmap).coalesce()
 
@@ -361,13 +366,17 @@ print TILE_VLD_EXT
 
 #print loop_x
 
-loop_x = iscc.iscc_communicate("L :=" + RSched + "; codegen L;")
+loop_x = iscc.iscc_communicate("L :=" + str(TILE_VLD_EXT ) + "; codegen L;")
 
 
 print '-------------'
 
-S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
-S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_par(RNA, i, j));'
+#S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
+#S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_par(RNA, i, j));'
+
+S1 = 'S[i][j] = S[i][k+i] + S[k+i+1][j]+ S[i][j];'
+S2 = 'S[i][j] = S[i][j]+ S[i+1][j-1];'
+
 
 lines = loop_x.split('\n')
 
