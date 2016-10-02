@@ -393,11 +393,11 @@ loop_x = iscc.iscc_communicate("L :=" + str(Rsched) + "; codegen L;")
 
 print '-------------'
 
-#S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
-#S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_par(RNA, i, j));'
+S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
+S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_par(RNA, i, j));'
 
-S1 = 'S[i][j] = S[i][k+i] + S[k+i+1][j]+ S[i][j];'
-S2 = 'S[i][j] = S[i][j]+ S[i+1][j-1];'
+#S1 = 'S[i][j] = S[i][k+i] + S[k+i+1][j]+ S[i][j];'
+#S2 = 'S[i][j] = S[i][j]+ S[i+1][j-1];'
 
 
 lines = loop_x.split('\n')
