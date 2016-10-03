@@ -15,18 +15,18 @@ except ImportError, e:
     sys.exit()
 
 
-TILE_S1 = '[N,ii,jj,kk] -> '
+TILE_S1 = '[N,ii,jj,kk,  b1, b2, b3, iib1,  jjb2,  kkb3, iipb1,  jjpb2,  kkpb3  ] -> '
 TILE_S1 += '{[i,j,k,1] : '
 
-tile_i_s1 = ' N-1 - b1 * ii >= i >= N-1-b1*(ii+1)+1, 0 && ii >=0 && '
-tile_j_s1 = ' (i+1) + b2*jj <= j <= b2*(jj+1)+i+1-1, N-1 && jj >= 0 &&'
-tile_k_s1 = ' b3*kk + 0 <= k <= b3*(kk+1)+0-1, j-i-1 && kk >= 0  '
+tile_i_s1 = ' N-1 - iib1 >= i >= N-1- iib1 -b1 +1, 0 && ii >=0 && '
+tile_j_s1 = ' (i+1) + jjb2 <= j <= jjb2+b2+i+1-1, N-1 && jj >= 0 &&'
+tile_k_s1 = ' kkb3 + 0 <= k <= kkb3+b3+0-1, j-i-1 && kk >= 0  '
 
 TILE_S1 += tile_i_s1 + tile_j_s1 + tile_k_s1 + '}'
 
 #######################################################################
 
-TILE_S2 = '[N,ii,jj,kk] -> '
+TILE_S2 = '[N,ii,jj,kk, iib1,  jjb2,  kkb3, b1, b2, b3] -> '
 TILE_S2 += '{[i,j,k,2] : '
 
 tile_k_s2 = ' k = 0 && kk=0 '
@@ -36,21 +36,6 @@ TILE_S2 += tile_i_s1 + tile_j_s1 + tile_k_s2 + '}'
 
 #######################################################################
 
-B = ['16', '16', '16']
-
-def ReplaceB(str, B):
-    str = str.replace('b1', B[0])
-    str = str.replace('b2', B[1])
-    str = str.replace('b3', B[2])
-    return str
-
-
-
-TILE_S1 = ReplaceB(TILE_S1, B)
-TILE_S2 = ReplaceB(TILE_S2, B)
-
-
-#######################################################################
 
 TILE_S1 = isl.Set(TILE_S1).coalesce()
 TILE_S2 = isl.Set(TILE_S2).coalesce()
@@ -61,6 +46,8 @@ print TILE_S1
 print '---'
 print 'TILE_S2'
 print TILE_S2
+
+
 
 #######################################################################
 # [S1 | S2]
@@ -79,23 +66,27 @@ lex_s1_g = ' ( (ii < iip) or (ii = iip && jj < jjp) or (ii=iip && jj=jjp & kk < 
 lex_s2_g = ' ( (ii < iip) or (ii = iip && jj < jjp) ) '
 lex_s1s2_g = ' ( (ii < iip) or (ii = iip && jj < jjp) or (ii=iip && jj=jjp)  ) '
 
-iig0 = ' ii >= 0 && jj >= 0 && kk>= 0 && iip >= 0 && jjp >= 0 && kkp>= 0 && '
+iig0 = ' ii >= 0 && jj >= 0 && kk>= 0 && iip >= 0 && jjp >= 0 && kkp>= 0 && b1 >0 && b2 >0 && b3 >0 &&'
 
-bilb1 = ' N-1 - b1*ii >= 0 && '
-bilb1p = ' N-1 - b1*iip >= 0 && '
+bilb1 = ' N-1 - iib1 >= 0 &&  iib1 > ii  && '
+bilb1p = ' N-1 - iipb1 >= 0 &&  iipb1 > ii  && '
 
-bilb2 = '(i+1) + b2 * jj <= N-1 && '
-bilb2p = '(i+1) + b2 * jjp <= N-1 && '
+bilb2 = '(i+1) + jjb2 <= N-1 && jjb2 > jj  && '
+bilb2p = '(i+1) + jjpb2 <= N-1 && jjpb2 > jj && '
 
-bilb3 = 'b3*kk + 0 <= j-i-1 && '
-bilb3p = 'b3*kkp + 0 <= j-i-1 && '
+bilb3 = 'kkb3 + 0 <= j-i-1 &&  kkb3 > kk  && '
+bilb3p = 'kkpb3 + 0 <= j-i-1 && kkpb3 > kk && '
 
 tile_ip_s1 = tile_i_s1.replace('ii', 'iip')
 tile_jp_s1 = tile_j_s1.replace('jj', 'jjp')
 tile_kp_s1 = tile_k_s1.replace('kk', 'kkp')
 
+tile_ip_s1 = tile_i_s1.replace('iib1', 'iipb1')
+tile_jp_s1 = tile_j_s1.replace('jjb2', 'jjpb2')
+tile_kp_s1 = tile_k_s1.replace('kkb3', 'kkpb3')
+
 def template(a):
-    return '[N,ii,jj,kk] -> {[i,j,k,'+str(a)+'] : exists iip,jjp,kkp : ('
+    return '[N,ii,jj,kk,b1, b2, b3, iib1,  jjb2,  kkb3, iipb1,  jjpb2,  kkpb3 ] -> {[i,j,k,'+str(a)+'] : exists iip,jjp,kkp : ('
 
 #######################################################################
 # LT
@@ -109,7 +100,7 @@ IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
 
 TILE_LT_S1_S1 += IinTILE + ')}'
 
-TILE_LT_S1_S1 = ReplaceB(TILE_LT_S1_S1, B)
+#TILE_LT_S1_S1 = ReplaceB(TILE_LT_S1_S1, B)
 
 TILE_LT_S1_S1 = isl.Set(TILE_LT_S1_S1).coalesce()
 
@@ -126,7 +117,7 @@ TILE_LT_S1_S2 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3
 IinTILE = tile_ip_s1 + tile_jp_s1
 TILE_LT_S1_S2 += IinTILE + ' 1=1  )}'  #s2
 
-TILE_LT_S1_S2 = ReplaceB(TILE_LT_S1_S2, B)
+#TILE_LT_S1_S2 = ReplaceB(TILE_LT_S1_S2, B)
 
 TILE_LT_S1_S2 = isl.Set(TILE_LT_S1_S2).coalesce()
 
@@ -144,7 +135,7 @@ TILE_LT_S2_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3p
 IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
 TILE_LT_S2_S1 += IinTILE + ')}'
 
-TILE_LT_S2_S1 = ReplaceB(TILE_LT_S2_S1, B)
+#TILE_LT_S2_S1 = ReplaceB(TILE_LT_S2_S1, B)
 
 TILE_LT_S2_S1 = isl.Set(TILE_LT_S2_S1).coalesce()
 
@@ -162,7 +153,7 @@ TILE_LT_S2_S2 += bilb1 + bilb1p + bilb2 + bilb2p
 IinTILE = tile_ip_s1 + tile_jp_s1
 TILE_LT_S2_S2 += IinTILE + ' 1=1)}'
 
-TILE_LT_S2_S2 = ReplaceB(TILE_LT_S2_S2, B)
+#TILE_LT_S2_S2 = ReplaceB(TILE_LT_S2_S2, B)
 
 TILE_LT_S2_S2 = isl.Set(TILE_LT_S2_S2).coalesce()
 
@@ -184,7 +175,7 @@ IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
 
 TILE_GT_S1_S1 += IinTILE + ')}'
 
-TILE_GT_S1_S1 = ReplaceB(TILE_GT_S1_S1, B)
+#TILE_GT_S1_S1 = ReplaceB(TILE_GT_S1_S1, B)
 
 TILE_GT_S1_S1 = isl.Set(TILE_GT_S1_S1).coalesce()
 
@@ -201,7 +192,7 @@ TILE_GT_S1_S2 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3
 IinTILE = tile_ip_s1 + tile_jp_s1
 TILE_GT_S1_S2 += IinTILE + ' 1=1  )}'  #s2
 
-TILE_GT_S1_S2 = ReplaceB(TILE_GT_S1_S2, B)
+#TILE_GT_S1_S2 = ReplaceB(TILE_GT_S1_S2, B)
 
 TILE_GT_S1_S2 = isl.Set(TILE_GT_S1_S2).coalesce()
 
@@ -218,7 +209,7 @@ TILE_GT_S2_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3p
 IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
 TILE_GT_S2_S1 += IinTILE + ')}'
 
-TILE_GT_S2_S1 = ReplaceB(TILE_GT_S2_S1, B)
+#TILE_GT_S2_S1 = ReplaceB(TILE_GT_S2_S1, B)
 
 TILE_GT_S2_S1 = isl.Set(TILE_GT_S2_S1).coalesce()
 
@@ -235,7 +226,7 @@ TILE_GT_S2_S2 += bilb1 + bilb1p + bilb2 + bilb2p
 IinTILE = tile_ip_s1 + tile_jp_s1
 TILE_GT_S2_S2 += IinTILE + ' 1=1)}'
 
-TILE_GT_S2_S2 = ReplaceB(TILE_GT_S2_S2, B)
+#TILE_GT_S2_S2 = ReplaceB(TILE_GT_S2_S2, B)
 
 TILE_GT_S2_S2 = isl.Set(TILE_GT_S2_S2).coalesce()
 
@@ -359,7 +350,7 @@ if(1==0):
     Rsched = isl.Map(RSched)
 
 else:
-    Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,')
+    Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,b1, b2, b3, iib1,  jjb2,  kkb3, iipb1,  jjpb2,  kkpb3')
     TILE_VLD_EXT1 = tiling_v3.Project(TILE_VLD1.apply(Rapply).coalesce(), ['ii','jj','kk'])
     Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; } ' )
 
@@ -372,7 +363,7 @@ else:
 
     TILE_VLD_EXT = TILE_VLD_EXT1.union(TILE_VLD_EXT2).coalesce()
 
-    RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
+    RSched = '[N,b1, b2, b3, iib1,  jjb2,  kkb3, iipb1,  jjpb2,  kkpb3] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
     in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT) + "}"
 
