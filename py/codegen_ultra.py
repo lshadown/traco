@@ -23,6 +23,29 @@ ctx = isl.Context()
 
 
 
+########################################################################
+
+#def printASTAsC(ast):
+#  p = isl.Printer.to_str(ast.get_ctx())
+#  p = p.set_output_format(isl.format.C)
+#  p = p.print_ast_node(ast)
+#  print(p.get_str())
+
+
+#context = isl.Set("{ : }")
+#domain = isl.Set("[T,N] -> { S[t,i] : 1<=t<=T and 1<=i<=N }")
+#schedule = isl.Map("[T,N] -> { S[t,i] -> [t,i+t] }")
+#schedule_domain = schedule.intersect_domain(domain)
+
+
+#build = isl.AstBuild.from_context(context)
+#ast = build.node_from_schedule_map(schedule.intersect_domain(domain))
+#printASTAsC(ast)
+
+
+#https://www.grosser.es/tutorials/polyhedral-ast-generation.html
+########################################################################
+
 def codegen(islSet, instrukcje, offset, vars, symexvars):
     # wyszukaj instrukcje z relacji
     # 0 0 
