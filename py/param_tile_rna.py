@@ -86,7 +86,7 @@ tile_jp_s1 = tile_j_s1.replace('jjb2', 'jjpb2')
 tile_kp_s1 = tile_k_s1.replace('kkb3', 'kkpb3')
 
 def template(a):
-    return '[N,ii,jj,kk,b1, b2, b3, iib1,  jjb2,  kkb3, iipb1,  jjpb2,  kkpb3 ] -> {[i,j,k,'+str(a)+'] : exists iip,jjp,kkp : ('
+    return '[N,ii,jj,kk,b1, b2, b3, iib1,  jjb2,  kkb3] -> {[i,j,k,'+str(a)+'] : exists iip,jjp, kkp, iipb1,  jjpb2,  kkpb3  : ('
 
 #######################################################################
 # LT
@@ -350,7 +350,7 @@ if(1==0):
     Rsched = isl.Map(RSched)
 
 else:
-    Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,b1, b2, b3, iib1,  jjb2,  kkb3, iipb1,  jjpb2,  kkpb3')
+    Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,b1, b2, b3, iib1,  jjb2,  kkb3')
     TILE_VLD_EXT1 = tiling_v3.Project(TILE_VLD1.apply(Rapply).coalesce(), ['ii','jj','kk'])
     Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; } ' )
 
@@ -363,11 +363,12 @@ else:
 
     TILE_VLD_EXT = TILE_VLD_EXT1.union(TILE_VLD_EXT2).coalesce()
 
-    RSched = '[N,b1, b2, b3, iib1,  jjb2,  kkb3, iipb1,  jjpb2,  kkpb3] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
+    RSched = '[N,b1, b2, b3, iib1,  jjb2,  kkb3, ff1, ff2, ff3] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : i2 <= ff1 &&  i4 <= ff2 && i6 <= ff3 && b1 > 0 && b2 >0 && b3 >0 && ff1 >0 && ff2 > 0 && ff3 > 0  && ';
     in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT) + "}"
 
     Rsched = isl.Map(RSched)
+    print Rsched
 
 
 #TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
