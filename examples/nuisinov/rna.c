@@ -4,7 +4,7 @@
 
 #define MAX(x,y)    ((x) > (y)? (x) : (y))
 
-int N = 1000;
+int N = 5000;
 
 int can_pair(int *input, int a, int b){
    return ((((input[a] + input[b]) == 3) && (a < b - 1))) ? 1 : 0;
