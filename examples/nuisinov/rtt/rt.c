@@ -97,12 +97,11 @@ for( c1 = 0; c1 <= floord(N - 1, 16); c1 += 1)
  register int lbv1, ubv1;
 start = omp_get_wtime();
 
+
+
 for( c1 = 0; c1 <= floord(N - 2, 8); c1 += 1)
-{
-lbv1 = max(0, (N + 15) / 16 + 1);
-ubv1 = c1 / 2;
-#pragma omp parallel for shared(c1, S,lbv1, ub1) private(c2,c3,c5,c7,c9,c11,c10,c4,c12)
-  for( c3 = lbv1; c3 <= ubv1; c3 += 1)
+#pragma omp parallel for shared(c1, S) private(c2,c3,c5,c7,c9,c11,c10,c4,c12)
+ for( c3 = max(0, c1 - (N + 15) / 16 + 1); c3 <= c1/2; c3 += 1)
     for( c4 = 0; c4 <= 1; c4 += 1) {
       if (c4 == 1) {
         for( c7 = max(-N + 16 * c1 - 16 * c3 + 1, -N + 16 * c3 + 2); c7 <= min(0, -N + 16 * c1 - 16 * c3 + 16); c7 += 1)
@@ -135,7 +134,7 @@ ubv1 = c1 / 2;
                 S[N-16*c1+16*c3-1][c9] = S[N-16*c1+16*c3-1][16*c3+N-16*c1+16*c3-1] + S[16*c3+N-16*c1+16*c3-1+1][c9]+ S[N-16*c1+16*c3-1][c9];
           }
     }
-}
+
 
 stop = omp_get_wtime();
 printf("%i %.2f\n",a, stop - start);
