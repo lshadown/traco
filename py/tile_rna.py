@@ -370,7 +370,7 @@ else:
 
     TILE_VLD_EXT = TILE_VLD_EXT1.union(TILE_VLD_EXT2).coalesce()
 
-    RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
+    RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2+i4,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
     in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT) + "}"
 
@@ -396,8 +396,8 @@ print '-------------'
 S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
 S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_par(RNA, i, j));'
 
-#S1 = 'S[i][j] = S[i][k+i] + S[k+i+1][j]+ S[i][j];'
-#S2 = 'S[i][j] = S[i][j]+ S[i+1][j-1];'
+S1 = 'S[i][j] = S[i][k+i] + S[k+i+1][j]+ S[i][j];'
+S2 = 'S[i][j] = S[i][j]+ S[i+1][j-1];'
 
 
 lines = loop_x.split('\n')
