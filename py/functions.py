@@ -33,6 +33,10 @@ def Loop(loop, extra_ub = 0):
             if(z1.match(test[1])):
                 ub = z1.sub("",test[1])
 
+            z1 = re.compile(".*>")
+            if(z1.match(test[1])):
+                ub = z1.sub("",test[1]) + "+1"
+
         if(extra_ub != 0):
             ub = ub + " +  " + str(extra_ub)
 
