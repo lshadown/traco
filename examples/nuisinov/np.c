@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define N 1000
+#define N 2500
 
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
@@ -41,11 +41,21 @@ printf("%i %.2f\n",a, stop-start);
 a=0;
 
 start = omp_get_wtime();
-for( c1 = 0; c1 <= floord(N - 2, 16); c1 += 1)
+/*for( c1 = 0; c1 <= floord(N - 2, 16); c1 += 1)
   for( c3 = c1; c3 <= (N - 1) / 16; c3 += 1)
     for( c5 = 0; c5 <= c1; c5 += 1)
       for( c7 = max(16 * c1 + 1, 16 * c3); c7 <= min(N - 1, 16 * c3 + 15); c7 += 1)
         for( c9 = 16 * c1 - c7 + 1; c9 <= min(0, 16 * c1 - c7 + 16); c9 += 1)
+          for( c11 = 16 * c5 - c9; c11 <= min(c7 - 1, 16 * c5 - c9 + 15); c11 += 1)
+            d[-c9][c7] = min(d[-c9][c7], d[-c9][c11] + d[c11][c7]);
+*/
+
+for( c1 = 0; c1 <= floord(N - 2, 8); c1 += 1)
+#pragma omp parallel for private(c3,c5,c7,c9,c11) shared(c1,d)
+  for( c3 = (c1 + 1) / 2; c3 <= min(c1, (N - 1) / 16); c3 += 1)
+    for( c5 = 0; c5 <= c1 - c3; c5 += 1)
+      for( c7 = max(16 * c3, 16 * c1 - 16 * c3 + 1); c7 <= min(N - 1, 16 * c3 + 15); c7 += 1)
+        for( c9 = 16 * c1 - 16 * c3 - c7 + 1; c9 <= min(0, 16 * c1 - 16 * c3 - c7 + 16); c9 += 1)
           for( c11 = 16 * c5 - c9; c11 <= min(c7 - 1, 16 * c5 - c9 + 15); c11 += 1)
             d[-c9][c7] = min(d[-c9][c7], d[-c9][c11] + d[c11][c7]);
 
