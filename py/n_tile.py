@@ -23,17 +23,17 @@ except ImportError, e:
 
 
 
-rel = " [n] -> { [j,i,k,v] -> [j',i',k',v'] : ( i' = i and j' = j and v = 9 and v' = 9 and 0 <= i <= k < k' < j < n and i <= j-1, k'-1 and k <= j-2 and 0 <= j ) or ( i = k and j' = j and i' = k and v = 9 and v' = 9 and 0 <= k < k' < j < n and k <= j-2 and 0 <= j ) or ( i' = i and j' = j and v = 9 and v' = 9 and 0 <= i <= k < k' < j < n and i <= j-1, k'-1 and k <= j-2 and 0 <= j ) or ( i' = i and k' = j and v = 9 and v' = 9 and 0 <= i <= k < j < j' < n and i <= j-1, n-2, j'-1 and 0 <= j <= n-2 and 1 <= n and 0 <= j' ) or ( k' = i and j' = j and v = 9 and v' = 9 and 1, i'+1 <= i <= k < j < n and 0 <= i' < j and i < j and 1 <= j ) or ( i' = i and j' = j and v = 9 and v' = 9 and 0 <= i <= k < k' < j < n and i <= j-1, k'-1 and k <= j-2 and 0 <= j ) }"
+rel = " [N] -> { [j,i,k,v] -> [j',i',k',v'] : ( i' = i and j' = j and v = 9 and v' = 9 and 0 <= i <= k < k' < j < n and i <= j-1, k'-1 and k <= j-2 and 0 <= j ) or ( i = k and j' = j and i' = k and v = 9 and v' = 9 and 0 <= k < k' < j < N and k <= j-2 and 0 <= j ) or ( i' = i and j' = j and v = 9 and v' = 9 and 0 <= i <= k < k' < j < N and i <= j-1, k'-1 and k <= j-2 and 0 <= j ) or ( i' = i and k' = j and v = 9 and v' = 9 and 0 <= i <= k < j < j' < N and i <= j-1, N-2, j'-1 and 0 <= j <= N-2 and 1 <= N and 0 <= j' ) or ( k' = i and j' = j and v = 9 and v' = 9 and 1, i'+1 <= i <= k < j < n and 0 <= i' < j and i < j and 1 <= j ) or ( i' = i and j' = j and v = 9 and v' = 9 and 0 <= i <= k < k' < j < N and i <= j-1, k'-1 and k <= j-2 and 0 <= j ) }"
 
 
-Rplus = "[n] -> { [j, i, k, 9] -> [j', i', k', 9] : i <= k < j and j < j' < n and 0 <= i' < i and i' < k' < j'; [j, i, k, 9] -> [j' = j, i', k', 9] : j < n and i <= k < j and 0 <= i' < i and i' < k' < j; [j, i, k, 9] -> [j', i' = i, k', 9] : i >= 0 and i <= k < j and j' < n and j <= k' < j'; [j, i, k, 9] -> [j' = j, i' = i, k', 9] : j < n and i >= 0 and k >= i and k < k' < j }"
+Rplus = "[N] -> { [j, i, k, 9] -> [j', i', k', 9] : i <= k < j and j < j' < N and 0 <= i' < i and i' < k' < j'; [j, i, k, 9] -> [j' = j, i', k', 9] : j < N and i <= k < j and 0 <= i' < i and i' < k' < j; [j, i, k, 9] -> [j', i' = i, k', 9] : i >= 0 and i <= k < j and j' < N and j <= k' < j'; [j, i, k, 9] -> [j' = j, i' = i, k', 9] : j < N and i >= 0 and k >= i and k < k' < j }"
 
 
 TILE_S1 = '[N,jj,ii,kk] -> '
 TILE_S1 += '{[j,i,k,9] : '
 
 tile_j_s1 = '0 + b1 * jj <= j <= b1*(jj+1) + 0 -1 ,N-1 && jj >=0 &&'
-tile_i_s1 = ' j-1+1  - b2*ii >= i >= -1+1-b2*(ii+1)+1, 0 && jj >= 0 && '
+tile_i_s1 = ' j-1  - b2*ii >= i >= j-1-b2*(ii+1)+1, 0 && ii >= 0 && '
 tile_k_s1 = ' b3*kk + i <= k <= b3*(kk+1)+i-1, j-1 && kk >= 0  '
 
 TILE_S1 += tile_j_s1 + tile_i_s1 + tile_k_s1 + '}'
@@ -71,8 +71,8 @@ lex_s1_g = ' ( (jj < jjp) or (jj = jjp && ii < iip) or (jj=jjp && ii=iip & kk < 
 
 iig0 = ' ii >= 0 && jj >= 0 && kk>= 0 && iip >= 0 && jjp >= 0 && kkp>= 0 && '
 
-bilb1 = ' 0 - b1*jj <= N-1 && '
-bilb1p = '  0 - b1*jjp <= N-1 && '
+bilb1 = ' 0 + b1*jj <= N-1 && '
+bilb1p = '  0 + b1*jjp <= N-1 && '
 
 bilb2 = 'j-1 - b2 * jj >= 0 && '
 bilb2p = 'j-1- b2 * jjp >= 0 && '
@@ -92,7 +92,7 @@ def template(a):
 # LT
 #######################################################################
 
-TILE_LT_S1_S1= template(1)
+TILE_LT_S1_S1= template(9)
 TILE_LT_S1_S1 += lex_s1 + ' && ' + iig0
 TILE_LT_S1_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3 + bilb3p
 
@@ -112,7 +112,7 @@ print TILE_LT_S1_S1
 # GT
 #######################################################################
 
-TILE_GT_S1_S1 = template(1)
+TILE_GT_S1_S1 = template(9)
 TILE_GT_S1_S1 += lex_s1_g + ' && ' + iig0
 TILE_GT_S1_S1 += bilb1 + bilb1p + bilb2 + bilb2p + bilb3 + bilb3p
 
@@ -156,13 +156,15 @@ TILE_VLD = TILE_VLD1
 
 #######################################################################
 
-Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,')
-TILE_VLD_EXT1 = tiling_v3.Project(TILE_VLD1.apply(Rapply).coalesce(), ['ii','jj','kk'])
-Rmap = isl.Map( '{[ii,jj,kk,i,j,k,9] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,9]; } ' )
+Rapply = tiling_v3.GetRapply(['j','i','k'], ['jj','ii','kk'], 'jj,ii,kk,N,')
+TILE_VLD_EXT1 = tiling_v3.Project(TILE_VLD1.apply(Rapply).coalesce(), ['jj','ii','kk'])
+Rmap = isl.Map( '{[jj,ii,kk,i,j,k,9] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,9]; } ' )
 
 TILE_VLD_EXT1 = TILE_VLD_EXT1.apply(Rmap).coalesce()
 
 TILE_VLD_EXT = TILE_VLD_EXT1
+
+TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
 
 RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,i8,i9,-i10,i11,i12,i13] : ';
 in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
@@ -183,7 +185,7 @@ loop_x = iscc.iscc_communicate("L :=" + str(Rsched) + "; codegen L;")
 
 print '-------------'
 
-S1 = 'd[i][j] = d[i][j]=mxn(d[i][j], d[i][k] + d[k][j]);'
+S1 = 'd[i][j] = mxn(d[i][j], d[i][k] + d[k][j]);'
 
 
 lines = loop_x.split('\n')
