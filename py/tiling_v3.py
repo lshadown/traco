@@ -544,7 +544,7 @@ def getIS(plik, rel, dane):
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
 
     SIMPLIFY = False
-    DEBUG = False
+    DEBUG = True
 
     schedule_mode = parallel_option
 
@@ -872,7 +872,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print '!!!!!!!!!!'
     # **************************************************************************
     exact_rplus = '-1'
-    islrp = True
+    islrp = False
     isl_relclosure = isl_rel
     if(rplus_file != ''):
         with open (rplus_file, "r") as myfile:
