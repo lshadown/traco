@@ -34,7 +34,7 @@ TILE_S2 += tile_i_s1 + tile_j_s1 + tile_k_s2 + '}'
 
 #######################################################################
 
-B = ['16', '16', '16']
+B = ['32', '32', '32']
 
 def ReplaceB(str, B):
     str = str.replace('b1', B[0])
@@ -77,16 +77,23 @@ lex_s1_g = ' ( (ii < iip) or (ii = iip && jj < jjp) or (ii=iip && jj=jjp & kk < 
 lex_s2_g = ' ( (ii < iip) or (ii = iip && jj < jjp) ) '
 lex_s1s2_g = ' ( (ii < iip) or (ii = iip && jj < jjp) or (ii=iip && jj=jjp)  ) '
 
-iig0 = ' ii >= 0 && jj >= 0 && kk>= 0 && iip >= 0 && jjp >= 0 && kkp>= 0 && '
+iig0 = '' # ii >= 0 && jj >= 0 && kk>= 0 && iip >= 0 && jjp >= 0 && kkp>= 0 && '
 
-bilb1 = ' N-1 - b1*ii >= 0 && '
-bilb1p = ' N-1 - b1*iip >= 0 && '
+#bilb1 = ' N-1 - b1*ii >= 0 && '
+#bilb1p = ' N-1 - b1*iip >= 0 && '
 
-bilb2 = '(i+1) + b2 * jj <= N-1 && '
-bilb2p = '(i+1) + b2 * jjp <= N-1 && '
+#bilb2 = '(i+1) + b2 * jj <= N-1 && '
+#bilb2p = '(i+1) + b2 * jjp <= N-1 && '
 
-bilb3 = 'b3*kk + 0 <= j-i-1 && '
-bilb3p = 'b3*kkp + 0 <= j-i-1 && '
+#bilb3 = 'b3*kk + 0 <= j-i-1 && '
+#bilb3p = 'b3*kkp + 0 <= j-i-1 && '
+
+bilb1 = ''
+bilb1p = ''
+bilb2 = ''
+bilb2p = ''
+bilb3 = ''
+bilb3p = ''
 
 tile_ip_s1 = tile_i_s1.replace('ii', 'iip')
 tile_jp_s1 = tile_j_s1.replace('jj', 'jjp')
@@ -310,10 +317,16 @@ print TVLD_LT2
 TILE_VLD1 = TVLD_LT1.union(TILE_ITR1).coalesce()
 TILE_VLD2 = TVLD_LT2.union(TILE_ITR2).coalesce()
 
+
+
 print 'TILE_VLD1'
 print TILE_VLD1
+
+
 print 'TILE_VLD2'
 print TILE_VLD2
+
+
 
 TILE_VLD = TILE_VLD1.union(TILE_VLD2)
 
@@ -361,10 +374,16 @@ else:
     TILE_VLD_EXT1 = tiling_v3.Project(TILE_VLD1.apply(Rapply).coalesce(), ['ii','jj','kk'])
     Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; } ' )
 
+    #TILE_VLD_EXT1 =imperf_tile.SimplifySlice(TILE_VLD_EXT1)
+
     TILE_VLD_EXT1 = TILE_VLD_EXT1.apply(Rmap).coalesce()
+
+
 
     TILE_VLD_EXT2 = tiling_v3.Project(TILE_VLD2.apply(Rapply).coalesce(), ['ii','jj','kk'])
     Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,1, kk,0, i,0, j,0,k,1]; [ii,jj,kk,i,j,k,2] -> [0, ii,0, jj,1, kk,0, i,0, j,1,k,2]; } ' )
+
+    #TILE_VLD_EXT2 =imperf_tile.SimplifySlice(TILE_VLD_EXT2)
 
     TILE_VLD_EXT2 = TILE_VLD_EXT2.apply(Rmap).coalesce()
 
