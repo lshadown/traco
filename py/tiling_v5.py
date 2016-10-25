@@ -49,6 +49,19 @@ except ImportError, e:
 
 # nowosc isl w pythonie do testow
 
+
+def LoopTree(lines):
+    for_level = 0
+    stuff=[]
+    for line in lines:
+        if 'endfor' in line:
+            for_level = for_level - 1
+        else:
+            if 'for' in line:
+                stuff.append(functions.Loop(line))
+                for_level = for_level + 1
+    return stuff
+
 ctx = isl.Context()
 
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
@@ -65,6 +78,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     linestring = open(plik, 'r').read()
     lines = linestring.split('\n')
+
+    stuff = LoopTree(lines)
 
     petit_loop = convert_loop.convert_loop(lines)
 
@@ -107,5 +122,29 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     print loop.isl_rel
 
+    cl = clanpy.ClanPy()
+    cl.loop_path = plik
+    cl.Load()
+
+    ##################################
+    # move to clanpy
+    # combine clan with Dependence
+    arr = map(int, loop.dane)
+    arr = sorted(list(set(arr)))
+    i=0
+    for st in cl.statements:
+        cl.statements[0].petit_line = arr[i]
+        i=i+1
+    ############################################################3
 
 
+    lines = linestring.split('\n')
+
+    print stuff
+
+    #####
+    # granice bierzemy iterator z numerem scateringu ze stuff
+
+    ############################################################
+
+    ### R^+
