@@ -49,18 +49,27 @@ except ImportError, e:
 
 # nowosc isl w pythonie do testow
 
-
-def LoopTree(lines):
+def GetBounds(lines, st_line):
     for_level = 0
-    stuff=[]
-    for line in lines:
-        if 'endfor' in line:
+    bounds=[]
+    for i in range(st_line-1,0,-1):
+        line = lines[i]
+        if 'endfor' in line:   # not my loop
             for_level = for_level - 1
         else:
             if 'for' in line:
-                stuff.append(functions.Loop(line))
-                for_level = for_level + 1
-    return stuff
+                if(for_level < 0):  # not my loop
+                    for_level = for_level + 1
+                else:
+                    items = line.split(' ')
+                    step = 1
+                    if 'by' in line:
+                        step = items[7]
+                    bounds.insert(0, {'var' : items[1], 'lb' : items[3], 'ub' : items[5], 'step' : step, 'loop' : line})
+
+    return bounds
+
+
 
 ctx = isl.Context()
 
@@ -79,7 +88,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     linestring = open(plik, 'r').read()
     lines = linestring.split('\n')
 
-    stuff = LoopTree(lines)
+
 
     petit_loop = convert_loop.convert_loop(lines)
 
@@ -132,18 +141,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     arr = map(int, loop.dane)
     arr = sorted(list(set(arr)))
     i=0
-    for st in cl.statements:
-        cl.statements[0].petit_line = arr[i]
+    for i in range(0, len(cl.statements)):
+        cl.statements[i].petit_line = arr[i]
+        cl.statements[i].bounds = GetBounds(petit_loop, cl.statements[i].petit_line)
+        print cl.statements[i].bounds
         i=i+1
-    ############################################################3
 
-
-    lines = linestring.split('\n')
-
-    print stuff
-
-    #####
-    # granice bierzemy iterator z numerem scateringu ze stuff
 
     ############################################################
 

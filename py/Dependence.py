@@ -45,6 +45,7 @@ class Dependence:
     graph = ""
     delta = ""
     user1 = ""
+    prep = 0
 
     def print_dep(self):
         print "From: " + self.from_
@@ -112,7 +113,7 @@ class Kernel_Loop:
         for i in range(0, len(lines),4):
             dep = Dependence()
             info = lines[i].split()
-            print lines[i]
+            #print lines[i]
             dep.kind = info[0]
             dep.var_in = info[2]
             #print info
@@ -165,9 +166,15 @@ class Kernel_Loop:
         self.isl_tmp = isl.Map("{[i] : false}")
 
         ii = 1
+        w = -1
         for dep in self.Deps:
-            #print dep.Relation
+
+            if(dep.prep == 1):
+                continue
+
             in_size = dep.Relation.dim(isl.dim_type.in_)
+
+
             out_size = dep.Relation.dim(isl.dim_type.out)
 
             dep.Relation = dep.Relation.insert_dims(isl.dim_type.in_, in_size, self.maxl-in_size+1)
@@ -188,7 +195,9 @@ class Kernel_Loop:
                 outvar.append("-1")
             tmp = str("{[" + ",".join(invar) + ","+dep.from_+"] -> [" + ",".join(outvar) + ","+dep.to +"]}")
             tmp = isl.Map(tmp)
+
             dep.Relation = dep.Relation.intersect(tmp).coalesce()
+            dep.prep = 1
 
 
 

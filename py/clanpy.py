@@ -33,6 +33,7 @@ class ClanStatement:
     bounds = []
     scop = 0
     pet_symbol = ''
+    petit_line = 0
 
 
     def __init__(self):
@@ -163,8 +164,9 @@ class ClanPy:
         linestring = open(self.loop_path, 'r').read()
         lines = linestring.split('\n')
         start_search = 0
-        for st in self.statements:
-
+        j= 0
+        for j in range(0,len(self.statements)):
+            st = self.statements[j]
             for i in range(start_search, len(lines)):
                 if st.body in lines[i]:
                     start_search = i
@@ -177,7 +179,7 @@ class ClanPy:
                 if 'for' in lines[i]:
                     stuff = convert_loop.functions.Loop(lines[i])
                     if stuff['var'] == st.original_iterators[l]:
-                        st.bounds.insert(0, stuff)
+                        self.statements[j].bounds.insert(0, stuff)
                         l = l-1
 
 
