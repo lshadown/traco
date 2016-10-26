@@ -75,7 +75,7 @@ def GetBounds(lines, st_line):
 
 def MakeTile(st, vars, sym_exvars, symb, B):
     #TODO i--
-    TILE = '['+','.join(symb + sym_exvars) +'] -> { [' + ','.join(vars) + '] : '
+    TILE = '['+','.join(symb + sym_exvars) +'] -> { [' + ','.join(vars) + ',' + str(st.petit_line) + '] : '
 
     deeploop =  len(st.original_iterators)
 
