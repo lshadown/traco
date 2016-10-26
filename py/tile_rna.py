@@ -4,6 +4,7 @@ import imperf_tile
 import relation_util
 import copyconstr
 import tiling_v3
+import re
 
 try:
     import islpy as isl
@@ -415,7 +416,7 @@ loop_x = iscc.iscc_communicate("L :=" + str(Rsched) + "; codegen L;")
 print '-------------'
 
 S1 = 'S[i][j] = max(S[i][k+i] + S[k+i+1][j], S[i][j]);'
-S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_par(RNA, i, j));'
+S2 = 'S[i][j] = max(S[i][j], S[i+1][j-1]  + can_pair(RNA, i, j));'
 
 #S1 = 'S[i][j] = S[i][k+i] + S[k+i+1][j]+ S[i][j];'
 #S2 = 'S[i][j] = S[i][j]+ S[i+1][j-1];'
@@ -443,11 +444,14 @@ for line in lines:
         jrep = arr[9]
         krep = arr[11]
 
-        s = s.replace('i', irep)
-        s = s.replace('j', jrep)
-        s = s.replace('k', krep)
+        #s = s.replace('i', irep)
+        #s = s.replace('j', jrep)
+        #s = s.replace('k', krep)
 
-        s = s.replace('par', 'pair')
+        s = re.sub(r'\bi\b', irep, s)
+        s = re.sub(r'\bj\b', jrep, s)
+        s = re.sub(r'\bk\b', krep, s)
+
         s = s.replace('for (int', 'for(')
 
         print tab + s
