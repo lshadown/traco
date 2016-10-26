@@ -337,78 +337,37 @@ print TILE_VLD
 
 
 
-#TILE_VLD = TILE_VLD.intersect(isl.Set("[N, ii, jj, kk] -> { [i, j, k, l] :  i >= 32 and i <= N-32 and j <= N-32 and j > i + 32 and k > 32 and k < j-1-32 }")).coalesce()
+
+Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,')
+TILE_VLD_EXT1 = tiling_v3.Project(TILE_VLD1.apply(Rapply).coalesce(), ['ii','jj','kk'])
+Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; } ' )
+
+#TILE_VLD_EXT1 =imperf_tile.SimplifySlice(TILE_VLD_EXT1)
+
+TILE_VLD_EXT1 = TILE_VLD_EXT1.apply(Rmap).coalesce()
 
 
 
+TILE_VLD_EXT2 = tiling_v3.Project(TILE_VLD2.apply(Rapply).coalesce(), ['ii','jj','kk'])
+Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,1, kk,0, i,0, j,0,k,1]; [ii,jj,kk,i,j,k,2] -> [0, ii,0, jj,1, kk,0, i,0, j,1,k,2]; } ' )
 
-#str_TV = str(TILE_VLD)
+#TILE_VLD_EXT2 =imperf_tile.SimplifySlice(TILE_VLD_EXT2)
 
-#str_TV = str_TV.replace('[N, ii, jj, kk] -> ', '')
-#str_TV = str_TV.replace('[', '[ii,jj,kk,')
-#str_TV = '[N] -> ' + str_TV
+TILE_VLD_EXT2 = TILE_VLD_EXT2.apply(Rmap).coalesce()
 
+TILE_VLD_EXT = TILE_VLD_EXT1.union(TILE_VLD_EXT2).coalesce()
 
+RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2+i4,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
+in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
+RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT) + "}"
 
-#print str_TV
-
-#TILE_VLD_EXT = isl.Set(str_TV)
-
-
-if(1==0):
-
-    Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,')
-    TILE_VLD_EXT = tiling_v3.Project(TILE_VLD.apply(Rapply).coalesce(), ['ii','jj','kk'])
-
-    Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; [ii,jj,kk,i,j,k,2] -> [0, ii,0, jj,1, kk,0, i,0, j,1,k,2]  } ' )
-
-    TILE_VLD_EXT = TILE_VLD_EXT.apply(Rmap).coalesce()
-
-    RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
-    in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
-    RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT) + "}"
-
-    Rsched = isl.Map(RSched)
-
-else:
-    Rapply = tiling_v3.GetRapply(['i','j','k'], ['ii','jj','kk'], 'ii,jj,kk,N,')
-    TILE_VLD_EXT1 = tiling_v3.Project(TILE_VLD1.apply(Rapply).coalesce(), ['ii','jj','kk'])
-    Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,1]; } ' )
-
-    #TILE_VLD_EXT1 =imperf_tile.SimplifySlice(TILE_VLD_EXT1)
-
-    TILE_VLD_EXT1 = TILE_VLD_EXT1.apply(Rmap).coalesce()
+Rsched = isl.Map(RSched)
 
 
 
-    TILE_VLD_EXT2 = tiling_v3.Project(TILE_VLD2.apply(Rapply).coalesce(), ['ii','jj','kk'])
-    Rmap = isl.Map( '{[ii,jj,kk,i,j,k,1] -> [0, ii,0, jj,1, kk,0, i,0, j,0,k,1]; [ii,jj,kk,i,j,k,2] -> [0, ii,0, jj,1, kk,0, i,0, j,1,k,2]; } ' )
-
-    #TILE_VLD_EXT2 =imperf_tile.SimplifySlice(TILE_VLD_EXT2)
-
-    TILE_VLD_EXT2 = TILE_VLD_EXT2.apply(Rmap).coalesce()
-
-    TILE_VLD_EXT = TILE_VLD_EXT1.union(TILE_VLD_EXT2).coalesce()
-
-    #TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
-
-    RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2+i4,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : ';
-    in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
-    RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT) + "}"
-
-    Rsched = isl.Map(RSched)
-
-
-#TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
 print 'TILE_VLD_EXT'
 print TILE_VLD_EXT
 
-#print relation_util.islSettoOmegaStr(TILE_VLD_EXT )
-
-#loop_x = iscc.isl_ast_codegen(TILE_VLD_EXT)
-#loop_x = iscc.isl_ast_codegen(Rsched)
-
-#print loop_x
 
 loop_x = iscc.iscc_communicate("L :=" + str(Rsched) + "; codegen L;")
 
