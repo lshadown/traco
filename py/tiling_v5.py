@@ -27,6 +27,8 @@ import relation_util
 
 import Dependence
 import clanpy
+from termcolor import colored
+
 
 import vis3dimperf
 
@@ -46,6 +48,7 @@ except ImportError, e:
     print "pip install ispy"
     sys.exit()
 
+ctx = isl.Context()
 
 # nowosc isl w pythonie do testow
 
@@ -70,10 +73,54 @@ def GetBounds(lines, st_line):
     return bounds
 
 
+def MakeTile(st, vars, sym_exvars, symb, B):
+    #TODO i--
+    TILE = '['+','.join(symb + sym_exvars) +'] -> { [' + ','.join(vars) + '] : '
 
-ctx = isl.Context()
+    deeploop =  len(st.original_iterators)
+
+    for i in range(0, len(vars)):
+        if(i < deeploop):
+            tile_part =  st.bounds[i]['lb'] + ' + ' + B[i] + '*' + sym_exvars[i] + ' <= ' + vars[i] + ' <= '
+            tile_part +=  B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '-1, ' + st.bounds[i]['ub']
+            tile_part +=  ' && ' + sym_exvars[i] + ' >= 0 && '
+
+            TILE += tile_part
+        else:
+            TILE +=  sym_exvars[i] + ' >= 0 && ' + vars[i] + ' = 0 && '
+
+    TILE += ' 1=1 }'
+
+#tile_i_s1 = ' N-1 - b1 * ii >= i >= N-1-b1*(ii+1)+1, 0 && ii >=0 && '
+#tile_j_s1 = ' (i+1) + b2*jj <= j <= b2*(jj+1)+i+1-1, N-1 && jj >= 0 &&'
+#tile_k_s1 = ' b3*kk + 0 <= k <= b3*(kk+1)+0-1, j-i-1 && kk >= 0  '
+
+#TILE_S1 += tile_i_s1 + tile_j_s1 + tile_k_s1 + '}'
+
+    return TILE
+
+
+
+def ReplaceB(tile, BLOCK):
+    for i in range(0,10):
+        tile = tile.replace('b' + str(i), BLOCK[i])
+    return tile
+
+
 
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
+
+    print ''
+    print colored('/\__  _\ /\  == \   /\  __ \   /\  ___\   /\  __ \   ', 'green')
+    print colored('\/_/\ \/ \ \  __<   \ \  __ \  \ \ \____  \ \ \/\ \  ', 'green')
+    print colored('   \ \_\  \ \_\ \_\  \ \_\ \_\  \ \_____\  \ \_____\ ', 'green')
+    print colored('    \/_/   \/_/ /_/   \/_/\/_/   \/_____/   \/_____/ ', 'green')
+    print ''
+    print '       An Automatic Parallelizer and Optimizer'
+    print ' based on the TRansitive ClOsure of dependence graph'
+    print '              traco.sourceforge.net               '
+    print ''
+
 
     SIMPLIFY = False
     DEBUG = True
@@ -151,3 +198,82 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     ############################################################
 
     ### R^+
+
+    isl_rel = loop.isl_rel
+
+    start = time.time()
+    if (DEBUG):
+        print '!!!!!!!!!!'
+    # **************************************************************************
+    if(1==0):
+        exact_rplus = '-1'
+        islrp = False
+        isl_relclosure = isl_rel
+
+        if islrp:
+            isl_relclosure = isl_rel.transitive_closure()
+            exact_rplus = isl_relclosure[1]
+            isl_relclosure = isl_relclosure[0]
+        else:
+            isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
+            exact_rplus = True
+
+        isl_relplus = isl_relclosure
+        end = time.time()
+        elapsed = end - start
+        print "Transitive closure: time taken: ", elapsed, "seconds."
+
+        isl_ident = isl_rel.identity(isl_rel.get_space())
+
+        if (DEBUG and 1==0):
+            print 'R+'
+            print isl_relclosure
+
+        #isl_relclosure = rpp
+        print "!! exact_rplus " + str(exact_rplus)
+
+        isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
+
+        if (DEBUG):
+            print "R*"
+            print isl_relclosure
+
+
+    # **************************************************************************
+    B = (["b%d" % i for i in range(0,loop.maxl)])
+
+    for st in cl.statements:
+        if (len(st.original_iterators) == loop.maxl):
+            vars = st.original_iterators
+            break
+
+    sym_exvars = []
+    for v in vars:
+        sym_exvars.append(v*2)
+
+    if (DEBUG):
+        print sym_exvars
+        print vars
+
+    isl_symb = isl_rel.get_var_names(isl.dim_type.param)
+
+    BLOCK = block.split(',')
+
+    for i in range(len(BLOCK),10):
+        BLOCK.append(BLOCK[len(BLOCK)-1])
+
+    # **************************************************************************
+
+    TILE = []
+
+    for st in cl.statements:
+        tile =  MakeTile(st, vars, sym_exvars, isl_symb, B)
+        tile = ReplaceB(tile, BLOCK)
+        tile = isl.Set(tile)
+        TILE.append(tile)
+        print tile
+
+    # **************************************************************************
+
+
+
