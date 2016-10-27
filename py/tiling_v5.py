@@ -87,7 +87,7 @@ def MakeTile(st, vars, sym_exvars, symb, B):
 
             TILE += tile_part
         else:
-            TILE +=  sym_exvars[i] + ' >= 0 && ' + vars[i] + ' = 0 && '
+            TILE +=  sym_exvars[i] + ' = 0 && ' + vars[i] + ' = 0 && '
 
     TILE += ' 1=1 }'
 
@@ -99,12 +99,46 @@ def MakeTile(st, vars, sym_exvars, symb, B):
 
     return TILE
 
+def MakeCustomLex(sym_exvars, sym_exvars_p, direct, size, eq):
+
+    constr = ' ( '
+    part = ''
+    comparator = ' > '   # LT
+
+    if(direct == 'GT'):
+        comparator = ' < '    # GT
+
+    for i in range(0, size):
+        part += '('
+        for j in range(0, i):
+            part += sym_exvars[j] + ' = ' + sym_exvars_p[j] + ' && '
+        part += sym_exvars[i] + comparator + sym_exvars_p[i] + ' ) or '
+
+    if(eq):
+        part += ' ('
+        for i in range(0, size):
+            part += sym_exvars[i] + ' = ' + sym_exvars_p[i] + ' && '
+        part = part[:-4] + ') '
+    else:
+        part = part[:-3]  # delete last or
+
+    constr += part + ') && '
+    return constr
 
 
 def ReplaceB(tile, BLOCK):
     for i in range(0,10):
         tile = tile.replace('b' + str(i), BLOCK[i])
     return tile
+
+def CompareScat(arr1, arr2):
+    l = len(arr1)
+    if(len(arr2) < l):
+        l = len(arr2)
+    for i in range(0,l):
+        if(arr1[i] != arr2[i]):
+            return i
+    return l
 
 
 
@@ -168,7 +202,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     loop.Load_Deps()
     loop.Load_instrukcje()
-    loop.Preprocess()
+    loop.Preprocess('0')
     loop.Get_Arrays()
     end = time.time()
     elapsed = end - start
@@ -191,7 +225,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for i in range(0, len(cl.statements)):
         cl.statements[i].petit_line = arr[i]
         cl.statements[i].bounds = GetBounds(petit_loop, cl.statements[i].petit_line)
-        print cl.statements[i].bounds
         i=i+1
 
 
@@ -205,38 +238,38 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     if (DEBUG):
         print '!!!!!!!!!!'
     # **************************************************************************
-    if(1==0):
-        exact_rplus = '-1'
-        islrp = False
-        isl_relclosure = isl_rel
 
-        if islrp:
-            isl_relclosure = isl_rel.transitive_closure()
-            exact_rplus = isl_relclosure[1]
-            isl_relclosure = isl_relclosure[0]
-        else:
-            isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
-            exact_rplus = True
+    exact_rplus = '-1'
+    islrp = False
+    isl_relclosure = isl_rel
 
-        isl_relplus = isl_relclosure
-        end = time.time()
-        elapsed = end - start
-        print "Transitive closure: time taken: ", elapsed, "seconds."
+    if islrp:
+        isl_relclosure = isl_rel.transitive_closure()
+        exact_rplus = isl_relclosure[1]
+        isl_relclosure = isl_relclosure[0]
+    else:
+        isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
+        exact_rplus = True
 
-        isl_ident = isl_rel.identity(isl_rel.get_space())
+    isl_relplus = isl_relclosure
+    end = time.time()
+    elapsed = end - start
+    print "Transitive closure: time taken: ", elapsed, "seconds."
 
-        if (DEBUG and 1==0):
-            print 'R+'
-            print isl_relclosure
+    isl_ident = isl_rel.identity(isl_rel.get_space())
 
-        #isl_relclosure = rpp
-        print "!! exact_rplus " + str(exact_rplus)
+    if (DEBUG and 1==0):
+        print 'R+'
+        print isl_relclosure
 
-        isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
+    #isl_relclosure = rpp
+    print "!! exact_rplus " + str(exact_rplus)
 
-        if (DEBUG):
-            print "R*"
-            print isl_relclosure
+    isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
+
+    if (DEBUG):
+        print "R*"
+        print isl_relclosure
 
 
     # **************************************************************************
@@ -248,8 +281,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             break
 
     sym_exvars = []
+    sym_exvars_p = []
     for v in vars:
         sym_exvars.append(v*2)
+        sym_exvars_p.append(v * 2 + 'p')
 
     if (DEBUG):
         print sym_exvars
@@ -264,16 +299,76 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # **************************************************************************
 
-    TILE = []
+    TILE = []       #isl
+    TILE_STR = []   #string
 
     for st in cl.statements:
         tile =  MakeTile(st, vars, sym_exvars, isl_symb, B)
         tile = ReplaceB(tile, BLOCK)
+        TILE_STR.append(tile)
         tile = isl.Set(tile)
         TILE.append(tile)
         print tile
 
     # **************************************************************************
 
+    TILE_LT = []
+    TILE_GT = []
 
 
+    for i in range(0, len(cl.statements)):
+        TILE_LT_I = ''
+        TILE_GT_I = ''
+        for j in range(0, len(cl.statements)):
+
+            l = CompareScat(cl.statements[i].scatering, cl.statements[j].scatering)
+            if(l > len(vars)):
+                l = len(vars)
+
+            tile_j = TILE_STR[j]
+
+            PARTS = tile_j.split(':')
+            for k in range(0, len(sym_exvars)):
+                PARTS[1] = PARTS[1].replace(sym_exvars[k], sym_exvars_p[k])
+
+            PARTS[1] = PARTS[1].replace('}', ')}')
+
+
+            lex_s_lt = MakeCustomLex(sym_exvars, sym_exvars_p, 'LT', l, cl.statements[i].petit_line > cl.statements[j].petit_line)
+            lex_s_gt = MakeCustomLex(sym_exvars, sym_exvars_p, 'GT', l, cl.statements[i].petit_line < cl.statements[j].petit_line)
+
+            join_LT = ':  exists  ' + ','.join(sym_exvars_p) + ' : ( ' + lex_s_lt
+            join_GT = ':  exists  ' + ','.join(sym_exvars_p) + ' : ( ' + lex_s_gt
+
+            TILE_LT_IJ = PARTS[0] + join_LT + PARTS[1]
+            TILE_GT_IJ = PARTS[0] + join_GT + PARTS[1]
+
+
+            TILE_LT_IJ = isl.Set(TILE_LT_IJ)
+            TILE_GT_IJ = isl.Set(TILE_GT_IJ)
+
+            if(j==0):
+                TILE_LT_I = TILE_LT_IJ
+                TILE_GT_I = TILE_GT_IJ
+            else:
+                TILE_LT_I = TILE_LT_I.union(TILE_LT_IJ).coalesce()
+                TILE_GT_I = TILE_GT_I.union(TILE_GT_IJ).coalesce()
+
+        TILE_LT.append(TILE_LT_I)
+        TILE_GT.append(TILE_GT_I)
+
+    print TILE_LT
+    print TILE_GT
+
+
+# **************************************************************************
+
+    TILE_ITR = []
+
+    for i in range(0, len(cl.statements)):
+        TILE_ITRI = TILE[i].subtract(TILE_GT[i].apply(isl_relclosure)).coalesce()
+        TILE_ITR.append(TILE_ITRI)
+
+    print TILE_ITR
+
+# **************************************************************************
