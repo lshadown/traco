@@ -161,7 +161,7 @@ class Kernel_Loop:
             if item['max_loop'] > self.maxl:
                 self.maxl = item['max_loop']
 
-    def Preprocess(self):
+    def Preprocess(self, imp = '-1'):
         self.isl_rel = isl.Map("{[i] : false}")
         self.isl_tmp = isl.Map("{[i] : false}")
 
@@ -188,11 +188,11 @@ class Kernel_Loop:
             for i in range(0, in_size):
                 invar.append("i" + str(i))
             for i in range(in_size, self.maxl):
-                invar.append("-1")
+                invar.append(imp)
             for i in range(0, out_size):
                 outvar.append("o" + str(i))
             for i in range(out_size, self.maxl):
-                outvar.append("-1")
+                outvar.append(imp)
             tmp = str("{[" + ",".join(invar) + ","+dep.from_+"] -> [" + ",".join(outvar) + ","+dep.to +"]}")
             tmp = isl.Map(tmp)
 
