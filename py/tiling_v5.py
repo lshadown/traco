@@ -170,14 +170,19 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for i in range(len(BLOCK),10):
         BLOCK.append(BLOCK[len(BLOCK)-1])
 
-    BLOCK2 = [0,32,32]
+    BLOCK2 = [0,6,6]
     # BLOCK2 = BLOCK
-    BLOCK2 = map(str, BLOCK2)
+
 
     linestring = open(plik, 'r').read()
     lines = linestring.split('\n')
 
-    petit_loop = convert_loop.convert_loop(lines)
+    if AGGRESSIVE_SIMPLIFY:
+        petit_loop = convert_loop.convert_loop(lines, BLOCK2)
+        BLOCK2 = map(str, BLOCK2)
+    else:
+        petit_loop = convert_loop.convert_loop(lines)
+
 
 
     file = open(LPetit, 'w')
@@ -453,9 +458,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 cor_set = isl.Set(cor_set)
 
                 print '**************************'
-#####################################################################################################################
 
                 TILE_VLD_EXTI = TILE_VLD_EXTI.intersect(cor_set)
+#####################################################################################################################
+
+
 
         TILE_VLD_EXT.append(TILE_VLD_EXTI)
 
