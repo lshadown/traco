@@ -54,6 +54,8 @@ def ReplaceB(str, B):
 
 TILE_S1 = ReplaceB(TILE_S1, B)
 
+print TILE_S1
+
 #######################################################################
 
 TILE_S1 = isl.Set(TILE_S1).coalesce()
@@ -80,12 +82,23 @@ bilb2p = 'j-1- b2 * jjp >= 0 && '
 bilb3 = 'b3*kk + i <= j-1 && '
 bilb3p = 'b3*kkp + i <= j-1 && '
 
+
+bilb1 = '  '
+bilb1p = '  '
+
+bilb2 = ''
+bilb2p = ''
+
+bilb3 = ' '
+bilb3p = ''
+iig0 = ' '
+
 tile_ip_s1 = tile_i_s1.replace('ii', 'iip')
 tile_jp_s1 = tile_j_s1.replace('jj', 'jjp')
 tile_kp_s1 = tile_k_s1.replace('kk', 'kkp')
 
 def template(a):
-    return '[N,ii,jj,kk] -> {[i,j,k,'+str(a)+'] : exists iip,jjp,kkp : ('
+    return '[N,ii,jj,kk] -> {[j,i,k,'+str(a)+'] : exists iip,jjp,kkp : ('
 
 
 #######################################################################
@@ -101,6 +114,8 @@ IinTILE = tile_ip_s1 + tile_jp_s1 + tile_kp_s1
 TILE_LT_S1_S1 += IinTILE + ')}'
 
 TILE_LT_S1_S1 = ReplaceB(TILE_LT_S1_S1, B)
+
+print TILE_LT_S1_S1
 
 TILE_LT_S1_S1 = isl.Set(TILE_LT_S1_S1).coalesce()
 
@@ -164,7 +179,7 @@ TILE_VLD_EXT1 = TILE_VLD_EXT1.apply(Rmap).coalesce()
 
 TILE_VLD_EXT = TILE_VLD_EXT1
 
-TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
+#TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
 
 RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2+i4,i3,i4,i5,i6,i7,i8,i9,-i10,i11,i12,i13] : ';
 in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
