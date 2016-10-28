@@ -78,22 +78,32 @@ def GetBounds(lines, st_line):
 ############################################################
 
 def MakeTile(st, vars, sym_exvars, symb, B):
-    #TODO i--
+
     TILE = '['+','.join(symb + sym_exvars) +'] -> { [' + ','.join(vars) + ',' + str(st.petit_line) + '] : '
 
     deeploop =  len(st.original_iterators)
 
+
     for i in range(0, len(vars)):
         if(i < deeploop):
-            tile_part =  st.bounds[i]['lb'] + ' + ' + B[i] + '*' + sym_exvars[i] + ' <= ' + vars[i] + ' <= '
-            tile_part +=  B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '-1, ' + st.bounds[i]['ub']
-            tile_part +=  ' && ' + sym_exvars[i] + ' >= 0 && '
+            tile_part = ''
+            if(st.bounds[i]['step'] == 1):
+                tile_part +=  st.bounds[i]['lb'] + ' + ' + B[i] + '*' + sym_exvars[i] + ' <= ' + vars[i] + ' <= '
+                tile_part +=  B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '-1, ' + st.bounds[i]['ub']
+                tile_part +=  ' && ' + sym_exvars[i] + ' >= 0 && '
+            if (st.bounds[i]['step'] == '-1'):
+                tile_part += st.bounds[i]['lb'] + ' - ' + B[i] + '*' + sym_exvars[i] + ' >= ' + vars[i] + ' >= -'
+                tile_part += B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '+1, ' + st.bounds[i]['ub']
+                tile_part += ' && ' + sym_exvars[i] + ' >= 0 && '
 
             TILE += tile_part
         else:
             TILE +=  sym_exvars[i] + ' = 0 && ' + vars[i] + ' = 0 && '
 
     TILE += ' 1=1 }'
+
+    print TILE
+
 
     return TILE
 
@@ -445,7 +455,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             scati = fix_scat(cl.statements[i].scatering, loop.maxl)
             scatj = fix_scat(cl.statements[j].scatering, loop.maxl)
 
-            combo = [x for t in zip(scati + scatj, sym_exvars + vars) for x in t]  # obled
+            vvars = vars[:]  # minus adding
+            for k in range(0, len(cl.statements[j].bounds)):
+                if cl.statements[j].bounds[k]['step'] == '-1':
+                    vvars[k] = '-' + vvars[k]
+
+
+            combo = [x for t in zip(scati + scatj, sym_exvars + vvars) for x in t]  # obled
 
             RMap = RMap + ','.join(combo) + ',' +  str(cl.statements[j].petit_line) + ']; '
 

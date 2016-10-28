@@ -113,6 +113,7 @@ if len(sys.argv) > 3:
             line_tmp = line_tmp.replace('--tile=', '')
             line_tmp = line_tmp.replace('--tiling2=', '')
             line_tmp = line_tmp.replace('--tiling3=', '')
+            line_tmp = line_tmp.replace('--tiling5=', '')
             line_tmp = line_tmp.replace('--partile=', '')
             if(line_tmp != ''):
                 block = line_tmp
