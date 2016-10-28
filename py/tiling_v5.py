@@ -503,7 +503,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     RSched = symb + '{[' + s + '] -> ['
 
-    #s = s.replace('i2', 'i2+i4')
+    #s = s.replace('i2', 'i2+i4') affine schedule
     # ToDo i8 na -i8
 
     RSched += s + '] : '
