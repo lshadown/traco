@@ -455,6 +455,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             scati = fix_scat(cl.statements[i].scatering, loop.maxl)
             scatj = fix_scat(cl.statements[j].scatering, loop.maxl)
 
+            #TODO jesli -1 wszedzie to do Rsched
             vvars = vars[:]  # minus adding
             for k in range(0, len(cl.statements[j].bounds)):
                 if cl.statements[j].bounds[k]['step'] == '-1':
@@ -506,7 +507,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    s = s.replace('i2', 'i2+i4')
+    #s = s.replace('i2', 'i2+i4')
+    #s = s.replace('i8', '-i8')
 
     # ToDo i8 na -i8
 
