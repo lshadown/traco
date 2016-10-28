@@ -173,7 +173,7 @@ TILE_VLD = TILE_VLD1
 
 Rapply = tiling_v3.GetRapply(['j','i','k'], ['jj','ii','kk'], 'jj,ii,kk,N,')
 TILE_VLD_EXT1 = tiling_v3.Project(TILE_VLD1.apply(Rapply).coalesce(), ['jj','ii','kk'])
-Rmap = isl.Map( '{[jj,ii,kk,i,j,k,9] -> [0, ii,0, jj,0, kk,0, i,0, j,0,k,9]; } ' )
+Rmap = isl.Map( '{[jj,ii,kk,j,i,k,9] -> [0, ii,0, jj,0, kk,0, j,0, i,0,k,9]; } ' )
 
 TILE_VLD_EXT1 = TILE_VLD_EXT1.apply(Rmap).coalesce()
 
