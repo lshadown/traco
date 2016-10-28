@@ -22,8 +22,10 @@ import copyconstr
 ctx = isl.Context()
 
 
-def GetBounds(lines, st_line):
+def GetBounds(lines, st_line, BLOCK2, simpl):
     for_level = 0
+    lev = len(BLOCK2)
+
     bounds=[]
     for i in range(st_line-1,0,-1):
         line = lines[i]
@@ -38,7 +40,19 @@ def GetBounds(lines, st_line):
                     step = 1
                     if 'by' in line:
                         step = items[7]
-                    bounds.insert(0, {'var' : items[1], 'lb' : items[3], 'ub' : items[5], 'step' : step, 'loop' : line})
+
+                    lev = lev - 1
+
+                    if(not simpl):
+                        bounds.insert(0, {'var' : items[1], 'lb' : items[3], 'ub' : items[5], 'step' : step, 'loop' : line})
+                    else:
+                        if step == '-1':
+                            bounds.insert(0, {'var': items[1], 'lb': items[3] + ' + ' +  BLOCK2[lev], 'ub': items[5] + ' - ' +  BLOCK2[lev] , 'step': step, 'loop': line})
+                        else:
+                            bounds.insert(0, {'var': items[1], 'lb': items[3] + ' - ' + BLOCK2[lev], 'ub': items[5] + ' + ' + BLOCK2[lev], 'step': step, 'loop': line})
+
+
+
 
     return bounds
 ############################################################
@@ -156,19 +170,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for i in range(len(BLOCK),10):
         BLOCK.append(BLOCK[len(BLOCK)-1])
 
-    BLOCK2 = [0,16,16]
+    BLOCK2 = [0,32,32]
     # BLOCK2 = BLOCK
+    BLOCK2 = map(str, BLOCK2)
 
     linestring = open(plik, 'r').read()
     lines = linestring.split('\n')
 
-    petit_loop = []
-    if AGGRESSIVE_SIMPLIFY:
-        petit_loop = convert_loop.convert_loop(lines, BLOCK2)
-    else:
-        petit_loop = convert_loop.convert_loop(lines)
+    petit_loop = convert_loop.convert_loop(lines)
 
-    BLOCK2 = map(str, BLOCK2)
 
     file = open(LPetit, 'w')
 
@@ -222,7 +232,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     i=0
     for i in range(0, len(cl.statements)):
         cl.statements[i].petit_line = arr[i]
-        cl.statements[i].bounds = GetBounds(petit_loop, cl.statements[i].petit_line)
+        cl.statements[i].bounds = GetBounds(petit_loop, cl.statements[i].petit_line, BLOCK2, AGGRESSIVE_SIMPLIFY)
         i=i+1
 
 
@@ -411,6 +421,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for i in range(0, len(cl.statements)):
         TILE_VLD_EXTI = tiling_v3.Project(TILE_VLD[i].apply(Rapply).coalesce(), sym_exvars)
 
+#####################################################################################################################
         if AGGRESSIVE_SIMPLIFY:
 
             cor_set = ''
@@ -424,18 +435,25 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             for k in range(0,i+1):
                 for j in range(0, len(cl.statements[k].bounds)):
                     compar = ' <= '
+                    add1 = ' - '
+                    add2 = ' + '
                     if cl.statements[k].bounds[j]['step'] == '-1':
+                        add1 = ' + '
+                        add2 = ' - '
                         compar = ' >= '
-                    cor_set = cor_set + vars[j] + compar + cl.statements[k].bounds[j]['ub'] + " - " + BLOCK2[j] + " && "
-                    cor_set = cor_set + cl.statements[k].bounds[j]['lb'] + " + " + BLOCK2[j] +  compar +  vars[j] +  " && "
+                    cor_set = cor_set + vars[j] + compar + cl.statements[k].bounds[j]['ub'] + add1 + BLOCK2[j] + " && "
+                    cor_set = cor_set + cl.statements[k].bounds[j]['lb'] + add2 + BLOCK2[j] +  compar +  vars[j] +  " && "
 
                 cor_set = cor_set + "("
                 cor_set = cor_set + " v = " + str(cl.statements[i].petit_line) + " "
                 cor_set = cor_set + ")}"
 
+                print cor_set
+
                 cor_set = isl.Set(cor_set)
 
-                print cor_set
+                print '**************************'
+#####################################################################################################################
 
                 TILE_VLD_EXTI = TILE_VLD_EXTI.intersect(cor_set)
 
