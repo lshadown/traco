@@ -180,6 +180,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print ''
 
     DEBUG = True
+    AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
+
 
     LPetit = "tmp/tmp_petit"+L+".t"
 
