@@ -529,7 +529,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     vars = map(str, vars)
 
     start = time.time()
-    loop_x = iscc.iscc_communicate("L :=" + str(Rsched) + "; codegen L;")
+    ast = 1
+    if (ast == 1):
+        loop_x = iscc.isl_ast_codegen_map(Rsched)
+    else:
+        loop_x = iscc.iscc_communicate("L :=" + str(Rsched) + "; codegen L;")
 
     lines = loop_x.split('\n')
 
