@@ -146,7 +146,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print ''
 
     DEBUG = True
-    AGGRESSIVE_SIMPLIFY = True # TODO simpl_ub   CANNOR BE USED for RTILE immediately, RTILE must be computed earlier
+    AGGRESSIVE_SIMPLIFY = True # TODO simpl_ub
 
 
     LPetit = "tmp/tmp_petit"+L+".t"
