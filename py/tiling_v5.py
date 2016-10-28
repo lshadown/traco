@@ -1,48 +1,7 @@
-import convert_loop
-import convert_loop
-import functions
-import gen
-import subprocess
 import re
 import sys
-import glob, os
-import shutil
-import loop_tools
-import priv_engine
 import time
-import os.path
-import iscc
-import tiling_schedule
-import correct
-import math
-import scc
-from pygraph.algorithms.accessibility import mutual_accessibility
-from pygraph.algorithms.cycles import find_cycle
-from multiprocessing import Pool
-import vis
-
-import imperf_tile
-import test_isl
-import relation_util
-
-import Dependence
-import clanpy
 from termcolor import colored
-
-import tiling_v3
-import copyconstr
-
-
-import vis3dimperf
-
-import fsnew_tiletry
-
-
-import slicing
-
-
-from CPython import codegen
-
 
 try:
     import islpy as isl
@@ -51,9 +10,16 @@ except ImportError, e:
     print "pip install ispy"
     sys.exit()
 
-ctx = isl.Context()
+import iscc
+import convert_loop
+import imperf_tile
+import relation_util
+import Dependence
+import clanpy
+import tiling_v3
+import copyconstr
 
-# nowosc isl w pythonie do testow
+ctx = isl.Context()
 
 
 def GetBounds(lines, st_line):
@@ -180,7 +146,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print ''
 
     DEBUG = True
-    AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
+    AGGRESSIVE_SIMPLIFY = True # TODO simpl_ub
 
 
     LPetit = "tmp/tmp_petit"+L+".t"
@@ -190,12 +156,19 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for i in range(len(BLOCK),10):
         BLOCK.append(BLOCK[len(BLOCK)-1])
 
+    BLOCK2 = [0,16,16]
+    # BLOCK2 = BLOCK
+
     linestring = open(plik, 'r').read()
     lines = linestring.split('\n')
 
+    petit_loop = []
+    if AGGRESSIVE_SIMPLIFY:
+        petit_loop = convert_loop.convert_loop(lines, BLOCK2)
+    else:
+        petit_loop = convert_loop.convert_loop(lines)
 
-
-    petit_loop = convert_loop.convert_loop(lines)
+    BLOCK2 = map(str, BLOCK2)
 
     file = open(LPetit, 'w')
 
@@ -437,6 +410,35 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     for i in range(0, len(cl.statements)):
         TILE_VLD_EXTI = tiling_v3.Project(TILE_VLD[i].apply(Rapply).coalesce(), sym_exvars)
+
+        if AGGRESSIVE_SIMPLIFY:
+
+            cor_set = ''
+            if (len(isl_symb) > 0):
+                cor_set = '[' + ','.join(isl_symb) + '] -> '
+            else:
+                cor_set = ''
+
+            cor_set = cor_set + '{[' + ','.join(sym_exvars) + ',' + ','.join(vars) + ',' + 'v] : '
+
+            for k in range(0,i+1):
+                for j in range(0, len(cl.statements[k].bounds)):
+                    compar = ' <= '
+                    if cl.statements[k].bounds[j]['step'] == '-1':
+                        compar = ' >= '
+                    cor_set = cor_set + vars[j] + compar + cl.statements[k].bounds[j]['ub'] + " - " + BLOCK2[j] + " && "
+                    cor_set = cor_set + cl.statements[k].bounds[j]['lb'] + " + " + BLOCK2[j] +  compar +  vars[j] +  " && "
+
+                cor_set = cor_set + "("
+                cor_set = cor_set + " v = " + str(cl.statements[i].petit_line) + " "
+                cor_set = cor_set + ")}"
+
+                cor_set = isl.Set(cor_set)
+
+                print cor_set
+
+                TILE_VLD_EXTI = TILE_VLD_EXTI.intersect(cor_set)
+
         TILE_VLD_EXT.append(TILE_VLD_EXTI)
 
 

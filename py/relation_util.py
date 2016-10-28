@@ -10,6 +10,7 @@ import sys
 import copyconstr
 from subprocess import Popen, PIPE, STDOUT
 import tiling_v3
+from termcolor import colored
 
 
 oc_proc = '~/omega+/omega_calc/obj/oc < tmp/oc.txt'
@@ -72,6 +73,11 @@ def oc_IterateClosure(R):
     w = w.replace('} union {', ';')
 
     #print w
+
+    if 'UNKNOWN' in w:
+        print colored('Iterate Closure Failed !!!! Abort !!!', 'red')
+        print 'ISL approximation can be still used'
+        sys.exit(0)
 
     rcl = isl.Map(w)
 
