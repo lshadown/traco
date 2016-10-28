@@ -460,10 +460,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 if cl.statements[j].bounds[k]['step'] == '-1':
                     vvars[k] = '-' + vvars[k]
 
-
             combo = [x for t in zip(scati + scatj, sym_exvars + vvars) for x in t]  # obled
 
-            RMap = RMap + ','.join(combo) + ',' +  str(cl.statements[j].petit_line) + ']; '
+            RMap = RMap + ','.join(combo) + ',' + str(cl.statements[j].petit_line) + ']; '
+            # normalize  j
 
         RMap = RMap[:-2] + '}'
         Rmap = isl.Map(RMap)
@@ -496,6 +496,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # Optional Schedule
 
     s = ','.join(["i%d" % i for i in range(1, loop.maxl*4+2)])
+    in_ = s.split(',')
 
     symb = ''
     if(len(isl_symb) > 0):
@@ -503,17 +504,19 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     RSched = symb + '{[' + s + '] -> ['
 
-    #s = s.replace('i2', 'i2+i4') affine schedule
+
+
+    s = s.replace('i2', 'i2+i4')
+
     # ToDo i8 na -i8
 
     RSched += s + '] : '
 
-    print RSched
-    in_ = s.split(',')
-
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT_union) + "}"
 
     Rsched = isl.Map(RSched)
+
+
 
     end = time.time()
     elapsed = end - start
@@ -543,9 +546,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
             s = ''
 
-            for st in cl.statements:
-                if(st.petit_line == int(petit_st)):
-                    s = st.body
+            for i in range(0,len(cl.statements)):
+                if(cl.statements[i].petit_line == int(petit_st)):   # st.petit_line
+                    s = cl.statements[i].body
 
 
             for i in range(0, len(vars)):        # todo oryginal iterators for loops with mixed indexes
