@@ -179,7 +179,7 @@ TILE_VLD_EXT1 = TILE_VLD_EXT1.apply(Rmap).coalesce()
 
 TILE_VLD_EXT = TILE_VLD_EXT1
 
-#TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
+TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
 
 RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2+i4,i3,i4,i5,i6,i7,i8,i9,-i10,i11,i12,i13] : ';
 in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
