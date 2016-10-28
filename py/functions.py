@@ -40,6 +40,9 @@ def Loop(loop, extra_ub = 0):
         if(extra_ub != 0):
             ub = ub + " +  " + str(extra_ub)
 
+        if (extra_ub != 0):
+                lb = lb + " -  " + str(extra_ub)
+
 
         # przerobic na inne zmiany zmiennej indeksowej  += -=
 
