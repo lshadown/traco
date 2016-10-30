@@ -69,6 +69,7 @@ gen.SetPath(rpath, sys.argv)
 gen.rpath = rpath
 
 block = '16'
+rplus_mode = ''
 
 if('--simplify' in sys.argv):
     SIMPLIFY = True
@@ -106,6 +107,7 @@ if len(sys.argv) > 3:
                 permute = True
             if('--rplus' in sys.argv[i]):
                 rplus_file = sys.argv[i].replace('--rplus=', '')
+                rplus_mode = rplus_file
 
 
         if('=' in sys.argv[3]):
@@ -130,7 +132,7 @@ if len(sys.argv) > 3:
             sys.exit()
 
         if('--tiling5' in sys.argv[3] or partile):
-            tiling_v5.tile(sys.argv[1], block, permute, "", "0", SIMPLIFY, perfect_mode, partile, rplus_file)
+            tiling_v5.tile(sys.argv[1], block, permute, "", "0", SIMPLIFY, perfect_mode, partile, rplus_mode)
             sys.exit()
 
         if('--tile' in sys.argv[3] or partile):
