@@ -91,6 +91,9 @@ def MakeTile(st, vars, sym_exvars, symb, B):
 
 def MakeCustomLex(sym_exvars, sym_exvars_p, direct, size, eq):
 
+    if size == 0:
+        return ''
+
     constr = ' ( '
     part = ''
     comparator = ' > '   # LT
@@ -361,6 +364,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             lex_s_lt = MakeCustomLex(sym_exvars, sym_exvars_p, 'LT', l, cl.statements[i].petit_line > cl.statements[j].petit_line)
             lex_s_gt = MakeCustomLex(sym_exvars, sym_exvars_p, 'GT', l, cl.statements[i].petit_line < cl.statements[j].petit_line)
 
+
             join_LT = ':  exists  ' + ','.join(sym_exvars_p) + ' : ( ' + lex_s_lt
             join_GT = ':  exists  ' + ','.join(sym_exvars_p) + ' : ( ' + lex_s_gt
 
@@ -377,6 +381,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             else:
                 TILE_LT_I = TILE_LT_I.union(TILE_LT_IJ).coalesce()
                 TILE_GT_I = TILE_GT_I.union(TILE_GT_IJ).coalesce()
+
+
 
         TILE_LT.append(TILE_LT_I)
         TILE_GT.append(TILE_GT_I)
