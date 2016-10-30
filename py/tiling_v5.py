@@ -146,7 +146,7 @@ def DebugPrint(label, arr, sts):
 
 ############################################################
 
-def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_file = ''):
+def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_mode = ''):
 
     print ''
     print colored('/\__  _\ /\  == \   /\  __ \   /\  ___\   /\  __ \   ', 'green')
@@ -252,7 +252,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # **************************************************************************
 
     exact_rplus = '-1'
-    islrp = False
+    islrp = True
+
+    if(rplus_mode == 'iterate'):
+        islrp = False
+
     isl_relclosure = isl_rel
 
     if islrp:
