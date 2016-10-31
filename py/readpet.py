@@ -20,7 +20,7 @@ class Scop:
 
 ##############################################################################
 
-scopfile = 'testw.c'
+scopfile = 'wz.c'
 
 #######################################################################
 # BARVINOK + PET
@@ -66,8 +66,11 @@ ld = isl.UnionSet(ld)
 ind = isl.UnionSet(ind)
 schedule = isl.UnionMap(schedule)
 strrel = rel
-rel = isl.UnionMap(rel)
 
+rel = isl.UnionMap(rel)
+print rel
+
+print schedule
 
 ########################################################################
 rels = strrel.split(';')

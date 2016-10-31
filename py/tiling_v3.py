@@ -105,7 +105,7 @@ def Constr_Przed(vars, sym_exvars, stuff, BLOCK, i, iloczyn,j):
       
 
 def Constr_Wbloku(vars, sym_exvars, stuff, BLOCK, i, iloczyn, j):
-    return iloczyn + ","+ stuff[j]['lb'] +" <= " + vars[i] + " <= " +  stuff[j]['ub'] + "," + iloczyn + "+" + BLOCK[i] + "-1 && "
+    return iloczyn + ","+ stuff[j]['lb'] +" <= " + vars[i] + " <= " +  stuff[j]['ub'] + "," + iloczyn + "+" + BLOCK[i] + "-1  && "
 
 
 
@@ -133,8 +133,8 @@ def Constraint(vars, sym_exvars, stuff, BLOCK, dane,par_vars,par_tiling):
         #
              
     for i in range(dane["nest"], len(vars)):
-        s = s + vars[i] + " = -1 && "
-    
+        s = s + vars[i] + " = 0 && "
+
   ##########################################
   ##########################################
 
@@ -149,12 +149,13 @@ def Constraint(vars, sym_exvars, stuff, BLOCK, dane,par_vars,par_tiling):
 
            # poprawka
             if(par_tiling):
-                s = s + par_vars[l] + " <= " + stuff[i]['ub'] + "-"+ stuff[i]['lb']   +" && "
-                s = s + par_vars[l] + " > " + stuff[i]['ub'] + "-"+ stuff[i]['lb'] +"-"+ BLOCK[i]   +"  && "
+                s = s + par_vars[l] + " <= " + stuff[i]['ub'] + "-("+ stuff[i]['lb']   +") && "
+                s = s + par_vars[l] + " > " + stuff[i]['ub'] + "-("+ stuff[i]['lb'] +")-"+ BLOCK[i]   +"  && "
             else:
                 # tu jest maly blad: jak pod granica jest zmienna z innej petli to trzeba ja wyeleminowac jej granicami albo jakos tak bo moze sie w iteracjach zmienic jej zakres
-                s = s + BLOCK[i] + "*" + sym_exvars[i] + " <= " + stuff[i]['ub'] + "-"+ stuff[i]['lb']   +" && "
-                s = s + BLOCK[i] + "*" + sym_exvars[i] + " > " + stuff[i]['ub'] + "-"+ stuff[i]['lb'] +"-"+ BLOCK[i]   +"  && "
+                s = s + BLOCK[i] + "*" + sym_exvars[i] + " <= " + stuff[i]['ub'] + "-("+ stuff[i]['lb']   +") && "
+                s = s + BLOCK[i] + "*" + sym_exvars[i] + " > " + stuff[i]['ub'] + "-("+ stuff[i]['lb'] +")-"+ BLOCK[i]   +" && "
+
               
             # tu powinno byc ub - lb / b
             #s = s + sym_exvars[i] + " = "+stuff[i]['ub']+"&& "
@@ -216,7 +217,7 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
 
     #print "===================================" + str(min_nest)
     if(dane["nest_id"] == dane2["nest_id"]):  # ta sama petla licz stara metoda
-        for i in range(n-1,n):    # od 0 ????????????????????????????????????????????????????????
+        for i in range(0,n):    # od 0 ????????????????????????????????????????????????????????
             for j in range(0,i):
                 l = dane['path'][j]
                 #l = j
@@ -269,7 +270,7 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
         if(par_tiling):
             varcon = varcon + par_vars[l] + "<=" + stuff[l]['ub'] +" && "
         else:
-            varcon = varcon + BLOCK[i] + "*" + sym_exvars[i] + "<=" + stuff[l]['ub'] +" && "
+            varcon = varcon + BLOCK[i] + "*" + sym_exvars[i] + "<= (" + stuff[l]['ub'] + ' - (' +  stuff[l]['lb'] + ")) && "   # w tej lini jest blad !!!!!!
         
             
     
@@ -282,7 +283,7 @@ def MakeBLTandBGT_v2(_SYM, vars, sym_exvars, par_vars, varsprim, exvars, stuff, 
     #dodaj  j = -1 lub granice i granice na jj    lub -0 lub ub
     for i in range(min(m,n),maxl):   
         if n < i+1:
-            varcon = varcon + " && " + vars[i] + " = -1 " 
+            varcon = varcon + " && " + vars[i] + " = 0 "
         else:
             if m < i+1:  # granice
                 l = dane['path'][i]
@@ -353,7 +354,8 @@ def GetRapply(vars, sym_exvars, _SYM):
         R = R + s + ","
     R = R + "v] : "     
     R = R + " true };\n"
-    
+
+
     isl_Rapply = isl.Map(R.replace('R := ',''))
     return isl_Rapply
 
@@ -570,7 +572,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         BLOCK.append(BLOCK[len(BLOCK)-1])
 
         
-    if(not BLOCK[0].isdigit()):
+    if(not BLOCK[1].isdigit()):
         par_tiling = True
      
     linestring = open(plik, 'r').read()
@@ -691,6 +693,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     
     rel = dane[0]
     rel2 = rel
+
+    print rel
+
 
 
 
@@ -1043,6 +1048,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     for i in range(0, len(instrukcje)):
         Bij = MakeBij(_SYM, vars, sym_exvars, im_par_vars, stuff, BLOCK, instrukcje[i], par_tiling)
+        print Bij
+        print "oooooooooooooooooooooooooooooooooooooooooooooooooooo"
         isl_TILE.append(isl.Set(str(Bij).replace("_Bij := ", "")))
 
         if (DEBUG):
@@ -1086,6 +1093,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 print BLGT[0]
                 print '-------GT ----------'
                 print BLGT[1]
+            print BLGT[0]
             isltmp = isl.Set(str(BLGT[0]).replace("_BLT := ", ""))
             if(bltc==0):
                 isl_TILE_LT.append(isltmp)
@@ -1115,6 +1123,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
         isl_BCUR = isl_TILE[i].subtract(X).coalesce()
+
 
 
 
@@ -1299,7 +1308,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, 0)
 
-
+    print _rap
     #vis.Vis(isl_TILEbis[0], stuff, cl.deps, isl.Set(cl.statements[0].domain_map), True)
     #sys.exit(0)
 
@@ -1313,6 +1322,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     
     for j in range(1, len(isl_TILEbis)):
         _rap =  GetRapply4(vars, sym_exvars, _SYM, instrukcje, j)
+        print _rap
         if (DEBUG):
             print _rap
         if(Extend):
@@ -1324,7 +1334,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     if(not Extend):
         zne = z
 
-
+    print z
 
     # -----------------------------------------------------------------
 
@@ -1351,6 +1361,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     z = z.coalesce()
     z = z.remove_redundancies()
     z = z.detect_equalities()
+   # z = imperf_tile.SimplifySlice(z)
 
     #calculate II_SET
     ii_SET = z.remove_dims(isl.dim_type.set, int(isl_TILEbis[i].dim(isl.dim_type.set)/2), int(isl_TILEbis[i].dim(isl.dim_type.set)/2)).coalesce()
@@ -1391,6 +1402,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         instrukcje[0]['st'] = tmp_st # correct statements
 
+    #z1 = isl.Set('[n,b] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13] : n+2 = 2*b && b > 2 && n > 8 }')
+    #  z1 = isl.Set('[n,b] -> {[i3,i4,i5,i6,i9,i10,i11,i12,i13] : n+2 = 2*b && b > 2 && n > 8 }')
+    #z = z.intersect(z1)
 
 
 
@@ -1398,7 +1412,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print "Cloog start..."
         start = time.time()
 
-        isl_ast = True
+        isl_ast = False
         barv = 1
 
         if(barv == 1):
@@ -1523,6 +1537,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             rapp = _rap
             rapp = rapp.remove_dims(isl._isl.dim_type.in_, 0, len(sym_exvars))
             rapp = rapp.remove_dims(isl._isl.dim_type.out, 0, len(sym_exvars)*2)
+
+
 
             if not Extend:
                 z = z.apply(_rap)

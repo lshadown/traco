@@ -15,7 +15,7 @@ except ImportError, e:
     sys.exit()
 
 
-TILE_S1 = '[N,ii,jj,kk,  b1, b2, b3, iib1,  jjb2,  kkb3, iipb1,  jjpb2,  kkpb3  ] -> '
+TILE_S1 = '[N,ii,jj,kk,  b1, b2, b3, iib1,  jjb2,  kkb3 ] -> '
 TILE_S1 += '{[i,j,k,1] : '
 
 tile_i_s1 = ' N-1 - iib1 >= i >= N-1- iib1 -b1 +1, 0 && ii >=0 && '
@@ -66,16 +66,16 @@ lex_s1_g = ' ( (ii < iip) or (ii = iip && jj < jjp) or (ii=iip && jj=jjp & kk < 
 lex_s2_g = ' ( (ii < iip) or (ii = iip && jj < jjp) ) '
 lex_s1s2_g = ' ( (ii < iip) or (ii = iip && jj < jjp) or (ii=iip && jj=jjp)  ) '
 
-iig0 = ' ii >= 0 && jj >= 0 && kk>= 0 && iip >= 0 && jjp >= 0 && kkp>= 0 && b1 >0 && b2 >0 && b3 >0 &&'
+iig0 = ' ii >= 0 && jj >= 0 && kk>= 0 && iip >= 0 && jjp >= 0 && kkp>= 0 && b1 >0 && b2 >0 && b3 >0 && iib1 >= ii && jjb2 >= jj && kkb3 >= kk   &&   '
 
-bilb1 = ' N-1 - iib1 >= 0 &&  iib1 > ii  && '
-bilb1p = ' N-1 - iipb1 >= 0 &&  iipb1 > ii  && '
+bilb1 = ' N-1 - iib1 >= 0 &&  iib1 >= ii  && '
+bilb1p = ' N-1 - iipb1 >= 0 &&  iipb1 >= iip  && '
 
-bilb2 = '(i+1) + jjb2 <= N-1 && jjb2 > jj  && '
-bilb2p = '(i+1) + jjpb2 <= N-1 && jjpb2 > jj && '
+bilb2 = '(i+1) + jjb2 <= N-1 && jjb2 >= jj  && '
+bilb2p = '(i+1) + jjpb2 <= N-1 && jjpb2 >= jjp && '
 
-bilb3 = 'kkb3 + 0 <= j-i-1 &&  kkb3 > kk  && '
-bilb3p = 'kkpb3 + 0 <= j-i-1 && kkpb3 > kk && '
+bilb3 = 'kkb3 + 0 <= j-i-1 &&  kkb3 >= kk  && '
+bilb3p = 'kkpb3 + 0 <= j-i-1 && kkpb3 >= kkp && '
 
 tile_ip_s1 = tile_i_s1.replace('ii', 'iip')
 tile_jp_s1 = tile_j_s1.replace('jj', 'jjp')
@@ -86,7 +86,7 @@ tile_jp_s1 = tile_j_s1.replace('jjb2', 'jjpb2')
 tile_kp_s1 = tile_k_s1.replace('kkb3', 'kkpb3')
 
 def template(a):
-    return '[N,ii,jj,kk,b1, b2, b3, iib1,  jjb2,  kkb3] -> {[i,j,k,'+str(a)+'] : exists iip,jjp, kkp, iipb1,  jjpb2,  kkpb3  : ('
+    return '[N,ii,jj,kk,b1, b2, b3, iib1,  jjb2,  kkb3] -> {[i,j,k,'+str(a)+'] : exists iip,jjp, kkp, iipb1,  jjpb2,  kkpb3  :  iipb1 >= iip && jjpb2 >= jjp && kkpb3 >= kkp  && ('
 
 #######################################################################
 # LT
@@ -106,6 +106,7 @@ TILE_LT_S1_S1 = isl.Set(TILE_LT_S1_S1).coalesce()
 
 print '---'
 print 'TILE_LT_S1_S1'
+
 print TILE_LT_S1_S1
 
 #######################################################################
@@ -363,7 +364,7 @@ else:
 
     TILE_VLD_EXT = TILE_VLD_EXT1.union(TILE_VLD_EXT2).coalesce()
 
-    RSched = '[N,b1, b2, b3, iib1,  jjb2,  kkb3, ff1, ff2, ff3] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : i2 <= ff1 &&  i4 <= ff2 && i6 <= ff3 && b1 > 0 && b2 >0 && b3 >0 && ff1 >0 && ff2 > 0 && ff3 > 0  && ';
+    RSched = '[N,b1, b2, b3, iib1,  jjb2,  kkb3, ff1, ff2, ff3] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]->[i1,i2,i3,i4,i5,i6,i7,-i8,i9,i10,i11,i12,i13] : i2 <= ff1 &&  i4 <= ff2 && i6 <= ff3 && b1 > 0 && b2 >0 && b3 >0 && ff1 >0 && ff2 > 0 && ff3 > 0  &&  iib1 >= i2 && jjb2 >= i4 && kkb3 >= i6 && ';
     in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12','i13']
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT) + "}"
 

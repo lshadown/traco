@@ -273,6 +273,7 @@ def SimplifySlice(slice):
     print 'Please wait, simplification... '
     for i in tqdm.tqdm(range(0, len(sets))):
         for j in range(0, len(sets)):
+        #for j in range(0, len(sets)):
             if(i!=j and not sets[i].is_equal(sets[j])):
                 tmp = sets[i].union(sets[j])
                 tmp2 = tmp.polyhedral_hull()
