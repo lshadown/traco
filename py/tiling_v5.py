@@ -555,7 +555,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT_union) + "}"
 
+
+    print 'RSCHEDULE'
+    print RSched
+
     Rsched = isl.Map(RSched)
+
+
 
 
 
