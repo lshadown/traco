@@ -548,7 +548,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    s = s.replace('i2', 'i2+i4')
+    #s = s.replace('i2', 'i2+i4')
     #s = s.replace('i8', '-i8')
 
     # ToDo i8 na -i8
@@ -595,6 +595,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     RValid += ' ) }'
     print '..',
+    print RValid
     RValid = isl.Map(RValid).coalesce()
     print '..'
 
@@ -603,6 +604,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     else:
         print colored('*** VALIDADION FAILED ***', 'red')
         sys.exit(0)
+
+# **************************************************************************
+    #### DISCOVER PARALLELISM -- empty
+
+    # ii, jj -> ii, jj' : not  jj = jj'
+
+
 
 
     end = time.time()
