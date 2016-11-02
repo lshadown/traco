@@ -544,9 +544,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     RSched = symb + '{[' + s + '] -> ['
 
+    RValid = RSched
 
 
-    #s = s.replace('i2', 'i2+i4')
+
+    s = s.replace('i2', 'i2+i4')
     #s = s.replace('i8', '-i8')
 
     # ToDo i8 na -i8
@@ -561,8 +563,46 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     Rsched = isl.Map(RSched)
 
+    # **************************************************************************
+
+    print 'VALIDATION CHECKING '
+    s_in = ','.join(["i%d" % i for i in range(1, loop.maxl * 4 + 2)])
+    sout = ','.join(["i%d'" % i for i in range(1, loop.maxl * 4 + 2)])
+    out_ = sout.split(',')
+
+    i1 = in_[2*loop.maxl+1:4*loop.maxl+1:2] + [in_[loop.maxl * 4 ]]
+    i2 = out_[2 * loop.maxl + 1:4 * loop.maxl + 1:2] + [in_[loop.maxl * 4]]
+
+    RValid += sout + '] : '
+
+    DomR = isl_rel.domain()
+
+    RValid += copyconstr.GetConstrSet(i1, DomR) + ' && ' + copyconstr.GetConstr(i1, i2, isl_rel)
+    print '..',
 
 
+    s_in_ex = ','.join(["ex%d" % i for i in range(1, loop.maxl * 4 + 2)])
+    s_out_ex = ','.join(["ex%d'" % i for i in range(1, loop.maxl * 4 + 2)])
+    ex_sin = s_in_ex.split(',')
+    ex_sout = s_out_ex.split(',')
+
+    RValid += ' && exists ' + s_in_ex + ',' + s_out_ex +  ' : ('
+
+    RValid += ' ( ' + tiling_v3.CreateLex(ex_sin, ex_sout) + ' ) && '
+
+    RValid += ' ( ' + copyconstr.GetConstr(in_, ex_sin, Rsched) + ' ) && '
+    RValid += ' ( ' + copyconstr.GetConstr(out_, ex_sout, Rsched) + ' ) '
+
+    RValid += ' ) }'
+    print '..',
+    RValid = isl.Map(RValid).coalesce()
+    print '..'
+
+    if(RValid.is_empty()):
+        print colored('*** VALIDATION OK ***', 'green')
+    else:
+        print colored('*** VALIDADION FAILED ***', 'red')
+        sys.exit(0)
 
 
     end = time.time()
