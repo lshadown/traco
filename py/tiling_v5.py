@@ -605,7 +605,18 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print colored('*** VALIDADION FAILED ***', 'red')
         sys.exit(0)
 
-    # dodatkowo  ii <> ii' && i1 = i2 && ii,i1 ,    ii',i2 nalezy do VLDEXTY
+
+    #for st in cl.statements:
+    #    print st.domain_map
+
+    # czy wszystkie z domain sa w TVLD_EXT
+
+    # I nalezy do TVLD_EXT and exists i,j,v i  nalezy do domain_map i   i,j,v != I
+
+
+    #sys.exit(0)
+
+    # dodatkowo  ii <> ii' && i1 = i2 && ii,i1 ,    ii',i2 nalezy do VLDEXTY exists
 
 # **************************************************************************
     #### DISCOVER PARALLELISM -- empty
