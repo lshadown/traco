@@ -611,12 +611,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # czy wszystkie z domain sa w TVLD_EXT
 
-    # I nalezy do TVLD_EXT and exists i,j,v i  nalezy do domain_map i   i,j,v != I
+    # I nalezy do TVLD_EXT and exists i,j,v i  nalezy do domain_map i   i,j,v != I ma byc pusty
 
 
     #sys.exit(0)
 
-    # dodatkowo  ii <> ii' && i1 = i2 && ii,i1 ,    ii',i2 nalezy do VLDEXTY exists
+    # dodatkowo  ii <> ii' && i1 = i2 && ii,i1 ,    ii',i2 nalezy do VLDEXTY exists ma byc pusty
 
 # **************************************************************************
     #### DISCOVER PARALLELISM -- empty
@@ -631,7 +631,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     Rel_base = '{[' + s + '] -> [' + sprim + '] :   '
 
-#i1 = domain R 12 = R(i1)   ii,i1 nalezy do VLD_EXT i'i',i2 nalezy do VLDEXT i ogr. ponizej np  ii2 <> ii2' ii1 = ii1'
+#i1 = domain R 12 = R(i1)   ii,i1 nalezy do VLD_EXT i'i',i2 nalezy do VLDEXT i ogr. ponizej np  ii2 <> ii2' ii1 = ii1' relacja
 
     for i in range(0,loop.maxl*4,2):
         print i,
