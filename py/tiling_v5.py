@@ -548,7 +548,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    s = s.replace('i2', 'i2+i4')
+    #s = s.replace('i2', 'i2+i4')
     #s = s.replace('i8', '-i8')
 
     # ToDo i8 na -i8
@@ -605,13 +605,48 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print colored('*** VALIDADION FAILED ***', 'red')
         sys.exit(0)
 
+    # dodatkowo  ii <> ii' && i1 = i2 && ii,i1 ,    ii',i2 nalezy do VLDEXTY
+
 # **************************************************************************
     #### DISCOVER PARALLELISM -- empty
 
     # ii, jj -> ii, jj' : not  jj = jj'
+    print colored('Parallelism searching', 'green')
+
+    s = ','.join(["i%d" % i for i in range(1, loop.maxl*4+2)])
+    in_ = s.split(',')
+    sprim = ','.join(["i%d'" % i for i in range(1, loop.maxl*4+2)])
+    out_ = sprim.split(',')
+
+    Rel_base = '{[' + s + '] -> [' + sprim + '] :   '
+
+#i1 = domain R 12 = R(i1)   ii,i1 nalezy do VLD_EXT i'i',i2 nalezy do VLDEXT i ogr. ponizej np  ii2 <> ii2' ii1 = ii1'
+
+    for i in range(0,loop.maxl*4,2):
+        print i,
+        Rel = Rel_base
+        tmp = ''
+        for j in range(0,i):
+            tmp += in_[j] + ' = ' + out_[j] + ' && '
+
+        if(i > 0):
+            tmp += ' not ( ' +  in_[j+1] + ' = ' + out_[j+1] + '  && ' + in_[j+2] + ' = ' + out_[j+2] + ' )  '
+
+        Rel += tmp + ' }'
+        print Rel
+        Rel = isl.Map(Rel)
+        # print Rel
+        Rel = Rsched.intersect(Rel)
+        if(Rel.is_empty()):
+            print 'found!'
+            break
+        else:
+            print 'no!'
 
 
 
+
+    sys.exit(0)
 
     end = time.time()
     elapsed = end - start
