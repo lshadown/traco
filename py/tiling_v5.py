@@ -548,7 +548,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    #s = s.replace('i2', 'i2+i4')
+    s = s.replace('i2', 'i2+i4')
     #s = s.replace('i8', '-i8')
 
     # ToDo i8 na -i8
@@ -594,10 +594,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     RValid += ' ( ' + copyconstr.GetConstr(out_, ex_sout, Rsched) + ' ) '
 
     RValid += ' ) }'
-    print '..',
-    print RValid
     RValid = isl.Map(RValid).coalesce()
-    print '..'
+
 
     if(RValid.is_empty()):
         print colored('*** VALIDATION OK ***', 'green')
@@ -629,9 +627,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     sprim = ','.join(["i%d'" % i for i in range(1, loop.maxl*4+2)])
     out_ = sprim.split(',')
 
-    Rel_base = '{[' + s + '] -> [' + sprim + '] :   '
+    Rel_base = symb + '{[' + s + '] -> [' + sprim + '] :   '
 
 #i1 = domain R 12 = R(i1)   ii,i1 nalezy do VLD_EXT i'i',i2 nalezy do VLDEXT i ogr. ponizej np  ii2 <> ii2' ii1 = ii1' relacja
+
+    VLD_VAL = Rsched.range()
 
     for i in range(0,loop.maxl*4,2):
         print i,
@@ -640,17 +640,19 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         for j in range(0,i):
             tmp += in_[j] + ' = ' + out_[j] + ' && '
 
-        if(i > 0):
-            tmp += ' not ( ' +  in_[j+1] + ' = ' + out_[j+1] + '  && ' + in_[j+2] + ' = ' + out_[j+2] + ' )  '
+        tmp += ' not ( ' +  in_[j+1] + ' = ' + out_[j+1] + '  && ' + in_[j+2] + ' = ' + out_[j+2] + ' )  && '
 
-        Rel += tmp + ' }'
-        print Rel
+        Rel += tmp
+        Rel += copyconstr.GetConstrSet(i1, DomR) + ' && ' + copyconstr.GetConstr(i1, i2, isl_rel)
+
+        Rel += ' && ( ' + copyconstr.GetConstrSet(in_, VLD_VAL) + ' ) && '
+        Rel += ' ( ' + copyconstr.GetConstrSet(out_, VLD_VAL) + ' )  '
+
+        Rel += ' }'
         Rel = isl.Map(Rel)
-        # print Rel
-        Rel = Rsched.intersect(Rel)
         if(Rel.is_empty()):
             print 'found!'
-            break
+            #break
         else:
             print 'no!'
 
