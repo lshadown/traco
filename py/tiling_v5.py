@@ -557,7 +557,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     RSched += s + '] : '
 
-    RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT_union) + "}"
+    RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT_union) + "  }"
 
 
     print 'RSCHEDULE'
@@ -605,15 +605,16 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         sys.exit(0)
 
 
-    #for st in cl.statements:
-    #    print st.domain_map
+    for st in cl.statements:
+        z = st.domain_map
+
+    z = isl.Set(z)
 
     # czy wszystkie z domain sa w TVLD_EXT    VLDUNION RELATION == v
 
     # I nalezy do TVLD_EXT and exists i,j,v i  nalezy do domain_map i   i,j,v != I ma byc pusty
+    VLD_VAL = Rsched.range()
 
-
-    #sys.exit(0)
 
     if(VALIDATION > 0):
         tiling5_valid.Valid1(Rsched, symb, in_, out_, s_in, sout, loop)
@@ -635,7 +636,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 #i1 = domain R 12 = R(i1)   ii,i1 nalezy do VLD_EXT i'i',i2 nalezy do VLDEXT i ogr. ponizej np  ii2 <> ii2' ii1 = ii1' relacja
 
-    VLD_VAL = Rsched.range()
+
     par_loop = []
 
     for i in range(0,loop.maxl*4,2):
@@ -658,7 +659,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         if(Rel.is_empty()):
             print colored('found!', 'green')
             par_loop.append('c' + str(i+1))
-            #break
+            break
         else:
             print 'no!'
 
@@ -722,7 +723,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #loop_str = '\n'.join(loop_str)
 
     for line in loop_str:
-        if(len(loop_str) > 0):
-            if('for( ' + par_loop[0] in line):
+        if(len(par_loop) > 0):
+            if('for( ' + par_loop[0] + ' ' in line):
                 print imperf_tile.get_tab(line) + colored('#pragma omp parallel for', 'green')
         print line
