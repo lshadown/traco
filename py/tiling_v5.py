@@ -18,6 +18,7 @@ import Dependence
 import clanpy
 import tiling_v3
 import copyconstr
+import tiling5_valid
 
 ctx = isl.Context()
 
@@ -164,6 +165,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     DEBUG = True
     AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
+    VALIDATION = 0    # levels
 
 
     LPetit = "tmp/tmp_petit"+L+".t"
@@ -578,7 +580,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     DomR = isl_rel.domain()
 
     RValid += copyconstr.GetConstrSet(i1, DomR) + ' && ' + copyconstr.GetConstr(i1, i2, isl_rel)
-    print '..',
 
 
     s_in_ex = ','.join(["ex%d" % i for i in range(1, loop.maxl * 4 + 2)])
@@ -607,14 +608,17 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #for st in cl.statements:
     #    print st.domain_map
 
-    # czy wszystkie z domain sa w TVLD_EXT
+    # czy wszystkie z domain sa w TVLD_EXT    VLDUNION RELATION == v
 
     # I nalezy do TVLD_EXT and exists i,j,v i  nalezy do domain_map i   i,j,v != I ma byc pusty
 
 
     #sys.exit(0)
 
-    # dodatkowo  ii <> ii' && i1 = i2 && ii,i1 ,    ii',i2 nalezy do VLDEXTY exists ma byc pusty
+    if(VALIDATION > 0):
+        tiling5_valid.Valid1(Rsched, symb, in_, out_, s_in, sout, loop)
+
+
 
 # **************************************************************************
     #### DISCOVER PARALLELISM -- empty
@@ -632,6 +636,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 #i1 = domain R 12 = R(i1)   ii,i1 nalezy do VLD_EXT i'i',i2 nalezy do VLDEXT i ogr. ponizej np  ii2 <> ii2' ii1 = ii1' relacja
 
     VLD_VAL = Rsched.range()
+    par_loop = []
 
     for i in range(0,loop.maxl*4,2):
         print i,
@@ -651,15 +656,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         Rel += ' }'
         Rel = isl.Map(Rel)
         if(Rel.is_empty()):
-            print 'found!'
+            print colored('found!', 'green')
+            par_loop.append('c' + str(i+1))
             #break
         else:
             print 'no!'
 
-
-
-
-    sys.exit(0)
 
     end = time.time()
     elapsed = end - start
@@ -712,9 +714,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             line = line.replace('for (int', 'for(')
             loop_str.append(line)
 
-    loop_str = '\n'.join(loop_str)
+
     end = time.time()
     elapsed = end - start
     print "Code Generation: time taken: ", elapsed, "seconds.\n\n"
 
-    print loop_str
+    #loop_str = '\n'.join(loop_str)
+
+    for line in loop_str:
+        if(len(loop_str) > 0):
+            if('for( ' + par_loop[0] in line):
+                print imperf_tile.get_tab(line) + colored('#pragma omp parallel for', 'green')
+        print line
