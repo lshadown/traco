@@ -19,6 +19,7 @@ import clanpy
 import tiling_v3
 import copyconstr
 import tiling5_valid
+import tiling_schedule
 
 ctx = isl.Context()
 
@@ -550,7 +551,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    s = s.replace('i2', 'i2+i4')
+    #s = s.replace('i2', 'i2+i4')
     #s = s.replace('i8', '-i8')
 
     # ToDo i8 na -i8
@@ -727,3 +728,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             if('for( ' + par_loop[0] + ' ' in line):
                 print imperf_tile.get_tab(line) + colored('#pragma omp parallel for', 'green')
         print line
+
+###################################################################################################
+
+    rtile = tiling_schedule.get_RTILE(TILE_VLD_EXT_union, sym_exvars, isl_rel, True)
+    print colored('RTILE', 'green')
+    print rtile
