@@ -47,7 +47,7 @@ if not os.path.exists("tmp"):
 
 if len(sys.argv) == 2:
     print 'Usage PAR:\n issf input_file.c [--codegen=0,1,2 --tc=0,1,2, --silent=0,1 (moredebug in  tmp/debug.txt)]'
-    print 'Usage TILE:\n --tile (source to source), experimental: --tiling, --tiling3, --permute'
+    print 'Usage TILE:\n --tile (source to source), experimental: --tiling3, --tiling5, --permute'
     print 'Usage PAR+TILE:\n --partile (source to source)'
     print 'Usage (other):\n --scc, --simplify (slow polyhedral hull for better code), --slicing, --fs, --acc, --scop'
     sys.exit()

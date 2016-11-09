@@ -159,9 +159,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print colored('   \ \_\  \ \_\ \_\  \ \_\ \_\  \ \_____\  \ \_____\ ', 'green')
     print colored('    \/_/   \/_/ /_/   \/_/\/_/   \/_____/   \/_____/ ', 'green')
     print ''
-    print '       An Automatic Parallelizer and Optimizer'
-    print ' based on the TRansitive ClOsure of dependence graph'
-    print '              traco.sourceforge.net               '
+    print '      An Automatic Parallelizer and Optimizer'
+    print 'based on the '+colored('TRA','green')+'nsitive '+colored('C', 'green')+'l'+colored('O', 'green')+'sure of dependence graphs'
+    print '             traco.sourceforge.net               '
     print ''
 
     DEBUG = True
@@ -731,6 +731,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 ###################################################################################################
 
-    rtile = tiling_schedule.get_RTILE(TILE_VLD_EXT_union, sym_exvars, isl_rel, True)
+    rtile = tiling_schedule.get_RTILE(Rsched.range(), sym_exvars, isl_rel, True)
     print colored('RTILE', 'green')
     print rtile
