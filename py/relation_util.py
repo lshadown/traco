@@ -13,7 +13,7 @@ import tiling_v3
 from termcolor import colored
 
 
-oc_proc = '~/omega+/omega_calc/obj/oc < tmp/oc.txt'
+oc_proc = '~/traco/omega+/omega_calc/obj/oc < tmp/oc.txt'
 
 # isl map to omega str
 def islMaptoOmegaStr(R):
