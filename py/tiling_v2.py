@@ -65,7 +65,7 @@ def DynamicRTILE(rtile, TILE_VLD_ext, n, cl, vars):
             if((('int c1') in loop[0]) or (('int c3') in loop[0]) or (('int c5') in loop[0])):
                 loop.insert(0, "#pragma omp parallel for")
 
-        loop_str = RestoreStatements2(loop, cl, n)
+        loop_str = RestoreStatements2(loop, cl, n, vars)
 
         text_file.write(loop_str)
 
@@ -79,7 +79,7 @@ def DynamicRTILE(rtile, TILE_VLD_ext, n, cl, vars):
 
 
 
-def RestoreStatements2(loop, cl, n):
+def RestoreStatements2(loop, cl, n, vars):
     loop_str = []
 
     for line in loop:
