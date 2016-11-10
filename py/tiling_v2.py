@@ -23,6 +23,7 @@
 #
 # end for
 import sys
+import re
 from termcolor import colored
 import islpy as isl
 ctx = isl.Context()
@@ -30,10 +31,12 @@ ctx = isl.Context()
 import iscc
 import imperf_tile
 
-def DynamicRTILE(rtile, TILE_VLD_ext, n):
+def DynamicRTILE(rtile, TILE_VLD_ext, n, cl, vars):
 
     I0 = rtile.domain();
     print I0
+    text_file = open("Output.txt", "w")
+
     for i in range(0,10000):
         if (i==0):
             J0 = rtile.range()
@@ -62,14 +65,46 @@ def DynamicRTILE(rtile, TILE_VLD_ext, n):
             if((('int c1') in loop[0]) or (('int c3') in loop[0]) or (('int c5') in loop[0])):
                 loop.insert(0, "#pragma omp parallel for")
 
-
+        loop_str = []
 
         for line in loop:
-            if '#pragma' in line:
-                print colored(line, 'green')
-            else:
-                print line
+            if line.endswith(');'):
+                tab = imperf_tile.get_tab(line)
+                line = line.replace(' ', '')
+                line = line[:-2]
+                line = line[1:]
 
-        loop = '\n'.join(loop)
+                arr = line.split(',')
+
+                petit_st = arr[4 * n]
+
+                s = ''
+
+                for i in range(0, len(cl.statements)):
+                    if (cl.statements[i].petit_line == int(petit_st)):  # st.petit_line
+                        s = cl.statements[i].body
+
+                for i in range(0, len(vars)):  # todo oryginal iterators for loops with mixed indexes
+                    subt = arr[2 * n + 2 * i + 1]
+                    if (('+' in subt) or ('-' in subt)):
+                        subt = '(' + subt + ')'
+                    s = re.sub(r'\b' + vars[i] + r'\b', subt, s)
+
+                loop_str.append(tab + s)
+
+            else:
+                line = line.replace('for (int', 'for(')
+                loop_str.append(line)
+
+        # for line in loop_str:
+        #     if '#pragma' in line:
+        #         print colored(line, 'green')
+        #     else:
+        #         print line
+
+        loop_str = '\n'.join(loop_str)
+        text_file.write(loop_str)
+
+    text_file.close()
 
 

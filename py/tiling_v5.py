@@ -752,4 +752,4 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     else:
         print  colored('RTILE+ exact', 'green')
 
-    #tiling_v2.DynamicRTILE(rtile, Rsched.range(), loop.maxl)
+    #tiling_v2.DynamicRTILE(rtile, Rsched.range(), loop.maxl, cl, vars)
