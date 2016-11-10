@@ -16,10 +16,12 @@ import imperf_tile
 import relation_util
 import Dependence
 import clanpy
+import tiling_v2
 import tiling_v3
 import copyconstr
 import tiling5_valid
 import tiling_schedule
+
 
 ctx = isl.Context()
 
@@ -430,6 +432,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     if (DEBUG):
         DebugPrint('TILE_VLD', TILE_VLD, cl.statements)
 
+
+
 # **************************************************************************
 
     TILE_VLD_EXT = []
@@ -747,3 +751,5 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print  colored('RTILE+ approx', 'yellow')
     else:
         print  colored('RTILE+ exact', 'green')
+
+    #tiling_v2.DynamicRTILE(rtile, Rsched.range(), loop.maxl)
