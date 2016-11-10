@@ -641,7 +641,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     par_loop = []
 
     for i in range(0,loop.maxl*4,2):
-        print i,
+        print 'c' + str(i+1),
         Rel = Rel_base
         tmp = ''
         for j in range(0,i):
@@ -734,3 +734,16 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     rtile = tiling_schedule.get_RTILE(Rsched.range(), sym_exvars, isl_rel, True)
     print colored('RTILE', 'green')
     print rtile
+
+    if islrp:
+        rtileplus, exact = rtile.transitive_closure()
+    else:
+        rtileplus = relation_util.oc_IterateClosure(rtile)
+        exact = 1
+
+    print colored('RTILE+', 'green')
+    print rtileplus
+    if(exact != 1):
+        print  colored('RTILE+ approx', 'yellow')
+    else:
+        print  colored('RTILE+ exact', 'green')
