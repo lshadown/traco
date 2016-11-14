@@ -39,7 +39,7 @@ stop = omp_get_wtime();
 
 printf("%i %.2f\n",a, stop-start);
 a=0;
-
+ 
 start = omp_get_wtime();
 /*
 #pragma omp parallel for
