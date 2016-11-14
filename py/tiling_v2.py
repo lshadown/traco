@@ -31,17 +31,18 @@ ctx = isl.Context()
 import iscc
 import imperf_tile
 
-def DynamicRTILE(rtile, TILE_VLD_ext, n, cl, vars):
+def DynamicRTILE(rtile, TILE_VLD_ext, n, cl, vars, RFS):
+
+    RFS = isl.Map(RFS).coalesce()
 
     I0 = rtile.domain();
-    print I0
     text_file = open("Output.txt", "w")
 
     for i in range(0,10000):
         if (i==0):
             J0 = rtile.range()
             FS0 = I0.subtract(J0).coalesce()
-            L0 = FS0.apply(rtile)
+            L0 = FS0
         else:
             L0 = Lay0.apply(rtile)
             J0 = J0.subtract(Lay0)
@@ -51,11 +52,16 @@ def DynamicRTILE(rtile, TILE_VLD_ext, n, cl, vars):
 
         Lay0 = L0.subtract(D0).coalesce()
 
+
         if(Lay0.is_empty()):
             break
 
         Lay = Lay0.insert_dims(isl.dim_type.set, 2*n, 2*n)
         Lay = Lay.intersect(TILE_VLD_ext).coalesce()
+
+
+        Lay = Lay.apply(RFS).coalesce()
+
         Lay = imperf_tile.SimplifySlice(Lay)
 
 

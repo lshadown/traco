@@ -170,6 +170,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
     VALIDATION = 0    # levels
 
+    FSSCHEDULE = 0 # RTILE expermiental
+
 
     LPetit = "tmp/tmp_petit"+L+".t"
 
@@ -493,6 +495,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     RMaps = []
 
+    step_dec = "-1"
+    if FSSCHEDULE == 1:
+        step_dec = "1"
+
     for i in range(0, len(cl.statements)):
         RMap = '{'
         for j in range(0, i+1):
@@ -504,7 +510,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             #TODO jesli -1 wszedzie to do Rsched
             vvars = vars[:]  # minus adding
             for k in range(0, len(cl.statements[j].bounds)):
-                if cl.statements[j].bounds[k]['step'] == '-1':
+                if cl.statements[j].bounds[k]['step'] == step_dec:
                     vvars[k] = '-' + vvars[k]
 
             combo = [x for t in zip(scati + scatj, sym_exvars + vvars) for x in t]  # obled
@@ -543,6 +549,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # Optional Schedule
 
     s = ','.join(["i%d" % i for i in range(1, loop.maxl*4+2)])
+    # RFS
+    ss = s
+
     in_ = s.split(',')
 
     symb = ''
@@ -552,15 +561,23 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     RSched = symb + '{[' + s + '] -> ['
 
     RValid = RSched
+    # RFS
+    RFS = RSched
 
 
 
     #s = s.replace('i2', 'i2+i4')
-    #s = s.replace('i8', '-i8')
+    #s = s.replace('i10', '-i10')
 
     # ToDo i8 na -i8
 
     RSched += s + '] : '
+
+    # RFS --------------------------------
+    ss = ss.replace('i8', '-i8')
+    RFS += ss + '] : 1=1 }'
+    # --------------------------------
+
 
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT_union) + "  }"
 
@@ -607,7 +624,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print colored('*** VALIDATION OK ***', 'green')
     else:
         print colored('*** VALIDADION FAILED ***', 'red')
-        sys.exit(0)
+        if(FSSCHEDULE == 0):
+            sys.exit(0)
 
 
     for st in cl.statements:
@@ -735,21 +753,24 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 ###################################################################################################
 
-    rtile = tiling_schedule.get_RTILE(Rsched.range(), sym_exvars, isl_rel, True)
-    print colored('RTILE', 'green')
-    print rtile
+    if (FSSCHEDULE):
 
-    if islrp:
-        rtileplus, exact = rtile.transitive_closure()
-    else:
-        rtileplus = relation_util.oc_IterateClosure(rtile)
-        exact = 1
+        rtile = tiling_schedule.get_RTILE(Rsched.range(), sym_exvars, isl_rel, True)
+        print colored('RTILE', 'green')
+        print rtile
 
-    print colored('RTILE+', 'green')
-    print rtileplus
-    if(exact != 1):
-        print  colored('RTILE+ approx', 'yellow')
-    else:
-        print  colored('RTILE+ exact', 'green')
+        if islrp:
+            rtileplus, exact = rtile.transitive_closure()
+        else:
+            rtileplus = relation_util.oc_IterateClosure(rtile)
+            exact = 1
 
-    #tiling_v2.DynamicRTILE(rtile, Rsched.range(), loop.maxl, cl, vars)
+        print colored('RTILE+', 'green')
+        print rtileplus
+        if(exact != 1):
+            print  colored('RTILE+ approx', 'yellow')
+        else:
+            print  colored('RTILE+ exact', 'green')
+
+
+        tiling_v2.DynamicRTILE(rtile, Rsched.range(), loop.maxl, cl, vars, RFS)
