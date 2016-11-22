@@ -170,7 +170,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
     VALIDATION = 0    # levels
 
-    FSSCHEDULE = 0 # RTILE expermiental
+    FSSCHEDULE = 1 # RTILE expermiental
 
 
     LPetit = "tmp/tmp_petit"+L+".t"
@@ -773,4 +773,41 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             print  colored('RTILE+ exact', 'green')
 
 
-        tiling_v2.DynamicRTILE(rtile, Rsched.range(), loop.maxl, cl, vars, RFS)
+    #    tiling_v2.DynamicRTILE(rtile, Rsched.range(), loop.maxl, cl, vars, RFS)
+
+
+        p = 2
+
+        FI = '[' + ','.join(isl_symb + sym_exvars) + ',v] -> { [p] : exists k : ('
+
+
+        item = ''
+        for i in range(0,p):
+            item = item + ' (p='+str(i)+' ' + ' && ' + sym_exvars[0] + ' - (2k + ' + str(i) + ') = 0 ) || '
+
+        FI += item[:-3] + '  ) &&'
+
+
+
+
+        vv = ["i%d" % i for i in range(1, loop.maxl * 4 + 2)]
+        s_in = ','.join(vv)
+        s_out = ','.join(["i%d" % i for i in range(2, loop.maxl*2+1,2)])  + ',' + vv[len(vv)-1]
+        rmap_fi = '{[' + s_in + '] -> [' + s_out + ']}'
+        rmap_fi = isl.Map(rmap_fi)
+
+        II_SET = TILE_VLD_EXT_union.apply(rmap_fi).coalesce()
+
+        print colored('II_SET', 'green')
+        print II_SET
+
+        FI += copyconstr.GetConstrSet(sym_exvars + ['v'], II_SET) + '}'
+
+        FI = isl.Set(FI).coalesce()
+
+        print colored('FI', 'green')
+        print FI
+
+
+
+###################################################################################################
