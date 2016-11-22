@@ -785,14 +785,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             print 'Bad cpus parameter. '
             sys.exit(0)
 
-        FI = '[' + ','.join(isl_symb + sym_exvars) + ',v] -> { [p] : exists k : ('
+        FI = symb + ' {[' + ','.join(sym_exvars) + ',v] ->  [p] : (exists k : ('
 
 
         item = ''
         for i in range(0,p):
             item = item + ' (p='+str(i)+' ' + ' && ' + sym_exvars[0] + ' - (2k + ' + str(i) + ') = 0 ) || '
 
-        FI += item[:-3] + '  ) &&'
+        FI += item[:-3] + '  )) &&'
 
 
 
@@ -808,10 +808,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print colored('II_SET', 'green')
         print II_SET
 
+
         FI += copyconstr.GetConstrSet(sym_exvars + ['v'], II_SET) + '}'
 
-
-        FI = isl.Set(FI).coalesce()
+        FI = isl.Map(FI).coalesce()
 
         print colored('FI', 'green')
         print FI
