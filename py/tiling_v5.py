@@ -153,7 +153,7 @@ def DebugPrint(label, arr, sts):
 
 ############################################################
 
-def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_mode = ''):
+def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_mode = '', cpus=2):
 
     print ''
     print colored('/\__  _\ /\  == \   /\  __ \   /\  ___\   /\  __ \   ', 'green')
@@ -776,7 +776,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #    tiling_v2.DynamicRTILE(rtile, Rsched.range(), loop.maxl, cl, vars, RFS)
 
 
-        p = 2
+
+
+
+        try:
+            p = int(cpus) # or int
+        except ValueError:
+            print 'Bad cpus parameter. '
+            sys.exit(0)
 
         FI = '[' + ','.join(isl_symb + sym_exvars) + ',v] -> { [p] : exists k : ('
 
@@ -802,6 +809,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print II_SET
 
         FI += copyconstr.GetConstrSet(sym_exvars + ['v'], II_SET) + '}'
+
 
         FI = isl.Set(FI).coalesce()
 
