@@ -756,6 +756,16 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     if (FSSCHEDULE):
 
         rtile = tiling_schedule.get_RTILE(Rsched.range(), sym_exvars, isl_rel, True)
+
+        rtile_ii = rtile
+
+
+        for i in range(0, loop.maxl):
+            rtile_ii = rtile_ii.remove_dims(isl.dim_type.in_, 2*loop.maxl-i*2-2, 1)
+            rtile_ii = rtile_ii.remove_dims(isl.dim_type.out, 2*loop.maxl-i*2-2, 1)
+
+
+
         print colored('RTILE', 'green')
         print rtile
 
@@ -816,6 +826,45 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print colored('FI', 'green')
         print FI
 
+        RPROC = symb + '{[' + ','.join(sym_exvars) + ',v] -> [' + ','.join(sym_exvars_p) + ',vp] : '
 
 
-###################################################################################################
+        domRTILE = rtile_ii.domain().coalesce()
+
+        RPROC += copyconstr.GetConstrSet(sym_exvars + ['v'], domRTILE) + ' && ' + copyconstr.GetConstr(sym_exvars + ['v'], sym_exvars_p + ['vp'], rtile_ii)
+
+        RPROC += ' && exists p,pp : ( not(p=pp) && ' + copyconstr.GetConstr(sym_exvars + ['v'], ['p'], FI) + ' && ' + copyconstr.GetConstr(sym_exvars_p + ['vp'], ['pp'], FI) +' ) }'
+
+        #print RPROC
+        RPROC = isl.Map(RPROC).coalesce()
+
+        print colored('RPROC', 'green')
+        print RPROC
+
+        s = ','.join(["i%d" % i for i in range(0, loop.maxl + 1)])
+        sv = s.split(',')
+        s1 = ','.join(["o%d" % i for i in range(0, loop.maxl + 1)])
+        sv1 = s1.split(',')
+        s2 = ','.join(["ex%d" % i for i in range(0, loop.maxl + 1)])
+        sve = s2.split(',')
+        R_RESIDUAL = symb + '{[' + s + '] -> [' + s1 + '] : '
+        R_RESIDUAL += copyconstr.GetConstrSet(sv, RPROC.domain().coalesce()) + '&& '
+        R_RESIDUAL += copyconstr.GetConstr(sv, sv1, RPROC) + '&&  not exists ' + s2 + ' : ('
+        R_RESIDUAL += tiling_v3.CreateLex(sve, sv) + ' && ' + copyconstr.GetConstr(sve, sv1, RPROC) + ')}'
+
+        R_RESIDUAL = isl.Map(R_RESIDUAL).coalesce()
+
+        print colored('R_RESIDUAL', 'green')
+        print R_RESIDUAL
+        irp = R_RESIDUAL.fixed_power_val(-1)
+
+        R_P_RESIDUAL = symb + '{[' + ','.join(sym_exvars) + ',v] -> [p,' + ','.join(sym_exvars_p) + ',vp] : '
+        R_P_RESIDUAL +=  copyconstr.GetConstr(sym_exvars_p + ['vp'], ['p'], FI) + ' && ' + copyconstr.GetConstr(sym_exvars+ ['v'], sym_exvars_p+ ['vp'], irp) + ' }'
+
+
+        R_P_RESIDUAL = isl.Map(R_P_RESIDUAL)
+        print colored('R_P_RESIDUAL', 'green')
+        print  R_P_RESIDUAL
+
+
+    ###################################################################################################
