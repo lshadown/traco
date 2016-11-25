@@ -495,10 +495,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     RMaps = []
 
-    step_dec = "-1"
-    if FSSCHEDULE == 1:
-        step_dec = "xxxx"
-
     for i in range(0, len(cl.statements)):
         RMap = '{'
         for j in range(0, i+1):
@@ -506,13 +502,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
             scati = fix_scat(cl.statements[i].scatering, loop.maxl)
             scatj = fix_scat(cl.statements[j].scatering, loop.maxl)
-
-            #TODO jesli -1 wszedzie to do
-            # TODO PRzeniesc do RSCHED !!!!! tu nie dziala
-            vvars = vars[:]  # minus adding
-            #for k in range(0, len(cl.statements[j].bounds)):
-            #    if cl.statements[j].bounds[k]['step'] == step_dec:
-            #        vvars[k] = '-' + vvars[k]
 
             combo = [x for t in zip(scati + scatj, sym_exvars + vvars) for x in t]  # obled
 
@@ -570,13 +559,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     s = s.replace('i2', 'i2+i4')
     #s = s.replace('i8', '-i8')      # tu dac dekrementacje POPRAWKA
 
+
+    # *****************************************************  DECREMENTATION
     index_arr = numpy.zeros(shape=(len(cl.statements),loop.maxl))
     for k in range(0,loop.maxl):
         for i in range(0, len(cl.statements)):
             if(k < len(cl.statements[i].bounds)):
                 index_arr[i][k] = cl.statements[i].bounds[k]['step']
 
-
+    print colored('step array (st,loop)','green')
     print numpy.matrix(index_arr)
 
     for k in range(0, loop.maxl):
@@ -589,8 +580,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         if(dec==0):
             continue
         ind = str(2*loop.maxl+2*(k+1))
+        print colored('decrementation on ' + str(k+1) + ' loop', 'yellow')
         s = s.replace('i'+ind, '-i'+ind)   # TODO rozdzielic na gniazda i v w przyszlosci
-
+    # *****************************************************
 
     RSched += s + '] : '
 
