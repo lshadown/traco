@@ -170,7 +170,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
     VALIDATION = 0    # levels
 
-    FSSCHEDULE = 1 # RTILE expermiental
+    FSSCHEDULE = 0 # RTILE expermiental
 
 
     LPetit = "tmp/tmp_petit"+L+".t"
@@ -497,7 +497,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     step_dec = "-1"
     if FSSCHEDULE == 1:
-        step_dec = "1"
+        step_dec = "xxxx"
 
     for i in range(0, len(cl.statements)):
         RMap = '{'
@@ -507,11 +507,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             scati = fix_scat(cl.statements[i].scatering, loop.maxl)
             scatj = fix_scat(cl.statements[j].scatering, loop.maxl)
 
-            #TODO jesli -1 wszedzie to do Rsched
+            #TODO jesli -1 wszedzie to do
+            # TODO PRzeniesc do RSCHED !!!!! tu nie dziala
             vvars = vars[:]  # minus adding
-            for k in range(0, len(cl.statements[j].bounds)):
-                if cl.statements[j].bounds[k]['step'] == step_dec:
-                    vvars[k] = '-' + vvars[k]
+            #for k in range(0, len(cl.statements[j].bounds)):
+            #    if cl.statements[j].bounds[k]['step'] == step_dec:
+            #        vvars[k] = '-' + vvars[k]
 
             combo = [x for t in zip(scati + scatj, sym_exvars + vvars) for x in t]  # obled
 
@@ -566,8 +567,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    #s = s.replace('i2', 'i2+i4')
-    #s = s.replace('i10', '-i10')
+    s = s.replace('i2', 'i2+i4')
+    s = s.replace('i8', '-i8')      # tu dac dekrementacje POPRAWKA
 
     # ToDo i8 na -i8
 
