@@ -2,7 +2,7 @@ import re
 import sys
 import time
 from termcolor import colored
-
+import numpy
 try:
     import islpy as isl
 except ImportError, e:
@@ -568,19 +568,29 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     s = s.replace('i2', 'i2+i4')
-    s = s.replace('i8', '-i8')      # tu dac dekrementacje POPRAWKA
+    #s = s.replace('i8', '-i8')      # tu dac dekrementacje POPRAWKA
 
-    #for i in range(0, len(cl.statements)):
-            # TODO jesli -1 wszedzie to do
-            # TODO PRzeniesc do RSCHED !!!!! tu nie dziala
-            # zmien na i8 na i8prim jezeli jest dekremnetacja  nadaj instrukcjom i8 lub -i8 a jezeli wszystkie to i8 mna -i8
-            # arr = i8,i10,i12...
+    index_arr = numpy.zeros(shape=(len(cl.statements),loop.maxl))
+    for k in range(0,loop.maxl):
+        for i in range(0, len(cl.statements)):
+            if(k < len(cl.statements[i].bounds)):
+                index_arr[i][k] = cl.statements[i].bounds[k]['step']
 
-            # for k in range(0, len(cl.statements[j].bounds)):
-            #    if cl.statements[j].bounds[k]['step'] == '-1':
-            #        vvars[k] = '-' + vvars[k]  # replace
 
-    # ToDo i8 na -i8
+    print numpy.matrix(index_arr)
+
+    for k in range(0, loop.maxl):
+        vec = index_arr[:,k]
+        dec = 1
+        for i in range(0, len(cl.statements)):
+            if(vec[i] != -1):
+                dec = 0
+                break
+        if(dec==0):
+            continue
+        ind = str(2*loop.maxl+2*(k+1))
+        s = s.replace('i'+ind, '-i'+ind)   # TODO rozdzielic na gniazda i v w przyszlosci
+
 
     RSched += s + '] : '
 
