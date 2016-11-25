@@ -573,6 +573,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     #for i in range(0, len(cl.statements)):
             # TODO jesli -1 wszedzie to do
             # TODO PRzeniesc do RSCHED !!!!! tu nie dziala
+            # zmien na i8 na i8prim jezeli jest dekremnetacja  nadaj instrukcjom i8 lub -i8 a jezeli wszystkie to i8 mna -i8
             # arr = i8,i10,i12...
 
             # for k in range(0, len(cl.statements[j].bounds)):
