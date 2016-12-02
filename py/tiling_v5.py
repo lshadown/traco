@@ -378,7 +378,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             TILE_LT_IJ = PARTS[0] + join_LT +  PARTS[1]
             TILE_GT_IJ = PARTS[0] + join_GT +  PARTS[1]
 
-            # czy trzeba dodac ze 0 <= ii*b < ub-lb   ???  rownoleglosc zewn blad
 
             print TILE_LT_IJ
             TILE_LT_IJ = isl.Set(TILE_LT_IJ)
