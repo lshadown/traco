@@ -375,10 +375,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             join_LT = ':  exists  ' + ','.join(sym_exvars_p) + ' : ( ' + lex_s_lt
             join_GT = ':  exists  ' + ','.join(sym_exvars_p) + ' : ( ' + lex_s_gt
 
-            TILE_LT_IJ = PARTS[0] + join_LT + PARTS[1]
-            TILE_GT_IJ = PARTS[0] + join_GT + PARTS[1]
+            TILE_LT_IJ = PARTS[0] + join_LT +  PARTS[1]
+            TILE_GT_IJ = PARTS[0] + join_GT +  PARTS[1]
 
+            # czy trzeba dodac ze 0 <= ii*b < ub-lb   ???  rownoleglosc zewn blad
 
+            print TILE_LT_IJ
             TILE_LT_IJ = isl.Set(TILE_LT_IJ)
             TILE_GT_IJ = isl.Set(TILE_GT_IJ)
 
@@ -503,7 +505,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             scati = fix_scat(cl.statements[i].scatering, loop.maxl)
             scatj = fix_scat(cl.statements[j].scatering, loop.maxl)
 
-            combo = [x for t in zip(scati + scatj, sym_exvars + vvars) for x in t]  # obled
+            combo = [x for t in zip(scati + scatj, sym_exvars + vars) for x in t]  # obled
 
             RMap = RMap + ','.join(combo) + ',' + str(cl.statements[j].petit_line) + ']; '
             # normalize  j
