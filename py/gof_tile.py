@@ -161,13 +161,15 @@ iig0 = ' tt >= 0 && ii >= 0 && jj >= 0 && ttp >= 0 && iip >= 0 && jjp >= 0 && '
 
 bilb1 = ' 0 + b1*tt <= T-1 && '
 bilb1p = '  0 + b1*ttp <= T-1 && '
+bilb1 = ''
 
 bilb2 =  ' 1 + b2*ii <= N-2 && '
 bilb2p =  ' 1 + b2*iip <= N-2 && '
+bilb2 =  ''
 
 bilb3 = 'b3*jj + 1 <= N-2 && '
 bilb3p = 'b3*jjp + 1 <= N-2 && '
-
+bilb3 = ''
 
 
 tile_ip_s1 = tile_i_s1.replace('tt', 'ttp')
@@ -261,7 +263,7 @@ Rmap = isl.Map( '{[tt,ii,jj,t,i,j] -> [0, tt,0, ii,0, jj,0, t,0, i,0,j]; } ' )
 
 TILE_VLD_EXT = TILE_VLD_EXT1
 
-TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
+#TILE_VLD_EXT =imperf_tile.SimplifySlice(TILE_VLD_EXT)
 
 #RSched = '[N] -> {[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12]->[i1,i2+i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12] : ';
 #in_ = ['i1', 'i2', 'i3', 'i4', 'i5', 'i6','i7','i8','i9','i10','i11','i12']
