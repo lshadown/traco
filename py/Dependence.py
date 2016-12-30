@@ -336,8 +336,9 @@ class Kernel_Loop:
                         loop_var = True
                         break
                 if not loop_var:
-                    rw = RWCheck(v, st, [0,0])
-                    self.var_st.update({v:rw})
+                    if not (( 'if' in st) and ('then' in st)):
+                        rw = RWCheck(v, st, [0,0])
+                        self.var_st.update({v:rw})
 
 
 
