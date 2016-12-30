@@ -557,7 +557,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    s = s.replace('i2', 'i2+i4')
+    #s = s.replace('i2', 'i2+i4')
     #s = s.replace('i8', '-i8')      # tu dac dekrementacje POPRAWKA
 
 
@@ -716,6 +716,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     else:
         loop_x = iscc.iscc_communicate("L :=" + str(Rsched) + "; codegen L;")
 
+    print loop_x
     lines = loop_x.split('\n')
 
     loop_str = []
@@ -734,6 +735,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             s = ''
 
             for i in range(0,len(cl.statements)):
+                # TODO if petit_st has 'c' get all statements make if from petit_line and insert to s, solution for loop over st
                 if(cl.statements[i].petit_line == int(petit_st)):   # st.petit_line
                     s = cl.statements[i].body
 

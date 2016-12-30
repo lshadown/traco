@@ -355,7 +355,7 @@ def GetRapply(vars, sym_exvars, _SYM):
     R = R + "v] : "     
     R = R + " true };\n"
 
-
+    print R
     isl_Rapply = isl.Map(R.replace('R := ',''))
     return isl_Rapply
 
