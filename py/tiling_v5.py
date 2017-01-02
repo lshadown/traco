@@ -344,9 +344,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         # if statements before st
         domainv = isl.Set(st.domain_map)
-        domainv = domainv.insert_dims(isl.dim_type.set, loop.maxl, 1)
 
-        tile = tile.intersect(domainv).coalesce()
+        if(domainv.dim(isl.dim_type.set)+1 == tile.dim(isl.dim_type.set)):  # todo domainmap rozszrzyc o loop.maxl
+            domainv = domainv.insert_dims(isl.dim_type.set, loop.maxl, 1)   #loop.maxl+1 - domainv.dim(isl_dim_type.set)
+            tile = tile.intersect(domainv).coalesce()
 
         TILE.append(tile)
 
@@ -686,6 +687,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     par_loop = []
 
 
+    delta = isl_rel.deltas()
+    chkc = isl.Set("{[0," + ",".join(vars) + "]}")
+    delta = delta.subtract(chkc)
 
 
     for i in range(0,loop.maxl*4,2):
@@ -696,8 +700,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         for j in range(0,i):
             tmp += in_[j] + ' = ' + out_[j] + ' && '
 
-        #print j
-        #print in_
         tmp += ' not ( ' +  in_[j+1] + ' = ' + out_[j+1] + '  && ' + in_[j+2] + ' = ' + out_[j+2] + ' )  && '
 
         Rel += tmp
@@ -707,9 +709,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         Rel += ' ( ' + copyconstr.GetConstrSet(out_, VLD_VAL) + ' )  '
 
         Rel += ' }'
-#        print Rel
+        #print Rel
 
         Rel = isl.Map(Rel)
+
+
+        if(i==0):
+            Rel = delta
+
         if(Rel.is_empty()):
             print colored('found!', 'green')
             par_loop.append('c' + str(i+1))
