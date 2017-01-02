@@ -740,7 +740,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                     combo_st = '{'
                     for j in range(0, len(cl.statements)):
                         combo_st += '\n' + tab
-                        combo_st += 'if( ' + petit_st + '==' + str(cl.statements[j].petit_line) + ' ) ' + cl.statements[j].body
+                        combo_st += 'if( ' + petit_st + ' == ' + str(cl.statements[j].petit_line) + ' ) ' + cl.statements[j].body
                     s = combo_st + '\n' + tab+ '}'
                 elif cl.statements[i].petit_line == int(petit_st):   # st.petit_line
                     s = cl.statements[i].body
