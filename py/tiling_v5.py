@@ -341,7 +341,16 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         tile = ReplaceB(tile, BLOCK)
         TILE_STR.append(tile)
         tile = isl.Set(tile)
+
+        # if statements before st
+        domainv = isl.Set(st.domain_map)
+        domainv = domainv.insert_dims(isl.dim_type.set, loop.maxl, 1)
+
+        tile = tile.intersect(domainv).coalesce()
+
         TILE.append(tile)
+
+
 
     if (DEBUG):
         DebugPrint('TILE', TILE, cl.statements)
@@ -735,6 +744,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             s = ''
 
             for i in range(0,len(cl.statements)):
+
                 # TODO if petit_st has 'c' get all statements make if from petit_line and insert to s, solution for loop over st
                 if 'c' in petit_st:
                     combo_st = '{'
