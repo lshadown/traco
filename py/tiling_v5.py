@@ -685,13 +685,19 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     par_loop = []
 
+
+
+
     for i in range(0,loop.maxl*4,2):
+        j = -1
         print 'c' + str(i+1),
         Rel = Rel_base
         tmp = ''
         for j in range(0,i):
             tmp += in_[j] + ' = ' + out_[j] + ' && '
 
+        #print j
+        #print in_
         tmp += ' not ( ' +  in_[j+1] + ' = ' + out_[j+1] + '  && ' + in_[j+2] + ' = ' + out_[j+2] + ' )  && '
 
         Rel += tmp
@@ -701,11 +707,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         Rel += ' ( ' + copyconstr.GetConstrSet(out_, VLD_VAL) + ' )  '
 
         Rel += ' }'
+#        print Rel
+
         Rel = isl.Map(Rel)
         if(Rel.is_empty()):
             print colored('found!', 'green')
             par_loop.append('c' + str(i+1))
-            break
+            #break
         else:
             print 'no!'
 
