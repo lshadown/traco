@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include<stdlib.h>
 
+
 #define ceild(n,d)  ceil(((double)(n))/((double)(d)))
 #define floord(n,d) floor(((double)(n))/((double)(d)))
 #define max(x,y)    ((x) > (y)? (x) : (y))
@@ -23,19 +24,24 @@ int main(int argc, char *argv[]) {
 
 	// Declare arrays on the stack
 	float **path = new float*[N];
-	for (i=0; i<N; i++)
+	float **D = new float*[N];
+	for (i=0; i<N; i++){
 	  path[i] = new float[N];
+	  D[i] = new float[N];
+	  }
 
 	// Set the input data
 	for (i=0; i<N; i++) {
 		for (j=0; j<N; j++) {
 			path[i][j] = ((float) i*i*(j+2) + 2) / N;
+			D[i][j] = path[i][j];
 		}
 	}
 
 double start = omp_get_wtime();
 // -- sekw.
 // -----------------------------------
+
 if(kind == 1){
 
 
@@ -72,11 +78,80 @@ if (N >= 1) {
   }
 }
 /* End of CLooG code */
+}
+
+else if(kind == 5){
+for(k = 0; k < N; k++) {
+for(i = 0 ; i < N; i++) {
+for(j = 0; j < N; j++) {
+  if(i < k && j < k)
+    D[i][j] = min(D[i][j], D[i][k] + D[k][j]);
+  if(i > k && j < k)
+    D[i][j] = min(D[i][j], D[i][k] + D[k][j]) ;
+  if(i < k && j > k)
+    D[i][j] = min(D[i][j], D[i][k] + D[k][j]) ;
+  if(i > k && j > k)
+    D[i][j] = min(D[i][j], D[i][k] + D[k][j]) ;
+ }
+}
+}
 }else{
 
     //traco
-    int c0,c1,c2,c3,c4,c5;
+    int c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11;
 
+    if (N >= 2)
+  for( c1 = 0; c1 <= (N - 1) / 32; c1 += 1) {
+ //   #pragma omp parallel for
+    for( c3 = 0; c3 <= min(c1, floord(N - 2, 32)); c3 += 1) {
+      for( c5 = 0; c5 < c1; c5 += 1)
+        for( c7 = 32 * c1; c7 <= min(N - 1, 32 * c1 + 31); c7 += 1) {
+          for( c9 = 32 * c3; c9 <= min(32 * c3 + 31, c7 - 1); c9 += 1)
+            for( c11 = 32 * c5; c11 <= 32 * c5 + 31; c11 += 1)
+              D[c9][c11] = min(D[c9][c11], D[c9][c7] + D[c7][c11]);
+              //intf("%i %i %i\n", c1,c3,c5);
+          if (c3 == c1)
+            for( c9 = c7 + 1; c9 <= min(N - 1, 32 * c1 + 31); c9 += 1)
+              for( c11 = 32 * c5; c11 <= 32 * c5 + 31; c11 += 1)
+                D[c9][c11] = min(D[c9][c11], D[c9][c7] + D[c7][c11]);
+                //intf("%i %i %i\n", c1,c3,c5);
+        }
+      if (N >= 32 * c1 + 2)
+        for( c5 = c1; c5 <= (N - 1) / 32; c5 += 1)
+          for( c7 = 32 * c1; c7 <= min(N - 1, 32 * c1 + 31); c7 += 1) {
+            for( c9 = 32 * c3; c9 <= min(32 * c3 + 31, c7 - 1); c9 += 1) {
+              if (c5 == c1)
+                for( c11 = 32 * c1; c11 < c7; c11 += 1)
+                  D[c9][c11] = min(D[c9][c11], D[c9][c7] + D[c7][c11]);
+                  //printf("%i %i %i\n", c1,c3,c5);
+              for( c11 = max(32 * c5, c7 + 1); c11 <= min(N - 1, 32 * c5 + 31); c11 += 1)
+                D[c9][c11] = min(D[c9][c11], D[c9][c7] + D[c7][c11]);
+                //printf("%i %i %i\n", c1,c3,c5);
+            }
+            if (c3 == c1)
+              for( c9 = c7 + 1; c9 <= min(N - 1, 32 * c1 + 31); c9 += 1) {
+                if (c5 == c1)
+                  for( c11 = 32 * c1; c11 < c7; c11 += 1)
+                    D[c9][c11] = min(D[c9][c11], D[c9][c7] + D[c7][c11]);
+                    //printf("%i %i %i\n", c1,c3,c5);
+                for( c11 = max(32 * c5, c7 + 1); c11 <= min(N - 1, 32 * c5 + 31); c11 += 1)
+                //printf("%i %i %i\n", c1,c3,c5);
+                  D[c9][c11] = min(D[c9][c11], D[c9][c7] + D[c7][c11]);
+              }
+          }
+    }
+   // #pragma omp parallel for
+    for( c3 = c1 + 1; c3 <= (N - 1) / 32; c3 += 1)
+      for( c5 = 0; c5 <= (N - 1) / 32; c5 += 1)
+        for( c7 = 32 * c1; c7 <= 32 * c1 + 31; c7 += 1)
+          for( c9 = 32 * c3; c9 <= min(N - 1, 32 * c3 + 31); c9 += 1) {
+            for( c11 = 32 * c5; c11 <= min(32 * c5 + 31, c7 - 1); c11 += 1)
+              D[c9][c11] = min(D[c9][c11], D[c9][c7] + D[c7][c11]);
+            for( c11 = max(32 * c5, c7 + 1); c11 <= min(N - 1, 32 * c5 + 31); c11 += 1)
+              D[c9][c11] = min(D[c9][c11], D[c9][c7] + D[c7][c11]);
+          }
+  }
+/*
 for (c0 = 0; c0 <= floord(N - 1, 32); c0 += 1)
   for (c1 = 0; c1 <= (N - 1) / 32; c1 += 1)
     for (c2 = 0; c2 <= (N - 1) / 32; c2 += 1)
@@ -93,7 +168,7 @@ for (c0 = 0; c0 <= floord(N - 1, 32); c0 += 1)
             for (c5 = 32 * c2; c5 < N; c5 += 1)
               path[c4][c5]=path[c4][c5]<path[c4][c3]+path[c3][c5]?path[c4][c5]:path[c4][c3]+path[c3][c5];
           }
-
+*/
  // simplify
  /*
 for (c0 = 0; c0 <= floord(N - 1, 32); c0 += 1)
@@ -114,6 +189,10 @@ for (c0 = 0; c0 <= floord(N - 1, 32); c0 += 1)
 	printf("%.3f\n", end - start);
 
 	#pragma endscop
+	if(1==0)
+for(i=0;i<N;i++)
+for(j=0;j<N;j++)
+printf("%.2f %.2f \n", path[i][j], D[i][j] );
 
 	// Clean-up and exit the function
 	fflush(stdout);
