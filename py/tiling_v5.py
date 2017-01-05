@@ -268,21 +268,25 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         islrp = False
 
     isl_relclosure = isl_rel
+    exact_rplus = True
 
-    if islrp:
-        isl_relclosure = isl_rel.transitive_closure()
-        exact_rplus = isl_relclosure[1]
-        isl_relclosure = isl_relclosure[0]
-    else:
-        isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
-        exact_rplus = True
+    if not isl_rel.is_empty():
+        if islrp:
+            isl_relclosure = isl_rel.transitive_closure()
+            exact_rplus = isl_relclosure[1]
+            isl_relclosure = isl_relclosure[0]
+        else:
+            isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
+            exact_rplus = True
 
     isl_relplus = isl_relclosure
     end = time.time()
     elapsed = end - start
     print "Transitive closure: time taken: ", elapsed, "seconds."
 
-    isl_ident = isl_rel.identity(isl_rel.get_space())
+    isl_ident = isl_rel
+    if not isl_rel.is_empty:
+        isl_ident = isl_rel.identity(isl_rel.get_space())
 
     if (DEBUG and 1==0):
         print 'R+'
@@ -337,6 +341,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     TILE_STR = []   #string
 
     for st in cl.statements:
+        if len(isl_symb) == 0:
+            isl_symb = isl.Map(st.domain_map).get_var_names(isl.dim_type.param)
         tile =  MakeTile(st, vars, sym_exvars, isl_symb, B)
         tile = ReplaceB(tile, BLOCK)
         TILE_STR.append(tile)
@@ -415,7 +421,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     TILE_ITR = []
 
     for i in range(0, len(cl.statements)):
-        TILE_ITRI = TILE[i].subtract(TILE_GT[i].apply(isl_relclosure)).coalesce()
+        if not isl_relclosure.is_empty():
+            TILE_ITRI = TILE[i].subtract(TILE_GT[i].apply(isl_relclosure)).coalesce()
+        else:
+            TILE_ITRI = TILE[i]
         TILE_ITR.append(TILE_ITRI)
 
     if(DEBUG):
@@ -425,19 +434,23 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     TVLD_LT = []
 
-    for i in range(0, len(cl.statements)):
-        TVLD_LTI = (TILE_LT[i].intersect(TILE_ITR[i].apply(isl_relclosure))).subtract(TILE_GT[i].apply(isl_relclosure)).coalesce()
-        TVLD_LT.append(TVLD_LTI)
+    if not isl_relclosure.is_empty():
+        for i in range(0, len(cl.statements)):
+            TVLD_LTI = (TILE_LT[i].intersect(TILE_ITR[i].apply(isl_relclosure))).subtract(TILE_GT[i].apply(isl_relclosure)).coalesce()
+            TVLD_LT.append(TVLD_LTI)
 
-    if(DEBUG):
-        DebugPrint('TVLD_LT', TVLD_LT, cl.statements)
+        if(DEBUG):
+            DebugPrint('TVLD_LT', TVLD_LT, cl.statements)
 
 # **************************************************************************
 
     TILE_VLD = []
 
     for i in range(0, len(cl.statements)):
-        TILE_VLDI = TVLD_LT[i].union(TILE_ITR[i]).coalesce()
+        if not isl_relclosure.is_empty():
+            TILE_VLDI = TVLD_LT[i].union(TILE_ITR[i]).coalesce()
+        else:
+            TILE_VLDI = TILE_ITR[i]
         if(SIMPLIFY):
             TILE_VLDI = imperf_tile.SimplifySlice(TILE_VLDI)
         TILE_VLD.append(TILE_VLDI)
@@ -607,64 +620,69 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     print 'RSCHEDULE'
+
     print RSched
 
     Rsched = isl.Map(RSched)
+    #Rsched = imperf_tile.SimplifyMap(Rsched)
 
     # **************************************************************************
 
     print 'VALIDATION CHECKING '
-    s_in = ','.join(["i%d" % i for i in range(1, loop.maxl * 4 + 2)])
-    sout = ','.join(["i%d'" % i for i in range(1, loop.maxl * 4 + 2)])
-    out_ = sout.split(',')
+    if(not isl_rel.is_empty()):
+        s_in = ','.join(["i%d" % i for i in range(1, loop.maxl * 4 + 2)])
+        sout = ','.join(["i%d'" % i for i in range(1, loop.maxl * 4 + 2)])
+        out_ = sout.split(',')
 
-    i1 = in_[2*loop.maxl+1:4*loop.maxl+1:2] + [in_[loop.maxl * 4 ]]
-    i2 = out_[2 * loop.maxl + 1:4 * loop.maxl + 1:2] + [in_[loop.maxl * 4]]
+        i1 = in_[2*loop.maxl+1:4*loop.maxl+1:2] + [in_[loop.maxl * 4 ]]
+        i2 = out_[2 * loop.maxl + 1:4 * loop.maxl + 1:2] + [in_[loop.maxl * 4]]
 
-    RValid += sout + '] : '
+        RValid += sout + '] : '
 
-    DomR = isl_rel.domain()
+        DomR = isl_rel.domain()
 
-    RValid += copyconstr.GetConstrSet(i1, DomR) + ' && ' + copyconstr.GetConstr(i1, i2, isl_rel)
-
-
-    s_in_ex = ','.join(["ex%d" % i for i in range(1, loop.maxl * 4 + 2)])
-    s_out_ex = ','.join(["ex%d'" % i for i in range(1, loop.maxl * 4 + 2)])
-    ex_sin = s_in_ex.split(',')
-    ex_sout = s_out_ex.split(',')
-
-    RValid += ' && exists ' + s_in_ex + ',' + s_out_ex +  ' : ('
-
-    RValid += ' ( ' + tiling_v3.CreateLex(ex_sin, ex_sout) + ' ) && '
-
-    RValid += ' ( ' + copyconstr.GetConstr(in_, ex_sin, Rsched) + ' ) && '
-    RValid += ' ( ' + copyconstr.GetConstr(out_, ex_sout, Rsched) + ' ) '
-
-    RValid += ' ) }'
-    RValid = isl.Map(RValid).coalesce()
+        RValid += copyconstr.GetConstrSet(i1, DomR) + ' && ' + copyconstr.GetConstr(i1, i2, isl_rel)
 
 
-    if(RValid.is_empty()):
-        print colored('*** VALIDATION OK ***', 'green')
+        s_in_ex = ','.join(["ex%d" % i for i in range(1, loop.maxl * 4 + 2)])
+        s_out_ex = ','.join(["ex%d'" % i for i in range(1, loop.maxl * 4 + 2)])
+        ex_sin = s_in_ex.split(',')
+        ex_sout = s_out_ex.split(',')
+
+        RValid += ' && exists ' + s_in_ex + ',' + s_out_ex +  ' : ('
+
+        RValid += ' ( ' + tiling_v3.CreateLex(ex_sin, ex_sout) + ' ) && '
+
+        RValid += ' ( ' + copyconstr.GetConstr(in_, ex_sin, Rsched) + ' ) && '
+        RValid += ' ( ' + copyconstr.GetConstr(out_, ex_sout, Rsched) + ' ) '
+
+        RValid += ' ) }'
+        RValid = isl.Map(RValid).coalesce()
+
+
+        if(RValid.is_empty()):
+            print colored('*** VALIDATION OK ***', 'green')
+        else:
+            print colored('*** VALIDADION FAILED ***', 'red')
+            if(FSSCHEDULE == 0):
+                sys.exit(0)
+
+
+        for st in cl.statements:
+            z = st.domain_map
+
+        z = isl.Set(z)
+
+        # czy wszystkie z domain sa w TVLD_EXT    VLDUNION RELATION == v
+
+        # I nalezy do TVLD_EXT and exists i,j,v i  nalezy do domain_map i   i,j,v != I ma byc pusty
+        VLD_VAL = Rsched.range()
+
+
+        if(VALIDATION > 0):
+            tiling5_valid.Valid1(Rsched, symb, in_, out_, s_in, sout, loop)
     else:
-        print colored('*** VALIDADION FAILED ***', 'red')
-        if(FSSCHEDULE == 0):
-            sys.exit(0)
-
-
-    for st in cl.statements:
-        z = st.domain_map
-
-    z = isl.Set(z)
-
-    # czy wszystkie z domain sa w TVLD_EXT    VLDUNION RELATION == v
-
-    # I nalezy do TVLD_EXT and exists i,j,v i  nalezy do domain_map i   i,j,v != I ma byc pusty
-    VLD_VAL = Rsched.range()
-
-
-    if(VALIDATION > 0):
-        tiling5_valid.Valid1(Rsched, symb, in_, out_, s_in, sout, loop)
+        print "OK"
 
 
 
@@ -686,43 +704,45 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     par_loop = []
 
-
-    delta = isl_rel.deltas()
-    chkc = isl.Set("{[0," + ",".join(vars) + "]}")
-    delta = delta.subtract(chkc)
-
-
-    for i in range(0,loop.maxl*4,2):
-        j = -1
-        print 'c' + str(i+1),
-        Rel = Rel_base
-        tmp = ''
-        for j in range(0,i):
-            tmp += in_[j] + ' = ' + out_[j] + ' && '
-
-        tmp += ' not ( ' +  in_[j+1] + ' = ' + out_[j+1] + '  && ' + in_[j+2] + ' = ' + out_[j+2] + ' )  && '
-
-        Rel += tmp
-        Rel += copyconstr.GetConstrSet(i1, DomR) + ' && ' + copyconstr.GetConstr(i1, i2, isl_rel)
-
-        Rel += ' && ( ' + copyconstr.GetConstrSet(in_, VLD_VAL) + ' ) && '
-        Rel += ' ( ' + copyconstr.GetConstrSet(out_, VLD_VAL) + ' )  '
-
-        Rel += ' }'
-        #print Rel
-
-        Rel = isl.Map(Rel)
+    if (not isl_rel.is_empty()):
+        delta = isl_rel.deltas()
+        chkc = isl.Set("{[0," + ",".join(vars) + "]}")
+        delta = delta.subtract(chkc)
 
 
-        if(i==0):
-            Rel = delta
+        for i in range(0,loop.maxl*4,2):
+            j = -1
+            print 'c' + str(i+1),
+            Rel = Rel_base
+            tmp = ''
+            for j in range(0,i):
+                tmp += in_[j] + ' = ' + out_[j] + ' && '
 
-        if(Rel.is_empty()):
-            print colored('found!', 'green')
-            par_loop.append('c' + str(i+1))
-            #break
-        else:
-            print 'no!'
+            tmp += ' not ( ' +  in_[j+1] + ' = ' + out_[j+1] + '  && ' + in_[j+2] + ' = ' + out_[j+2] + ' )  && '
+
+            Rel += tmp
+            Rel += copyconstr.GetConstrSet(i1, DomR) + ' && ' + copyconstr.GetConstr(i1, i2, isl_rel)
+
+            Rel += ' && ( ' + copyconstr.GetConstrSet(in_, VLD_VAL) + ' ) && '
+            Rel += ' ( ' + copyconstr.GetConstrSet(out_, VLD_VAL) + ' )  '
+
+            Rel += ' }'
+            #print Rel
+
+            Rel = isl.Map(Rel)
+
+
+            if(i==0):
+                Rel = delta
+
+            if(Rel.is_empty()):
+                print colored('found!', 'green')
+                par_loop.append('c' + str(i+1))
+                #break
+            else:
+                print 'no!'
+
+
 
 
     end = time.time()

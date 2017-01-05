@@ -113,6 +113,8 @@ class Kernel_Loop:
         for i in range(0, len(lines),4):
             dep = Dependence()
             info = lines[i].split()
+            if len(info) == 0:
+                continue
             #print lines[i]
             dep.kind = info[0]
             dep.var_in = info[2]
@@ -323,6 +325,8 @@ class Kernel_Loop:
     def Get_Arrays(self):
         self.var_st = {}
         for st in self.st_lines:
+            if 'then' in st:
+                continue
             varsn = []
             varsn = functions.CollectVars(varsn, st)
             for v in varsn:
