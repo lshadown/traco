@@ -22,6 +22,8 @@ import copyconstr
 import tiling5_valid
 import tiling_schedule
 
+import agent
+
 
 ctx = isl.Context()
 
@@ -257,6 +259,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     isl_rel = loop.isl_rel
 
+
     start = time.time()
 
     # **************************************************************************
@@ -270,7 +273,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     isl_relclosure = isl_rel
     exact_rplus = True
 
-    if not isl_rel.is_empty():
+    if not isl_rel.is_empty() and rplus_mode != 'remote':
         if islrp:
             isl_relclosure = isl_rel.transitive_closure()
             exact_rplus = isl_relclosure[1]
@@ -278,6 +281,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         else:
             isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
             exact_rplus = True
+
+    if rplus_mode == 'remote':
+        isl_relclosure, exact_rplus = agent.remote_tc(isl_rel)
+
 
     isl_relplus = isl_relclosure
     end = time.time()
@@ -351,9 +358,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         # if statements before st
         domainv = isl.Set(st.domain_map)
 
-        if(domainv.dim(isl.dim_type.set)+1 == tile.dim(isl.dim_type.set)):  # todo domainmap rozszrzyc o loop.maxl
-            domainv = domainv.insert_dims(isl.dim_type.set, loop.maxl, 1)   #loop.maxl+1 - domainv.dim(isl_dim_type.set)
-            tile = tile.intersect(domainv).coalesce()
+        dimdom = domainv.dim(isl.dim_type.set)
+        domainv = domainv.insert_dims(isl.dim_type.set, dimdom, loop.maxl+1 - dimdom)
+
+        print domainv
+
+        tile = tile.intersect(domainv).coalesce()
 
         TILE.append(tile)
 
@@ -425,6 +435,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             TILE_ITRI = TILE[i].subtract(TILE_GT[i].apply(isl_relclosure)).coalesce()
         else:
             TILE_ITRI = TILE[i]
+        if(SIMPLIFY):
+            TILE_ITRI = imperf_tile.SimplifySlice(TILE_ITRI)
         TILE_ITR.append(TILE_ITRI)
 
     if(DEBUG):
@@ -629,7 +641,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # **************************************************************************
 
     print 'VALIDATION CHECKING '
-    if(not isl_rel.is_empty()):
+    if(not isl_rel.is_empty() and 1==1):
         s_in = ','.join(["i%d" % i for i in range(1, loop.maxl * 4 + 2)])
         sout = ','.join(["i%d'" % i for i in range(1, loop.maxl * 4 + 2)])
         out_ = sout.split(',')
@@ -704,7 +716,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     par_loop = []
 
-    if (not isl_rel.is_empty()):
+    if (not isl_rel.is_empty() and 1==0):
         delta = isl_rel.deltas()
         chkc = isl.Set("{[0," + ",".join(vars) + "]}")
         delta = delta.subtract(chkc)
@@ -754,7 +766,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     vars = map(str, vars)
 
     start = time.time()
-    ast = 1
+    ast = 0
     if (ast == 1):
         loop_x = iscc.isl_ast_codegen_map(Rsched)
     else:
