@@ -309,6 +309,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             color = 'yellow'
         print colored("!! exact_rplus " + str(exact_rplus), color)
 
+
     isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
 
     if (DEBUG):
@@ -367,8 +368,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         dimdom = domainv.dim(isl.dim_type.set)
         domainv = domainv.insert_dims(isl.dim_type.set, dimdom, loop.maxl+1 - dimdom)
-
         print domainv
+
 
         tile = tile.intersect(domainv).coalesce()
 
@@ -648,7 +649,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # **************************************************************************
 
     print 'VALIDATION CHECKING '
-    if(not isl_rel.is_empty() and 1==1):
+    if(not isl_rel.is_empty() and 1==0):
         s_in = ','.join(["i%d" % i for i in range(1, loop.maxl * 4 + 2)])
         sout = ','.join(["i%d'" % i for i in range(1, loop.maxl * 4 + 2)])
         out_ = sout.split(',')
@@ -676,6 +677,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         RValid += ' ( ' + copyconstr.GetConstr(out_, ex_sout, Rsched) + ' ) '
 
         RValid += ' ) }'
+
         RValid = isl.Map(RValid).coalesce()
 
 
@@ -684,6 +686,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         else:
             print colored('*** VALIDADION FAILED ***', 'red')
             if(FSSCHEDULE == 0):
+                print RValid
                 sys.exit(0)
 
 
@@ -773,7 +776,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     vars = map(str, vars)
 
     start = time.time()
-    ast = 0
+    ast = 1
     if (ast == 1):
         loop_x = iscc.isl_ast_codegen_map(Rsched)
     else:
