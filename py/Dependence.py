@@ -145,7 +145,7 @@ class Kernel_Loop:
                 continue
             if 'for ' in line:
                 infor = 1
-            if 'for ' not in line and 'if ' not in line and 'endfor' not in line and 'endif' not in line and line.strip():
+            if 'for ' not in line and 'if ' not in line and 'endfor' not in line and 'if(' not in line and 'then' not in line and 'endif' not in line and line.strip():
                 sts.append(str(i))
                 self.dane.append(str(i))
                 self.st_lines.append(line)
