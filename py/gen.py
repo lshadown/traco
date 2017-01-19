@@ -350,7 +350,7 @@ def RelPrint(file, only_tiling=0):
     cmd = path_framework + " " + file + " --relation_print --silent=1" 
     if only_tiling==1:
         cmd = cmd + " --no_sources=1" 
-    #print cmd
+    print cmd
     return Proc(cmd).call(timeout=25).stdout
 
 def RelPrint_WithPriv(file, deps_to_remove):
