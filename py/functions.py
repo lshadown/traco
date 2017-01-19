@@ -3,7 +3,7 @@ import sys
 
 VARS = []
 
-keywords = ["if", "endif", "for", "endfor", "and", "or", "max", "min", "else"]
+keywords = ["if", "endif", "for", "endfor", "and", "or", "max", "min", "else", "MAX", "MIN"]
 
 # przetwarza petle
 def Loop(loop, extra_ub = 0):
@@ -164,5 +164,8 @@ def ConvertSt(st):
     st = re.compile("\]").sub(")", st)
     st = st.replace(";", "")
     st = st.replace("%", " mod ")
+
+    st = st.replace("MAX", "myfun")
+    st = st.replace("MIN", "myfun")
 
     return st

@@ -10,6 +10,8 @@ def convert_loop(input_loop, block=[]):
     endl = []
     def_lines = []
 
+    def_lines.append('builtin integer myfun()')
+
     for_level = 0  #ktora petla for zagniezdzona
 
     
@@ -28,6 +30,7 @@ def convert_loop(input_loop, block=[]):
         line = input_loop[i]
         line = line.replace("\t", "")
         line = line.replace(" ", "")
+
         line = line.replace("elseif", " else if")
         line = line.replace("int", "")
         # usun komentarze

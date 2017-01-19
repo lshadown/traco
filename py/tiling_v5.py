@@ -237,6 +237,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print colored('R', 'green')
     print loop.isl_rel
 
+    print loop.dane
+
+
     cl = clanpy.ClanPy()
     cl.loop_path = plik
     cl.Load()
@@ -318,6 +321,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     B = (["b%d" % i for i in range(0,loop.maxl)])
 
+
+
+
     for st in cl.statements:
         if (len(st.original_iterators) == loop.maxl):
             vars = st.original_iterators
@@ -327,6 +333,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     sym_exvars = []
     sym_exvars_p = []
+    print vars
     for v in vars:
         sym_exvars.append(v*2)
         sym_exvars_p.append(v * 2 + 'p')
