@@ -32,7 +32,7 @@ def remote_tc(rel):
     ftp.put('tmp/_rel.txt', '_rel.txt')
     ftp.close()
 
-    stdin, stdout, stderr = ssh.exec_command("barvinok/iscc < log.txt")
+    stdin, stdout, stderr = ssh.exec_command("barvinok/iscc < _rel.txt")
 
     wynik = stdout.readlines()[0]
 
