@@ -11,6 +11,7 @@ import loop_tools
 import islpy as isl
 import re
 import tqdm, time
+import agent
 
 ctx = isl.Context()
 
@@ -267,16 +268,28 @@ def Get_ST(plik, dane):
     return sts
 
 
+remote = 0
+
 def SimplifySlice(slice):
     sets =  slice.get_basic_sets()
 
+    rhull = ""
+    if(remote == 1):
+        rhull= agent.remote_hull()
+
     print 'Please wait, simplification... '
-    for i in tqdm.tqdm(range(0, len(sets))):
-        for j in range(0, len(sets)):
+    #for i in tqdm.tqdm(range(0, len(sets))):
+    for i in tqdm.trange(len(sets), desc='1st loop', leave=True):
+        for j in tqdm.trange(len(sets), desc='2nd loop', leave=False):
+        #for j in range(0, len(sets)):
         #for j in range(0, len(sets)):
             if(i!=j and not sets[i].is_equal(sets[j])):
                 tmp = sets[i].union(sets[j])
-                tmp2 = tmp.polyhedral_hull()
+
+                if(remote == 1):
+                    tmp2 = rhull.hull(tmp)
+                else:
+                    tmp2 = tmp.polyhedral_hull()
                 if(tmp.is_equal(tmp2) and len(tmp2.get_basic_sets()) == 1):
                     #print "i j " + str(i) + " " + str(j) + "joinable"
                     sets[i] = tmp2
@@ -287,6 +300,9 @@ def SimplifySlice(slice):
     slice = sets[0]
     for i in range(1, len(sets)):
         slice = slice.union(sets[i]).coalesce()
+
+    if (remote == 1):
+        rhull.disconnect()
 
 
     return slice
