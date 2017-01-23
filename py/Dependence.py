@@ -325,7 +325,7 @@ class Kernel_Loop:
     def Get_Arrays(self):
         self.var_st = {}
         for st in self.st_lines:
-            if 'then' in st:
+            if 'then' in st or 'else' in st:
                 continue
             varsn = []
             varsn = functions.CollectVars(varsn, st)
@@ -350,6 +350,7 @@ class Kernel_Loop:
 
 
 def RWCheck(var, line,rw):
+    print line
     sides = line.split("=")
     pattern = re.compile("\\b"+var+"\\b")
     if pattern.match(sides[0]):
