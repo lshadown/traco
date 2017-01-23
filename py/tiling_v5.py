@@ -578,6 +578,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print colored('TILE_VLD_EXT to CodeGen', 'green')
         print TILE_VLD_EXT_union
 
+    #if(SIMPLIFY):
+    #    TILE_VLD_EXT_union= imperf_tile.SimplifySlice(TILE_VLD_EXT_union)
+
 # **************************************************************************
 
     # Optional Schedule
@@ -600,7 +603,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    #s = s.replace('i2', 'i2+i4')
+    s = s.replace('i2', 'i2+i4')
     #s = s.replace('i8', '-i8')      # tu dac dekrementacje POPRAWKA
 
 
@@ -649,7 +652,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # **************************************************************************
 
     print 'VALIDATION CHECKING '
-    if(not isl_rel.is_empty() and 1==0):
+    if(not isl_rel.is_empty() and 1==1):
         s_in = ','.join(["i%d" % i for i in range(1, loop.maxl * 4 + 2)])
         sout = ','.join(["i%d'" % i for i in range(1, loop.maxl * 4 + 2)])
         out_ = sout.split(',')
@@ -726,7 +729,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     par_loop = []
 
-    if (not isl_rel.is_empty() and 1==0):
+    if (not isl_rel.is_empty() and 1==1):
         delta = isl_rel.deltas()
         chkc = isl.Set("{[0," + ",".join(vars) + "]}")
         delta = delta.subtract(chkc)
@@ -760,7 +763,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             if(Rel.is_empty()):
                 print colored('found!', 'green')
                 par_loop.append('c' + str(i+1))
-                #break
+                break
             else:
                 print 'no!'
 
