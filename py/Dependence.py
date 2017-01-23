@@ -145,7 +145,7 @@ class Kernel_Loop:
                 continue
             if 'for ' in line:
                 infor = 1
-            if 'for ' not in line and 'if ' not in line and 'endfor' not in line and 'if(' not in line and 'then' not in line and 'endif' not in line and line.strip():
+            if 'for ' not in line and 'if ' not in line and 'endfor' not in line and 'if(' not in line and 'then' not in line and 'endif' not in line and 'else' not in line and line.strip():
                 sts.append(str(i))
                 self.dane.append(str(i))
                 self.st_lines.append(line)
@@ -159,11 +159,16 @@ class Kernel_Loop:
         combo = loop_tools.ReadStatementNests(self.plik, self.dane)
         self.instrukcje = combo[0]
 
+
+
         for item in self.instrukcje:
             if item['max_loop'] > self.maxl:
                 self.maxl = item['max_loop']
 
+
+
     def Preprocess(self, imp = '-1'):
+
         self.isl_rel = isl.Map("{[i] : false}")
         self.isl_tmp = isl.Map("{[i] : false}")
 
