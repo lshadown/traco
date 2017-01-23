@@ -350,7 +350,6 @@ class Kernel_Loop:
 
 
 def RWCheck(var, line,rw):
-    print line
     sides = line.split("=")
     pattern = re.compile("\\b"+var+"\\b")
     if pattern.match(sides[0]):
