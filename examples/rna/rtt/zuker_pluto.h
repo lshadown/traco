@@ -7,7 +7,7 @@ if (N >= 2) {
   for (t2=max(-1,ceild(-N-13,16));t2<=floord(N-1,16);t2++) {
     lbp=max(0,t2);
     ubp=min(floord(N-1,16),floord(16*t2+N+13,16));
-#pragma omp parallel for private(lbv,ubv,t5,t6,t7,t8,t9,t10,t11,t12)
+#pragma omp parallel for private(lbv,ubv,t5,t6,t7,t8,t9,t10,t11,t12, t4) shared(t2)
     for (t4=lbp;t4<=ubp;t4++) {
       if ((t2 <= floord(16*t4-N+2,16)) && (t4 >= ceild(N-13,16))) {
         V[(N-2)][(N-1)] = MIN( MIN (V[(N-2)+1][(N-1)-1], EHF[(N-2)][(N-1)]), V[(N-2)][(N-1)]);;
