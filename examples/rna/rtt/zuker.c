@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
      V[i][j] = i*j*0.004;
     }
 
-
+    omp_set_num_threads(num_proc);
 
     double start = omp_get_wtime();
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
     double stop = omp_get_wtime();
     printf("%.2f\n",stop - start);
 
-    omp_set_num_threads(4);
+
 
 
 return 0;
