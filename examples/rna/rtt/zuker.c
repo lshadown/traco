@@ -19,6 +19,7 @@ int N = 100, DIM = 102;
 #include "zuker_oryg.h"
 #include "zuker_pluto.h"
 #include "zuker_traco.h"
+#include "zuker_traco2.h"
 #include "mem.h"
 
 
@@ -56,6 +57,11 @@ int main(int argc, char *argv[]){
     omp_set_num_threads(num_proc);
 
     double start = omp_get_wtime();
+
+    if(kind == 4){
+        //printf("!!!\n");
+        zuker_traco2();
+    }
 
     if(kind == 3){
         //printf("!!!\n");
