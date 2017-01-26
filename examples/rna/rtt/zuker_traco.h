@@ -2,6 +2,7 @@ void zuker_traco(){
 
 int c1,c2,c3,c4,c5,c6,c7,c8,c9,c11,c10,c12,c13,c14,c15;
 
+/*
 for( c1 = 1; c1 < 2 * N - 2; c1 += 1)
   #pragma omp parallel for
   for( c3 = max(0, -N + c1 + 1); c3 < (c1 + 1) / 2; c3 += 1)
@@ -23,7 +24,7 @@ for( c1 = 1; c1 < 2 * N - 2; c1 += 1)
           }
         }
     }
-
+*/
 
 /*
 for( c1 = 0; c1 < N - 1; c1 += 1)
@@ -68,7 +69,7 @@ for( c1 = 0; c1 < N - 1; c1 += 1)
 
 */
 
-/*
+
 for( c1 = 0; c1 <= floord(N - 2, 8); c1 += 1)
   #pragma omp parallel for
   for( c3 = max(0, c1 - (N + 15) / 16 + 1); c3 <= c1 / 2; c3 += 1) {
@@ -255,5 +256,5 @@ for( c1 = 0; c1 <= floord(N - 2, 8); c1 += 1)
         }
     }
   }
-*/
+
 }
