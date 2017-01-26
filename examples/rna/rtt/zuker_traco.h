@@ -71,7 +71,7 @@ for( c1 = 0; c1 < N - 1; c1 += 1)
 
 
 for( c1 = 0; c1 <= floord(N - 2, 8); c1 += 1)
-  #pragma omp parallel for
+  #pragma omp parallel for shared(c1,N) private(c2,c3,c4,c5,c6,c7,c8,c9,c11,c10,c12,c13,c14,c15)
   for( c3 = max(0, c1 - (N + 15) / 16 + 1); c3 <= c1 / 2; c3 += 1) {
     if (2 * c3 == c1)
       for( c5 = 0; c5 <= min(floord(N - 4, 16), c1 / 2); c5 += 1) {
@@ -79,13 +79,17 @@ for( c1 = 0; c1 <= floord(N - 2, 8); c1 += 1)
           for( c9 = max(-N + 8 * c1 + 2, -N + 16 * c5 + 16 * c7 + 4); c9 <= min(0, -N + 8 * c1 + 16); c9 += 1) {
             for( c11 = max(8 * c1 - c9 + 1, 16 * c5 + 16 * c7 - c9 + 3); c11 <= min(N - 1, 8 * c1 - c9 + 3); c11 += 1)
               for( c15 = 16 * c5 + 16 * c7 - c9 + 2; c15 <= min(min(16 * c5 + 16 * c7 - c9 + 17, 16 * c5 + c11 - 2), c11 - 1); c15 += 1)
-                {exit(0);
+                {
+                    //printf("!!\n");
                     V[(-c9)][c11] = MIN(V[(16*c5-c9+1)][c15] + EFL[(-c9)][c11], V[(-c9)][c11]);
+                  //  exit(0);
                 }
             if (c5 == 0)
               for( c11 = 8 * c1 - c9 + 4; c11 < N; c11 += 1)
                 for( c15 = 16 * c7 - c9 + 2; c15 <= 16 * c7 - c9 + 17; c15 += 1)
+                { //printf("!!\n");
                   V[(-c9)][c11] = MIN(V[(-c9+1)][c15] + EFL[(-c9)][c11], V[(-c9)][c11]);
+                }
           }
         for( c6 = max(1, (-c1 / 2) + c5 + 2); c6 <= 2; c6 += 1) {
           if (c6 == 2) {
@@ -101,7 +105,9 @@ for( c1 = 0; c1 <= floord(N - 2, 8); c1 += 1)
             for( c9 = -N + 8 * c1 + 2; c9 <= min(0, -N + 8 * c1 + 16); c9 += 1)
               for( c11 = 8 * c1 - c9 + 1; c11 <= min(N - 1, 8 * c1 - c9 + 2); c11 += 1)
                 for( c13 = 16 * c5 - c9 + 1; c13 <= 16 * c5 - c9 + 16; c13 += 1)
+                 { //printf("!!\n");
                   W[(-c9)][c11] = MIN ( MIN(W[(-c9)][c13], W[c13+1][c11]), W[(-c9)][c11]);
+                 }
         }
       }
     for( c4 = max(0, -c1 + 2 * c3 + 1); c4 <= 2; c4 += 1) {
