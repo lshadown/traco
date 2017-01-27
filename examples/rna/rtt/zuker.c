@@ -18,6 +18,7 @@ int N = 100, DIM = 102;
 
 #include "zuker_oryg.h"
 #include "zuker_pluto.h"
+#include "zuker_pluto2.h"
 #include "zuker_traco.h"
 #include "zuker_traco2.h"
 #include "mem.h"
@@ -70,6 +71,9 @@ int main(int argc, char *argv[]){
 
     if(kind == 2)
         zuker_pluto();
+
+    if(kind == 5)
+        zuker_pluto2();
 
     if(kind == 1)
         zuker_seq();
