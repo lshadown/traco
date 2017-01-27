@@ -76,7 +76,7 @@ int main(int argc, char *argv[]){
     if(kind == 5)
         zuker_pluto2();
 
-    if(kind == 5)
+    if(kind == 6)
         zuker_pluto2a();
 
     if(kind == 1)
