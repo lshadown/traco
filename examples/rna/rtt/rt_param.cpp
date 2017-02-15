@@ -78,7 +78,6 @@ int main(int argc, char *argv[]){
 
     double start = omp_get_wtime();
 
-
 if(1==0)
     for (i = N-1; i >= 0; i--) {
      for (j = i+1; j < N; j++) {
@@ -123,7 +122,11 @@ if(1==0)
 
 
     double stop = omp_get_wtime();
-    printf("%.2f\n",stop - start);
+    printf("%.4f\n",stop - start);
+
+    FILE * plik = fopen("wyniki.csv", "a+");
+    fprintf(plik, "%i,%i,%i,%.4f\n",b1,b2,b3,stop-start);
+    fclose(plik);
 
 
     /* End of CLooG code */
