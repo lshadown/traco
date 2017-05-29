@@ -20,7 +20,7 @@ class Scop:
 
 ##############################################################################
 
-scopfile = 'gof.c'
+scopfile = 'rna_pet.c'
 
 #######################################################################
 # BARVINOK + PET
@@ -87,8 +87,8 @@ for q in rels:
 
 #rel = isl.UnionMap(rel).coalesce()
 
-#print "LD"
-#print ld
+print "LD"
+print ld
 #print "SCHEDULE"
 #print schedule
 #print "REL"
@@ -112,10 +112,10 @@ statements = re.findall(r'S_\d+', str(ld))
 
 statements = natural_sort(statements)
 
-assert len(cl.statements) == len(statements), "Pet & Clan return found different number of statements"
+#assert len(cl.statements) == len(statements), "Pet & Clan return found different number of statements"
 
-for i in range(0, len(cl.statements)):
-    cl.statements[i].pet_symbol = statements[i]
+# for i in range(0, len(cl.statements)):
+#    cl.statements[i].pet_symbol = statements[i]
 
 #######################################################################
 
@@ -128,22 +128,26 @@ items_ = []
 for item in items:
     items_.append(isl.Set('{' + item + '}'))
 
-scop_number = cl.statements[len(cl.statements)-1].scop+1
+#scop_number = cl.statements[len(cl.statements)-1].scop+1
+#print items
+#scop_number = 2;
 
-scops = []
+#scops = []
 
-for i in range(0, scop_number):
-    openscop = Scop()
-    tmp_set = isl.UnionSet('{[]}')
-    for j in range(0, len(cl.statements)):
-        if(cl.statements[j].scop == i):
-            tmp_set = items_[j].union(tmp_set)
-    openscop.LD = tmp_set.intersect(ld)
-    openscop.IND = tmp_set.intersect(ind)
+#for i in range(0, scop_number):
+ #   openscop = Scop()
+  #  tmp_set = isl.UnionSet('{[]}')
+   # for j in range(0, len(items)):
+    #    if(cl.statements[j].scop == i):
+     #       tmp_set = items_[j].union(tmp_set)
+  #  openscop.LD = tmp_set.intersect(ld)
+  #  openscop.IND = tmp_set.intersect(ind)
 
-    tmp_rel = isl.UnionMap.from_domain_and_range(tmp_set,tmp_set)
-    openscop.R = tmp_rel.intersect(rel)
-    scops.append(openscop)
+    #tmp_rel = isl.UnionMap.from_domain_and_range(tmp_set,tmp_set)
+    #openscop.R = tmp_rel.intersect(rel)
+#    scops.append(openscop)
+
+#print openscop.LD
 
 
 
