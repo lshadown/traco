@@ -268,7 +268,7 @@ def Get_ST(plik, dane):
     return sts
 
 
-remote = 0
+remote = 1
 
 def SimplifySlice(slice):
     sets =  slice.get_basic_sets()

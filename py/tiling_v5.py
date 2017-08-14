@@ -1,3 +1,4 @@
+import os, glob
 import re
 import sys
 import time
@@ -73,7 +74,7 @@ def MakeTile(st, vars, sym_exvars, symb, B):
     for i in range(0, len(vars)):
         if(i < deeploop):
             tile_part = ''
-            if(st.bounds[i]['step'] == 1):
+            if(st.bounds[i]['step'] == 1 or st.bounds[i]['step'] == '1'):
                 tile_part +=  st.bounds[i]['lb'] + ' + ' + B[i] + '*' + sym_exvars[i] + ' <= ' + vars[i] + ' <= '
                 tile_part +=  B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '-1, ' + st.bounds[i]['ub']
                 tile_part +=  ' && ' + sym_exvars[i] + ' >= 0 && '
@@ -88,7 +89,7 @@ def MakeTile(st, vars, sym_exvars, symb, B):
 
     TILE += ' 1=1 }'
 
-    print TILE
+    #print TILE
 
 
     return TILE
@@ -172,7 +173,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
     VALIDATION = 0    # levels
 
-    FSSCHEDULE = 0 # RTILE expermiental
+    FSSCHEDULE = 1 # RTILE expermiental
 
 
     LPetit = "tmp/tmp_petit"+L+".t"
@@ -237,6 +238,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print colored('R', 'green')
     print loop.isl_rel
 
+    print colored('domain R', 'green')
+    print loop.isl_rel.domain()
+    print colored('range R', 'green')
+    print loop.isl_rel.range()
+
+
     print loop.dane
 
 
@@ -261,6 +268,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     ### R^+
 
     isl_rel = loop.isl_rel
+
+
 
 
     start = time.time()
@@ -365,10 +374,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         # if statements before st
         domainv = isl.Set(st.domain_map)
+        print domainv
+
+        #if len(TILE) == 0:
+        #    domainv = isl.Set('[N] -> {[i, j, k, m]: N > 0 and 0 <= i <= -2 + N and 2 + i <= j < N and i < k <= -2 + j and k < m <= -3 - i + j + k and m < j and k < m and j-m < 30}')
 
         dimdom = domainv.dim(isl.dim_type.set)
         domainv = domainv.insert_dims(isl.dim_type.set, dimdom, loop.maxl+1 - dimdom)
-        print domainv
 
 
         tile = tile.intersect(domainv).coalesce()
@@ -379,6 +391,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     if (DEBUG):
         DebugPrint('TILE', TILE, cl.statements)
+
+
 
     # **************************************************************************
 
@@ -413,7 +427,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             TILE_GT_IJ = PARTS[0] + join_GT +  PARTS[1]
 
 
-            print TILE_LT_IJ
+            #print TILE_LT_IJ
             TILE_LT_IJ = isl.Set(TILE_LT_IJ)
             TILE_GT_IJ = isl.Set(TILE_GT_IJ)
 
@@ -447,8 +461,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             TILE_ITRI = imperf_tile.SimplifySlice(TILE_ITRI)
         TILE_ITR.append(TILE_ITRI)
 
+        #print 'R+(TILE_GT)*TILE[i]'
+        #print i
+      #  print TILE_GT[i].apply(isl_relclosure).intersect(TILE[i])
+
     if(DEBUG):
         DebugPrint('TILE_ITR', TILE_ITR, cl.statements)
+
+
 
 # **************************************************************************
 
@@ -461,6 +481,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         if(DEBUG):
             DebugPrint('TVLD_LT', TVLD_LT, cl.statements)
+
+
 
 # **************************************************************************
 
@@ -579,7 +601,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print TILE_VLD_EXT_union
 
     #if(SIMPLIFY):
-    #    TILE_VLD_EXT_union= imperf_tile.SimplifySlice(TILE_VLD_EXT_union)
+    #TILE_VLD_EXT_union= imperf_tile.SimplifySlice(TILE_VLD_EXT_union)
 
 # **************************************************************************
 
@@ -603,7 +625,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    s = s.replace('i2', 'i2+i4')
+    s = s.replace('i2', 'i2 + i4')
+    #s = s.replace('i16', 'i16p')
+   # s = s.replace('i12', 'i12+i10')
+  #  s = s.replace('i12', '2*i8+i10+i12')
     #s = s.replace('i8', '-i8')      # tu dac dekrementacje POPRAWKA
 
 
@@ -634,21 +659,81 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     RSched += s + '] : '
 
     # RFS --------------------------------
-    ss = ss.replace('i8', '-i8')
+
+
+
+   # Smith Waterman
+   # ss = ss.replace('i2', 'i2+i4')
+
+    # -------------------------
+
+
+
+   # ss = ss.replace('i8', 'i10 + i8')
+   # ss = ss.replace('i12', 'i10 + 2i8 + i12')
+   # ss = ss.replace('i4', '4*i2 + 2*i4 + i6')
+   # ss = ss.replace('i6', '5*i2 + 2*i4 + i6')
+
+    #5i1 + 2i3 + i5]}
+   # [N] -> {[i0, i1, i2, i3, i4, i5, i6] -> [2i4 - i6, i3, 3i1 + i3 + i4, i1, i5]}
+
     RFS += ss + '] : 1=1 }'
     # --------------------------------
 
+    # Smith Waterman
+    #RSched = RSched.replace(' i13 = 16 ', ' i13 = 16  and i12p = i12 + i10')
+    #RSched = RSched.replace(' i13 = 19 ', ' i13 = 19  and i12p = i12 + i8')
+   # RSched = RSched.replace(' i13 = 21 ', ' i13 = 21  and i12p = i8 + i10')
 
+    #3d
+
+    # -------------------------
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT_union) + "  }"
+    if(1==0):
 
+
+        RSched = RSched.replace(' i17 = 24 ', ' i17 = 24  and i16p = i8 + i10 + i14 ')
+        RSched = RSched.replace(' i17 = 29 ', ' i17 = 29  and i16p = i8 + i10 + i14 ')
+        RSched = RSched.replace(' i17 = 34 ', ' i17 = 34  and i16p = i8 + i12 + i14 ')
+        RSched = RSched.replace(' i17 = 39 ', ' i17 = 39  and i16p = i8 + i10 + i14 ')
+
+        RSched = RSched.replace(' i17 = 44 ', ' i17 = 44  and i16p = i8 + i12 + i14 ')
+        RSched = RSched.replace(' i17 = 49 ', ' i17 = 49  and i16p = i12 + i10 + i14 ')
+
+        RSched = RSched.replace(' i17 = 52 ', ' i17 = 52  and i16p = i8 + i10 + i12 ')
 
     print 'RSCHEDULE'
 
     print RSched
 
+
+
     Rsched = isl.Map(RSched)
     #Rsched = imperf_tile.SimplifyMap(Rsched)
 
+   # Rsched = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13] -> [i1,i2p,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12p,i13] :  ((  ( i12p = i12 + i10 and  i1 = 0 and i3 = 0 and i5 = 1 and i7 = 0 and i9 = 0 and i10 = 32i4 and i11 = 1 and i13 = 15 and i2 >= 0 and 32i4 <= N and i6 >= 0 and 32i2 <= i8 <= 31 + 32i2 and i8 <= N and 32i6 < i12 <= 32 + 32i6 and i12 <= 32i4   ) or  (i12p = i12 + i8 and  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 0 and i8 = 32i2 and i9 = 0 and i11 = 0 and i13 = 12 and 32i2 <= N and i4 >= 0 and i6 >= 0 and 32i4 <= i10 <= 31 + 32i4 and i10 <= N and 32i6 < i12 <= 32 + 32i6 and i12 <= 32i2   ) or  (  i12p = i12 + i10 and  i1 = 0 and i3 = 0 and i5 = 2 and i6 = 0 and i7 = 0 and i9 = 0 and i11 = 1 and i13 = 15 and i2 >= 0 and 32i2 <= i8 <= 31 + 32i2 and i8 <= N and 32i4 < i10 <= 31 + 32i4 and i10 <= N and 0 < i12 <= i10   ) or  (  i12p = i12 + i8 and i1 = 0 and i3 = 0 and i5 = 2 and i6 = 0 and i7 = 0 and i9 = 0 and i11 = 0 and i13 = 12 and 32i2 < i8 <= 31 + 32i2 and i8 <= N and i10 >= 32i4 and 0 <= i10 <= 31 + 32i4 and i10 <= N and 0 < i12 <= i8   ) or  ( i12p = i8 + i10 and i1 = 0 and i3 = 0 and i5 = 2 and i6 = 0 and i7 = 0 and i9 = 0 and i11 = 2 and i12 = 0 and i13 = 17 and i2 >= 0 and i4 >= 0 and 32i2 <= i8 <= 31 + 32i2 and i8 <= N and 32i4 <= i10 <= 31 + 32i4 and i10 <= N  )  ) and i2p = i2+i4   )  }'
+   # Rsched = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13] -> [i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12p,i13] :  ((  ( i12p = i12 + i10 and  i1 = 0 and i3 = 0 and i5 = 1 and i7 = 0 and i9 = 0 and i10 = 32i4 and i11 = 1 and i13 = 15 and i2 >= 0 and 32i4 <= N and i6 >= 0 and 32i2 <= i8 <= 31 + 32i2 and i8 <= N and 32i6 < i12 <= 32 + 32i6 and i12 <= 32i4   ) or  (i12p = i12 + i8 and  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 0 and i8 = 32i2 and i9 = 0 and i11 = 0 and i13 = 12 and 32i2 <= N and i4 >= 0 and i6 >= 0 and 32i4 <= i10 <= 31 + 32i4 and i10 <= N and 32i6 < i12 <= 32 + 32i6 and i12 <= 32i2   ) or  (  i12p = i12 + i10 and  i1 = 0 and i3 = 0 and i5 = 2 and i6 = 0 and i7 = 0 and i9 = 0 and i11 = 1 and i13 = 15 and i2 >= 0 and 32i2 <= i8 <= 31 + 32i2 and i8 <= N and 32i4 < i10 <= 31 + 32i4 and i10 <= N and 0 < i12 <= i10   ) or  (  i12p = i12 + i8 and i1 = 0 and i3 = 0 and i5 = 2 and i6 = 0 and i7 = 0 and i9 = 0 and i11 = 0 and i13 = 12 and 32i2 < i8 <= 31 + 32i2 and i8 <= N and i10 >= 32i4 and 0 <= i10 <= 31 + 32i4 and i10 <= N and 0 < i12 <= i8   ) or  ( i12p = i8 + i10 and i1 = 0 and i3 = 0 and i5 = 2 and i6 = 0 and i7 = 0 and i9 = 0 and i11 = 2 and i12 = 0 and i13 = 17 and i2 >= 0 and i4 >= 0 and 32i2 <= i8 <= 31 + 32i2 and i8 <= N and 32i4 <= i10 <= 31 + 32i4 and i10 <= N  )  )   )  }'
+
+    #16 16 16 16
+    #z = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 5 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 16i6 and i15 = 5 and i17 = 49 and i4 >= 0 and 16i6 < N and i8 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i8 < i16 <= i10 and i16 <= 16 + 16i8 and i16 <= 1 + 16i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 5 and i9 = 0 and i10 = 1 + 16i2 and i11 = 0 and i13 = 0 and i15 = 5 and i17 = 49 and 16i2 < N and i4 >= 0 and i8 >= 0 and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= i14 and i16 <= 16 + 16i8 and i16 <= 1 + 16i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 4 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 16i6 and i15 = 4 and i17 = 44 and i2 >= 0 and 16i6 < N and i8 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 2 + 16i4 <= i12 <= 16 + 16i4 and i12 <= N and 16i8 < i16 <= i12 and i16 <= 16 + 16i8 and i16 <= 1 + 16i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 4 and i9 = 0 and i11 = 0 and i12 = 1 + 16i4 and i13 = 0 and i15 = 4 and i17 = 44 and i2 >= 0 and 16i4 < N and i8 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= i14 and i16 <= 16 + 16i8 and i16 <= 1 + 16i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 5 and i17 = 49 and i4 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 2 + 16i6 <= i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i14 and i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 4 and i17 = 44 and i2 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 2 + 16i4 <= i12 <= 16 + 16i4 and i12 <= N and 2 + 16i6 <= i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i14 and i16 <= i12   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N  )  )   }'
+    #z1 = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 3 and i9 = 0 and i11 = 0 and i12 = 1 + 16i4 and i13 = 0 and i15 = 3 and i17 = 39 and 16i4 < N and i6 >= 0 and i8 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= i10 and i16 <= 16 + 16i8 and i16 <= 1 + 16i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 3 and i9 = 0 and i10 = 1 + 16i2 and i11 = 0 and i13 = 0 and i15 = 3 and i17 = 39 and 16i2 < N and i6 >= 0 and i8 >= 0 and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= i12 and i16 <= 16 + 16i8 and i16 <= 1 + 16i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 2 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 16i6 and i15 = 2 and i17 = 34 and i2 >= 0 and i4 >= 0 and 16i6 < N and i8 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + 16i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 3 and i17 = 39 and i6 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 2 + 16i4 <= i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i12 and i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 2 and i17 = 34 and i2 >= 0 and i4 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 2 + 16i6 <= i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i14   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N  )  )   }'
+    #z2 = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 1 and i9 = 0 and i11 = 0 and i12 = 1 + 16i4 and i13 = 0 and i15 = 1 and i17 = 29 and i2 >= 0 and 16i4 < N and i6 >= 0 and i8 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + 16i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 0 and i9 = 0 and i10 = 1 + 16i2 and i11 = 0 and i13 = 0 and i15 = 0 and i17 = 24 and 16i2 < N and i4 >= 0 and i6 >= 0 and i8 >= 0 and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + 16i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 1 and i17 = 29 and i2 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 2 + 16i4 <= i12 <= 16 + 16i4 and i12 <= N and i14 > 16i6 and 0 < i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i12   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 0 and i17 = 24 and i4 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and i14 > 16i6 and 0 < i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N  )  )   }'
+
+    # 1 8 128 16
+    #z = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 5 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 5 and i17 = 49 and i2 < N and i4 >= 0 and i8 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 128i6 < i14 <= 128 + 128i6 and i14 <= N and 16i8 < i16 <= i14 and i16 <= 16 + 16i8 and i16 <= 1 + i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 4 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i14 = 1 + 128i6 and i15 = 4 and i17 = 44 and 0 <= i2 < N and 128i6 < N and i8 >= 0 and 2 + 8i4 <= i12 <= 8 + 8i4 and i12 <= N and 16i8 < i16 <= i12 and i16 <= 16 + 16i8 and i16 <= 1 + 128i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 4 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i12 = 1 + 8i4 and i13 = 0 and i15 = 4 and i17 = 44 and 0 <= i2 < N and 8i4 < N and i8 >= 0 and 128i6 < i14 <= 128 + 128i6 and i14 <= N and 16i8 < i16 <= i14 and i16 <= 16 + 16i8 and i16 <= 1 + 8i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 4 and i17 = 44 and 0 <= i2 < N and 2 + 8i4 <= i12 <= 8 + 8i4 and i12 <= N and 2 + 128i6 <= i14 <= 128 + 128i6 and i14 <= N and 0 < i16 <= i14 and i16 <= i12   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and 0 <= i2 < N and i4 >= 0 and i6 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 128i6 < i14 <= 128 + 128i6 and i14 <= N  )  )   }'
+    #z1 = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 3 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 3 and i17 = 39 and i2 < N and i6 >= 0 and i8 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 128i6 < i14 <= 128 + 128i6 and i14 <= N and 16i8 < i16 <= i12 and i16 <= 16 + 16i8 and i16 <= 1 + i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 2 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i14 = 1 + 128i6 and i15 = 2 and i17 = 34 and 0 <= i2 < N and i4 >= 0 and 128i6 < N and i8 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + 128i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 2 and i17 = 34 and 0 <= i2 < N and i4 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 2 + 128i6 <= i14 <= 128 + 128i6 and i14 <= N and 0 < i16 <= i14   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and 0 <= i2 < N and i4 >= 0 and i6 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 128i6 < i14 <= 128 + 128i6 and i14 <= N  )  )   }'
+    #z2 = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 0 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 0 and i17 = 24 and i2 < N and i4 >= 0 and i6 >= 0 and i8 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 128i6 < i14 <= 128 + 128i6 and i14 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 1 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i12 = 1 + 8i4 and i13 = 0 and i15 = 1 and i17 = 29 and 0 <= i2 < N and 8i4 < N and i6 >= 0 and i8 >= 0 and 128i6 < i14 <= 128 + 128i6 and i14 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + 8i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 1 and i17 = 29 and 0 <= i2 < N and i6 >= 0 and 2 + 8i4 <= i12 <= 8 + 8i4 and i12 <= N and 128i6 < i14 <= 128 + 128i6 and i14 <= N and 0 < i16 <= i12   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i10 = 1 + i2 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and 0 <= i2 < N and i4 >= 0 and i6 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 128i6 < i14 <= 128 + 128i6 and i14 <= N  )  )   }'
+
+    # 8
+    #z = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 1 and i9 = 0 and i11 = 0 and i12 = 1 + 8i4 and i13 = 0 and i15 = 1 and i17 = 29 and i2 >= 0 and 8i4 < N and i6 >= 0 and i8 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N and 8i8 < i16 <= 8 + 8i8 and i16 <= 1 + 8i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 0 and i9 = 0 and i10 = 1 + 8i2 and i11 = 0 and i13 = 0 and i15 = 0 and i17 = 24 and 8i2 < N and i4 >= 0 and i6 >= 0 and i8 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N and 8i8 < i16 <= 8 + 8i8 and i16 <= 1 + 8i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 1 and i17 = 29 and i2 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 2 + 8i4 <= i12 <= 8 + 8i4 and i12 <= N and i14 > 8i6 and 0 < i14 <= 8 + 8i6 and i14 <= N and 0 < i16 <= i12   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 0 and i17 = 24 and i4 >= 0 and 2 + 8i2 <= i10 <= 8 + 8i2 and i10 <= N and 8i4 < i12 <= 8 + 8i4 and i12 <= N and i14 > 8i6 and 0 < i14 <= 8 + 8i6 and i14 <= N and 0 < i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N  )  )   }'
+    #z1 = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 3 and i9 = 0 and i11 = 0 and i12 = 1 + 8i4 and i13 = 0 and i15 = 3 and i17 = 39 and 8i4 < N and i6 >= 0 and i8 >= 0 and 2 + 8i2 <= i10 <= 8 + 8i2 and i10 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N and 8i8 < i16 <= i10 and i16 <= 8 + 8i8 and i16 <= 1 + 8i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 3 and i9 = 0 and i10 = 1 + 8i2 and i11 = 0 and i13 = 0 and i15 = 3 and i17 = 39 and 8i2 < N and i6 >= 0 and i8 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N and 8i8 < i16 <= i12 and i16 <= 8 + 8i8 and i16 <= 1 + 8i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 2 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 8i6 and i15 = 2 and i17 = 34 and i2 >= 0 and i4 >= 0 and 8i6 < N and i8 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 8i8 < i16 <= 8 + 8i8 and i16 <= 1 + 8i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 3 and i17 = 39 and i6 >= 0 and 2 + 8i2 <= i10 <= 8 + 8i2 and i10 <= N and 2 + 8i4 <= i12 <= 8 + 8i4 and i12 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N and 0 < i16 <= i12 and i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 2 and i17 = 34 and i2 >= 0 and i4 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 2 + 8i6 <= i14 <= 8 + 8i6 and i14 <= N and 0 < i16 <= i14   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N  )  )   }'
+    #z2 = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 5 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 8i6 and i15 = 5 and i17 = 49 and i4 >= 0 and 8i6 < N and i8 >= 0 and 2 + 8i2 <= i10 <= 8 + 8i2 and i10 <= N and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 8i8 < i16 <= i10 and i16 <= 8 + 8i8 and i16 <= 1 + 8i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 5 and i9 = 0 and i10 = 1 + 8i2 and i11 = 0 and i13 = 0 and i15 = 5 and i17 = 49 and 8i2 < N and i4 >= 0 and i8 >= 0 and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N and 8i8 < i16 <= i14 and i16 <= 8 + 8i8 and i16 <= 1 + 8i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 4 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 8i6 and i15 = 4 and i17 = 44 and i2 >= 0 and 8i6 < N and i8 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 2 + 8i4 <= i12 <= 8 + 8i4 and i12 <= N and 8i8 < i16 <= i12 and i16 <= 8 + 8i8 and i16 <= 1 + 8i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 4 and i9 = 0 and i11 = 0 and i12 = 1 + 8i4 and i13 = 0 and i15 = 4 and i17 = 44 and i2 >= 0 and 8i4 < N and i8 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N and 8i8 < i16 <= i14 and i16 <= 8 + 8i8 and i16 <= 1 + 8i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 5 and i17 = 49 and i4 >= 0 and 2 + 8i2 <= i10 <= 8 + 8i2 and i10 <= N and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 2 + 8i6 <= i14 <= 8 + 8i6 and i14 <= N and 0 < i16 <= i14 and i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 4 and i17 = 44 and i2 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 2 + 8i4 <= i12 <= 8 + 8i4 and i12 <= N and 2 + 8i6 <= i14 <= 8 + 8i6 and i14 <= N and 0 < i16 <= i14 and i16 <= i12   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 8i2 < i10 <= 8 + 8i2 and i10 <= N and 8i4 < i12 <= 8 + 8i4 and i12 <= N and 8i6 < i14 <= 8 + 8i6 and i14 <= N  )  )   }'
+
+  #  z = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16p,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 1 and i9 = 0 and i11 = 0 and i12 = 1 + 16i4 and i13 = 0 and i15 = 1 and i17 = 29  and i16p = i8 + i10 + i14 and i2 >= 0 and 16i4 < N and i6 >= 0 and i8 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + 16i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 0 and i9 = 0 and i10 = 1 + 16i2 and i11 = 0 and i13 = 0 and i15 = 0 and i17 = 24  and i16p = i8 + i10 + i14 and 16i2 < N and i4 >= 0 and i6 >= 0 and i8 >= 0 and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + 16i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 1 and i17 = 29  and i16p = i8 + i10 + i14 and i2 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 2 + 16i4 <= i12 <= 16 + 16i4 and i12 <= N and i14 > 16i6 and 0 < i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i12   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 0 and i17 = 24  and i16p = i8 + i10 + i14 and i4 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and i14 > 16i6 and 0 < i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52  and i16p = i8 + i10 + i12 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N  )  )   }'
+  #  z1 = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16p,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 3 and i9 = 0 and i11 = 0 and i12 = 1 + 16i4 and i13 = 0 and i15 = 3 and i17 = 39  and i16p = i8 + i10 + i14 and 16i4 < N and i6 >= 0 and i8 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= i10 and i16 <= 16 + 16i8 and i16 <= 1 + 16i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 3 and i9 = 0 and i10 = 1 + 16i2 and i11 = 0 and i13 = 0 and i15 = 3 and i17 = 39  and i16p = i8 + i10 + i14 and 16i2 < N and i6 >= 0 and i8 >= 0 and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= i12 and i16 <= 16 + 16i8 and i16 <= 1 + 16i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 2 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 16i6 and i15 = 2 and i17 = 34  and i16p = i8 + i12 + i14 and i2 >= 0 and i4 >= 0 and 16i6 < N and i8 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i8 < i16 <= 16 + 16i8 and i16 <= 1 + 16i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 3 and i17 = 39  and i16p = i8 + i10 + i14 and i6 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 2 + 16i4 <= i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i12 and i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 2 and i17 = 34  and i16p = i8 + i12 + i14 and i2 >= 0 and i4 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 2 + 16i6 <= i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i14   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52  and i16p = i8 + i10 + i12 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N  )  )   }'
+
+#    z2 = '[N]->{[i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17] -> [i1,i2 + i4,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16p,i17] :  (  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 5 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 16i6 and i15 = 5 and i17 = 49  and i16p = i12 + i10 + i14 and i4 >= 0 and 16i6 < N and i8 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i8 < i16 <= i10 and i16 <= 16 + 16i8 and i16 <= 1 + 16i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 5 and i9 = 0 and i10 = 1 + 16i2 and i11 = 0 and i13 = 0 and i15 = 5 and i17 = 49  and i16p = i12 + i10 + i14 and 16i2 < N and i4 >= 0 and i8 >= 0 and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= i14 and i16 <= 16 + 16i8 and i16 <= 1 + 16i2   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 4 and i9 = 0 and i11 = 0 and i13 = 0 and i14 = 1 + 16i6 and i15 = 4 and i17 = 44  and i16p = i8 + i12 + i14 and i2 >= 0 and 16i6 < N and i8 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 2 + 16i4 <= i12 <= 16 + 16i4 and i12 <= N and 16i8 < i16 <= i12 and i16 <= 16 + 16i8 and i16 <= 1 + 16i6   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 4 and i9 = 0 and i11 = 0 and i12 = 1 + 16i4 and i13 = 0 and i15 = 4 and i17 = 44  and i16p = i8 + i12 + i14 and i2 >= 0 and 16i4 < N and i8 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N and 16i8 < i16 <= i14 and i16 <= 16 + 16i8 and i16 <= 1 + 16i4   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 5 and i17 = 49  and i16p = i12 + i10 + i14 and i4 >= 0 and 2 + 16i2 <= i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 2 + 16i6 <= i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i14 and i16 <= i10   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 4 and i17 = 44  and i16p = i8 + i12 + i14 and i2 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 2 + 16i4 <= i12 <= 16 + 16i4 and i12 <= N and 2 + 16i6 <= i14 <= 16 + 16i6 and i14 <= N and 0 < i16 <= i14 and i16 <= i12   ) or  (  i1 = 0 and i3 = 0 and i5 = 0 and i7 = 6 and i8 = 0 and i9 = 0 and i11 = 0 and i13 = 0 and i15 = 6 and i16 = 0 and i17 = 52  and i16p = i8 + i10 + i12 and i2 >= 0 and i4 >= 0 and i6 >= 0 and 16i2 < i10 <= 16 + 16i2 and i10 <= N and 16i4 < i12 <= 16 + 16i4 and i12 <= N and 16i6 < i14 <= 16 + 16i6 and i14 <= N  )  )   }'
+    #Rsched = isl.Map(z).union(isl.Map(z2)).union(isl.Map(z1)).coalesce()
     # **************************************************************************
 
     print 'VALIDATION CHECKING '
@@ -681,13 +766,17 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         RValid += ' ) }'
 
+
         RValid = isl.Map(RValid).coalesce()
+
+
 
 
         if(RValid.is_empty()):
             print colored('*** VALIDATION OK ***', 'green')
         else:
             print colored('*** VALIDADION FAILED ***', 'red')
+            print colored(RValid, 'green')
             if(FSSCHEDULE == 0):
                 print RValid
                 sys.exit(0)
@@ -776,6 +865,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 # **************************************************************************
 
+
     vars = map(str, vars)
 
     start = time.time()
@@ -786,9 +876,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         loop_x = iscc.iscc_communicate("L :=" + str(Rsched) + "; codegen L;")
 
     print loop_x
+
+
+    # **************************************************************************
     lines = loop_x.split('\n')
 
     loop_str = []
+
 
     for line in lines:
         if line.endswith(');'):
@@ -816,6 +910,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                     s = cl.statements[i].body
 
 
+
+
             for i in range(0, len(vars)):        # todo oryginal iterators for loops with mixed indexes
                 subt = arr[2 * loop.maxl + 2 * i + 1]
                 if (('+' in subt) or ('-' in subt)):
@@ -836,20 +932,38 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print "Code Generation: time taken: ", elapsed, "seconds.\n\n"
 
     #loop_str = '\n'.join(loop_str)
+    filePaths = glob.glob(plik)
+    if(output_file != ""):
+        nazwa = output_file
+    else:
+        for filePath in filePaths:
+            base = os.path.basename(filePath)
+            nazwa = os.path.splitext(base)[0] + "_tiling" + os.path.splitext(base)[1]
+
+    text_file = open(nazwa, "w")
 
     for line in loop_str:
         if(len(par_loop) > 0):
             if('for( ' + par_loop[0] + ' ' in line):
                 print imperf_tile.get_tab(line) + colored('#pragma omp parallel for', 'green')
+                text_file.write(imperf_tile.get_tab(line) + '#pragma omp parallel for' + '\n')
         print line
+        text_file.write(line + '\n')
+
+
+    text_file.close()
+    print 'Output written to: ' + nazwa
+    sys.exit(0);
 
 ###################################################################################################
 
     if (FSSCHEDULE):
 
-        rtile = tiling_schedule.get_RTILE(Rsched.range(), sym_exvars, isl_rel, True)
+        rtile = tiling_schedule.get_RTILE(TILE_VLD_EXT_union, sym_exvars, isl_rel, True)  #Rsched.Range()
 
         rtile_ii = rtile
+
+        print rtile_ii
 
 
         for i in range(0, loop.maxl):

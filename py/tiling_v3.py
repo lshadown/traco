@@ -677,6 +677,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         else:
             dane = gen.RelPrint(LPetit, flag)
 
+
+
     output = process.stdout.read()
 
     end = time.time()
@@ -1096,6 +1098,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             print BLGT[0]
             isltmp = isl.Set(str(BLGT[0]).replace("_BLT := ", ""))
             if(bltc==0):
+                print isltmp
+                sys.exit(0)
                 isl_TILE_LT.append(isltmp)
                 bltc=1
             else:

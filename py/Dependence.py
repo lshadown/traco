@@ -326,6 +326,7 @@ class Kernel_Loop:
         gvv = gv.readstring(dot)
         gv.layout(gvv,'dot')
         gv.render(gvv,'png',nazwa + '.png')
+        gv.render(gvv, 'eps', nazwa + '.eps')
 
     def Get_Arrays(self):
         self.var_st = {}

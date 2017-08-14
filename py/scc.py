@@ -94,6 +94,7 @@ def DepGraph(j):
     gvv = gv.readstring(dot)
     gv.layout(gvv,'dot')
     gv.render(gvv,'png','tmp/scc_'+str(j)+'.png')
+    gv.render(gvv, 'eps', 'tmp/scc_' + str(j) + '.eps')
 
     return gr
 

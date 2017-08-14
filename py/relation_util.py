@@ -11,6 +11,7 @@ import copyconstr
 from subprocess import Popen, PIPE, STDOUT
 import tiling_v3
 from termcolor import colored
+import agent
 
 
 oc_proc = '~/traco/omega+/omega_calc/obj/oc < tmp/oc.txt'
@@ -50,9 +51,18 @@ def oc_IterateClosure(R):
     #outFile.write(';R^+;')
     outFile.close()
 
-    cmd = oc_proc
-    p= Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE)
-    stdout_data = p.communicate(input='')[0]
+    stdout_data = ''
+    remote = 0
+
+    if(remote == 0):
+        cmd = oc_proc
+        p= Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE)
+        stdout_data = p.communicate(input='')[0]
+    else:
+        ri = agent.remote_iterate()
+        stdout_data = ri.iterate_closure()
+        ri.disconnect()
+
 
     stdout_data = stdout_data.split('\n')
 

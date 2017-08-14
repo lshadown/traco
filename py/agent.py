@@ -52,3 +52,86 @@ def remote_tc(rel):
     ssh.close()
 
     return relp, exact
+
+
+
+class remote_hull:
+
+    ssh = False
+
+    def connect(self):
+        privatekeyfile = os.path.expanduser(cred.cred_keyfile)
+        mykey = paramiko.RSAKey.from_private_key_file(privatekeyfile)
+
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        self.ssh.connect(cred.cred_host, username=cred.cred_user, pkey=mykey)
+
+    def disconnect(self):
+        self.ssh.close()
+
+    def __init__(self):
+        self.connect()
+
+
+    def hull(self, S):
+
+        text_file = open('tmp/_rel.txt', 'w')
+        text_file.write('R := ' + str(S) + ';poly R;')
+        text_file.close()
+
+        ftp = self.ssh.open_sftp()
+        ftp.put('tmp/_rel.txt', '_rel.txt')
+        ftp.close()
+
+
+        stdin, stdout, stderr = self.ssh.exec_command("barvinok/iscc < _rel.txt")
+
+
+
+        wynik = stdout.readlines()
+
+        #print wynik
+
+        relp = isl.Set(wynik[0])
+
+        return relp
+
+
+
+class remote_iterate:
+
+    ssh = False
+
+    def connect(self):
+        privatekeyfile = os.path.expanduser(cred.cred_keyfile)
+        mykey = paramiko.RSAKey.from_private_key_file(privatekeyfile)
+
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        self.ssh.connect(cred.cred_host, username=cred.cred_user, pkey=mykey)
+
+    def disconnect(self):
+        self.ssh.close()
+
+    def __init__(self):
+        self.connect()
+
+
+    def iterate_closure(self):
+
+
+        ftp = self.ssh.open_sftp()
+        ftp.put('tmp/oc.txt', 'oc.txt')
+        ftp.close()
+
+
+        stdin, stdout, stderr = self.ssh.exec_command("./oc < tmp/oc.txt")
+
+        wynik = stdout.readlines()
+
+        tc = isl.Set(wynik[0])
+
+        return tc

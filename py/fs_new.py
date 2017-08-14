@@ -355,7 +355,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
 
     D = D.apply(rap)
 
-    D = imperf_tile.SimplifySlice(D)
+    #D = imperf_tile.SimplifySlice(D)
     D = D.coalesce()
     print rap
     print D
