@@ -626,10 +626,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     s = s.replace('i2', 'i2 + i4')
-    #s = s.replace('i16', 'i16p')
-   # s = s.replace('i12', 'i12+i10')
-  #  s = s.replace('i12', '2*i8+i10+i12')
-    #s = s.replace('i8', '-i8')      # tu dac dekrementacje POPRAWKA
+
 
 
     # *****************************************************  DECREMENTATION
