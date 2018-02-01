@@ -272,8 +272,6 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     isl_rel = loop.isl_rel
 
 
-
-
     start = time.time()
 
     # **************************************************************************
@@ -301,13 +299,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     isl_relplus = isl_relclosure
+    print 'Rplus before'
+    print isl_relplus
 
-    r1 = isl.UnionMap("[N] -> { [i, j, k, m, 20] -> [i', j', k', m', 20] : k > i and k < m <= -3 - i + j + k and m < j and i' >= 0 and j' < N and m' < j' and ((i' < k' < i and j < m' <= -3 - i' + j' + k') or (i' < i and j' > j and j' >= 3 - i + j + i' and k' > i and m' > k') or (i' <= -2 + i and j' >= 2 + j and j' >= 5 - i + j + i' and k' >= 5 + j + i' - j' and k' >= 2 + i' and m' > k')); [i, j, k, m, 20] -> [i' = i, j' = j, k', m', 20] : i >= 0 and j < N and k > i and k < m <= -3 - i + j + k and m < j and k' > k and k' < m' < j; [i, j, k, m, 20] -> [i', j' = i + j - i', k' = 0, m' = 0, 38] : k > i and k < m <= -3 - i + j + k and m < j and i' >= -3 + i and i' >= 0 and -N + i + j < i' <= i; [i, j, k, m, 20] -> [i', j', k' = i, m', 20] : k > i and k < m <= -3 - i + j + k and m < j and 0 <= i' < i and j' < N and j <= m' < j' and m' <= -3 + i - i' + j'; [i, j, k, m, 20] -> [i', j', k' = 0, m' = 0, 38] : k > i and k < m <= -3 - i + j + k and m < j and 0 <= i' < i and j' > j and 3 - i + j + i' <= j' < N; [i, j, k = 0, m = 0, 38] -> [i', j', k', m', 20] : j > i and i' >= 0 and j' < N and m' < j' and ((i' < i and j' > j and j' >= 3 - i + j + i' and k' > i and m' > k') or (i' < k' < i and m' > j and 3 - i + j + k' <= m' <= -3 - i' + j' + k') or (k' >= -1 + i and i' < k' <= i and i + j - k' <= m' <= -3 - i' + j' + k') or (i' <= -2 + i and j' >= 2 + j and j' >= 5 - i + j + i' and k' >= 5 + j + i' - j' and k' >= 2 + i' and m' > k')); [i, j, k, m, 20] -> [i' = i, j' = j, k' = k, m', 20] : i >= 0 and j < N and k > i and m > k and m < m' <= -3 - i + j + k and m' < j; [i, j, k = 0, m = 0, 38] -> [i', j', k' = 0, m' = 0, 38] : j > i and 0 <= i' < i and j' > j and 3 - i + j + i' <= j' < N; [i, j, k = 0, m = 0, 38] -> [i' = -1 + i, j' = 1 + j, k' = 0, m' = 0, 38] : i > 0 and i < j <= -2 + N }")
-    r2 = isl.UnionMap("[N] -> { [i, j, k, 0, 27] -> [i', j', k', 0, 27] : i < k <= -2 + j and i' >= 0 and j' < N and k' <= -2 + j' and ((i' < i and k' >= j) or (j < j' < i + j - i' and k' >= i + j - j') or (i' <= -2 + i and j' > j and j' >= 4 - i + j + i' and k' > i')); [i, j, k = 0, 0, 38] -> [i', j', k' = 0, 0, 41] : j > i and 0 <= i' <= i and j' >= j and -i + j + i' < j' < N; [i, j, k, 0, 27] -> [i', j' = i + j - i', k' = 0, 0, 41] : i < k <= -2 + j and i' >= 0 and -N + i + j < i' <= i; [i, j, k, 0, 27] -> [i', j', k' = 0, 0, 41] : i < k <= -2 + j and 0 <= i' <= i and j' >= j and -i + j + i' < j' < N; [i, j, k, 0, 27] -> [i', j', k' = 0, 0, 38] : i < k <= -2 + j and i' >= 0 and j' < N and ((j < j' < i + j - i') or (i' < i and j' > i + j - i') or (i' < i and j' > j and j' >= 4 - i + j + i')); [i, j, k = 0, 0, 41] -> [i', j', k' = 0, 0, 38] : j > i and i' >= 0 and j' < N and ((i' < i and j' > i + j - i') or (j < j' < i + j - i') or (i' < i and j' > j and j' >= 4 - i + j + i')); [i, j, k, 0, 27] -> [i' = i, j' = j, k', 0, 27] : i >= 0 and j < N and k > i and k < k' <= -2 + j; [i, j, k = 0, 0, 41] -> [i', j', k', 0, 27] : j > i and 0 <= i' < i and j' < N and k' <= -2 + j' and (k' >= j or (i' <= -2 + i and j' > j and k' > i')); [i, j, k = 0, 0, 38] -> [i', j' = i + j - i', k' = 0, 0, 41] : j > i and i' >= 0 and -N + i + j < i' <= i; [i, j, k = 0, 0, 38] -> [i', j', k', 0, 27] : j > i and i' >= 0 and j' < N and k' <= -2 + j' and ((i' < i and k' >= j) or (j < j' < i + j - i' and k' >= i + j - j') or (i' <= -2 + i and j' > j and j' >= 4 - i + j + i' and k' > i')); [i, j, k = 0, 0, 38] -> [i', j', k' = 0, 0, 38] : j > i and 0 <= i' < i and j < j' < N; [i, j, k, 0, 27] -> [i', j' = i + j - i', k' = 0, 0, 38] : i < k <= -2 + j and i' >= 0 and -N + i + j < i' <= i; [i, j, k = 0, 0, 41] -> [i', j', k' = 0, 0, 41] : j > i and 0 <= i' <= i and j' >= j and -i + j + i' < j' < N }")
-    r3 = isl.UnionMap("[N] -> { [i, j, k, 0, 33] -> [i', j', k', 0, 33] : i < k < j and 0 <= i' <= i and j' < N and k' < j' and (k' >= j or (i' <= -2 + i and j' >= j and k' > i')); [i, j, k = 0, 0, 41] -> [i', j', k' = 0, 0, 41] : j > i and 0 <= i' <= i and j' >= j and -i + j + i' < j' < N; [i, j, k, 0, 33] -> [i', j', k' = 0, 0, 41] : i < k < j and 0 <= i' <= i and j <= j' < N; [i, j, k = 0, 0, 41] -> [i', j', k', 0, 33] : j > i and 0 <= i' <= i and j' < N and k' < j' and (k' >= j or (i' <= -2 + i and j' >= j and k' > i')); [i, j, k, 0, 33] -> [i' = i, j' = j, k', 0, 33] : i >= 0 and j < N and k > i and k < k' < j }")
+    # lata Pugh - eksperymentalnie
+    isl_rel = isl_rel.subtract(isl_relplus.apply_domain(isl_rel))
+    isl_relplus = isl_rel.transitive_closure()
+    # ---------
 
-    isl_replus = r1.union(r2).union(r3).coalesce()
-    print '$$$$$$$$$$$$$4444'
+    print 'Rplus after'
     print isl_relplus
 
     end = time.time()
@@ -650,6 +650,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     if(sdel.is_empty()):
         print colored('Found:  i2 -> i2 + i4', 'yellow')
         s = s.replace('i2', 'i2 + i4')
+    else:
+        print colored('Failed.', 'yellow')
+
+    #s = s.replace('i2', '2*i2 + i4')
+    #s = s.replace('i10', 'i10 + i8')
+    #s = s.replace('i6', '2*i2 + i4 + i6')
+
     # *****************************************************  LOOP SKEWING
 
 
@@ -687,6 +694,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print 'RSCHEDULE'
 
     print RSched
+
+
 
 
 
@@ -910,6 +919,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     text_file.close()
     print 'Output written to: ' + nazwa
+
+
     sys.exit(0);
 
 ###################################################################################################
@@ -920,7 +931,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
         rtile_ii = rtile
 
-        print rtile_ii
+        #print rtile_ii
 
 
         for i in range(0, loop.maxl):
@@ -930,7 +941,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
         print colored('RTILE', 'green')
+
+
+
         print rtile
+
+        sys.exit(0)
 
         if islrp:
             rtileplus, exact = rtile.transitive_closure()
