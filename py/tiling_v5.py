@@ -303,8 +303,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print isl_relplus
 
     # lata Pugh - eksperymentalnie
-    isl_rel = isl_rel.subtract(isl_relplus.apply_domain(isl_rel))
-    isl_relplus = isl_rel.transitive_closure()
+    isl_rel = isl_rel.subtract(isl_relplus.apply_range(isl_rel))
+
+    print isl_rel
+    isl_relclosure = isl_rel.transitive_closure()[0]
+    isl_relplus = isl_relclosure
     # ---------
 
     print 'Rplus after'
