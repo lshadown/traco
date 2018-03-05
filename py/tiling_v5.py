@@ -173,7 +173,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
     VALIDATION = 0    # levels
 
-    FSSCHEDULE = 1 # RTILE expermiental
+    FSSCHEDULE = 0 # RTILE expermiental
+    INVERSE_TILING = 0
+
+
 
 
     LPetit = "tmp/tmp_petit"+L+".t"
@@ -271,34 +274,82 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     isl_rel = loop.isl_rel
 
+    #for i in range(0, len(cl.statements)):
+    #    print cl.statements[i].petit_line
+
+
 
     start = time.time()
 
     # **************************************************************************
 
+    RPLUSUNION = True
+    RPLUSUNION = False # NESTED strong experimental with Pugh only Valid why?
+
     exact_rplus = '-1'
-    islrp = True
-
-    if(rplus_mode == 'iterate'):
-        islrp = False
-
     isl_relclosure = isl_rel
-    exact_rplus = True
 
-    if not isl_rel.is_empty() and rplus_mode != 'remote':
-        if islrp:
-            isl_relclosure = isl_rel.transitive_closure()
-            exact_rplus = isl_relclosure[1]
-            isl_relclosure = isl_relclosure[0]
-        else:
-            isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
-            exact_rplus = True
 
-    if rplus_mode == 'remote':
-        isl_relclosure, exact_rplus = agent.remote_tc(isl_rel)
+    if(RPLUSUNION):
 
+        islrp = True
+
+        if(rplus_mode == 'iterate'):
+            islrp = False
+
+        exact_rplus = True
+
+        if not isl_rel.is_empty() and rplus_mode != 'remote':
+            if islrp:
+                isl_relclosure = isl_rel.transitive_closure()
+                exact_rplus = isl_relclosure[1]
+                isl_relclosure = isl_relclosure[0]
+            else:
+                isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
+                exact_rplus = True
+
+        if rplus_mode == 'remote':
+            isl_relclosure, exact_rplus = agent.remote_tc(isl_rel)
+
+    else: #NESTED
+        stline = []
+
+        isl_relclosure = isl.Map('{[i]->[i] : 1=0}').coalesce()
+
+        for st in cl.statements:
+            stline.append(st.petit_line)
+
+        for i in range(0, len(stline)):
+            for j in range(0, len(stline)):
+                cutrel = '{[' + ','.join(["a%d" % l for l in range(0,loop.maxl)]) + ',' + str(stline[i]) + ']->[' +  ','.join(["b%d" % l for l in range(0,loop.maxl)]) + ',' + str(stline[j]) + ']}'
+                cutrel = isl.Map(cutrel)
+                cutrel = isl_rel.intersect(cutrel).coalesce()
+
+
+                cpartplus =  cutrel.transitive_closure()
+                if not cpartplus[1]:
+                    print "iterate required"
+                    cpartplus = relation_util.oc_IterateClosure(cutrel) #iterate
+                else:
+                    cpartplus = cpartplus[0]
+
+                if isl_relclosure.is_empty():
+                    isl_relclosure = cpartplus
+                else:
+                    isl_relclosure = isl_relclosure.union(cpartplus).coalesce()
+
+
+        exact_rplus = True
+        print isl_relclosure
+
+
+
+
+    # **************************************************************************
 
     isl_relplus = isl_relclosure
+
+
     print 'Rplus before'
     print isl_relplus
 
@@ -335,9 +386,17 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     isl_relclosure = isl_relclosure.union(isl_ident).coalesce()  # R* = R+ u I
 
+
+
+
+    if(INVERSE_TILING):
+        isl_relclosure = isl_relclosure.fixed_power_val(-1).coalesce()
+
     if (DEBUG):
         print colored("R*", 'green')
         print isl_relclosure
+
+
 
 
     # **************************************************************************
@@ -462,6 +521,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         DebugPrint('TILE_GT', TILE_GT, cl.statements)
 
 
+
+    if (INVERSE_TILING):
+        tmpx = TILE_LT[:]
+        TILE_LT = TILE_GT
+        TILE_GT = tmpx
+
+
 # **************************************************************************
 
     TILE_ITR = []
@@ -577,7 +643,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     for i in range(0, len(cl.statements)):
         RMap = '{'
-        for j in range(0, i+1):
+        lbx = 0
+        ubx = i+1
+
+        if (INVERSE_TILING):
+            lbx = i
+            ubx =  len(cl.statements)
+
+        for j in range(lbx, ubx): # to przy odwrotnym tilngu moze trzeba poprawic
             RMap =  RMap +  '[' + ','.join(sym_exvars + vars) + ',' + str(cl.statements[j].petit_line) + '] -> ['
 
             scati = fix_scat(cl.statements[i].scatering, loop.maxl)
@@ -838,7 +911,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     vars = map(str, vars)
 
     start = time.time()
-    ast = 1
+    ast = 0
     if (ast == 1):
         loop_x = iscc.isl_ast_codegen_map(Rsched)
     else:
