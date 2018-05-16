@@ -16,6 +16,8 @@ import convert_loop
 import Dependence
 import clanpy
 import tiling_v5
+import iscc
+import sched_parser
 
 
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_mode = '', cpus=2):
@@ -105,6 +107,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for i in range(0, len(cl.statements)):
         cl.statements[i].petit_line = arr[i]
         cl.statements[i].bounds = tiling_v5.GetBounds(petit_loop, cl.statements[i].petit_line, BLOCK2, 0)
+        print cl.statements[i].scatering
 
 
 
@@ -120,6 +123,32 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print colored('IS', 'green')
     print IS
 
-    #SPACE
 
+    #isl schedule
+    text = 'R:= ' + str(loop.isl_rel) + '; IS := ' + str(IS) + '; schedule IS respecting R minimizing R;'
+
+    print colored('ISL output', 'green')
+
+    sched_dump = iscc.iscc_communicate(text)
+
+    print sched_dump
+
+    lines = sched_dump.split('\n')
+    sched_maps = sched_parser.parse(lines, cl, symb_prefix)
+
+
+    print colored('ISL schedules', 'green')
+
+
+
+    for m in sched_maps:
+        print m
+
+
+
+
+
+
+
+    # SPACE
 
