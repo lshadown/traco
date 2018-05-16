@@ -142,9 +142,42 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for m in sched_maps:
         print m
 
-    print loop.isl_rel.deltas()
+    SCHED = isl.UnionMap(str(sched_maps[0]))
+    for i in range(1, len(sched_maps)):
+        SCHED = SCHED.union(sched_maps[i])
+        SCHED = SCHED.coalesce()
+
+    print colored('SCHED', 'green')
+    print SCHED
+
+    #print colored('deltas R', 'green')
+
+    # SPACE
+
+    # wykryj liczbe na razie globalnie
 
 
+    D = loop.isl_rel.deltas()
+    spaces_num = sys.maxint
 
-   # SPACE
+    for i in range(0, len(cl.statements)):
+        depth = len(cl.statements[i].original_iterators)
+        nums = 0
+        for j in range(0, depth):
+            TEST = '{ S' + str(cl.statements[i].petit_line) + '[' + ','.join(cl.statements[i].original_iterators) + '] : ' + cl.statements[i].original_iterators[j] + '< 0 }'
+            TEST = isl.Set(TEST)
+
+            TEST = D.intersect(TEST)
+            if(TEST.is_empty()):
+                nums = nums + 1
+            else:
+                break  # sa ujemne
+        #print nums
+        if (nums < spaces_num):
+            spaces_num = nums
+
+    print  colored('SPACES NUMBER', 'green')
+    print  spaces_num
+
+
 
