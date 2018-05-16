@@ -1,9 +1,12 @@
+
+
 import re
 import os
 import sys
 
 import convert_loop
 import gen
+
 
 #sys.exit("Error message")
 #import glob
@@ -12,6 +15,7 @@ import tiling_v2
 import tiling_v3
 import tiling_v4
 import tiling_v5
+import time_space_tiling
 import tiling
 import scc
 import iscc
@@ -93,7 +97,7 @@ for item in sys.argv:
 
 
 if len(sys.argv) > 3:
-    if('--tiling' in sys.argv[3] or '--partile' in sys.argv[3] or '--tile' in sys.argv[3] or '--slicing' in sys.argv[3] or '--fs' in sys.argv[3]):
+    if('--tiling' in sys.argv[3] or '--partile' in sys.argv[3] or '--tile' in sys.argv[3] or '--slicing' in sys.argv[3] or '--fs' in sys.argv[3] or '--tstile' in sys.argv[3]):
 
         perfect_mode = False
         if(len(sys.argv) >= 5):
@@ -133,6 +137,10 @@ if len(sys.argv) > 3:
 
         if('--tiling5' in sys.argv[3] or partile):
             tiling_v5.tile(sys.argv[1], block, permute, "", "0", SIMPLIFY, perfect_mode, partile, rplus_mode)
+            sys.exit()
+
+        if('--tstile' in sys.argv[3] or partile):
+            time_space_tiling.tile(sys.argv[1], block, permute, "", "0", SIMPLIFY, perfect_mode, partile, rplus_mode)
             sys.exit()
 
         if('--tile' in sys.argv[3] or partile):

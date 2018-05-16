@@ -79,6 +79,24 @@ class Kernel_Loop:
             self.Get_Arrays()
 
 
+    def PreprocessPet(self):
+
+        for i in range(0, len(self.Deps)):
+            from_ = 'S' + str(self.Deps[i].from_)
+            to =  'S' + str(self.Deps[i].to)
+            rel = str(self.Deps[i].Relation)
+            rel = rel.replace('{ [', '{ '+from_+'[')  #like aka Pet
+            rel = rel.replace('> [', '> ' + to + '[')
+            self.Deps[i].Relation = isl.Map(rel)
+            print self.Deps[i].Relation
+
+
+
+        self.isl_rel = isl.UnionMap(str(self.Deps[0].Relation))
+        for i in range(1, len(self.Deps)):
+            self.isl_rel = self.isl_rel.union(self.Deps[i].Relation)
+            self.isl_rel = self.isl_rel.coalesce()
+
 
 
     def Load_Deps(self):
