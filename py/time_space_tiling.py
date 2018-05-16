@@ -14,6 +14,8 @@ except ImportError, e:
 
 import convert_loop
 import Dependence
+import clanpy
+import tiling_v5
 
 
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_mode = '', cpus=2):
@@ -34,12 +36,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     LPetit = "tmp/tmp_petit"+L+".t"
 
     BLOCK = block.split(',')
+    BLOCK2 = BLOCK
 
     for i in range(len(BLOCK),10):
         BLOCK.append(BLOCK[len(BLOCK)-1])
-
-    BLOCK2 = [0,6,6]
-    # BLOCK2 = BLOCK
 
 
     linestring = open(plik, 'r').read()
@@ -88,4 +88,38 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     print colored('R', 'green')
     print loop.isl_rel
+
+    isl_symb = loop.Deps[0].Relation.get_var_names(isl.dim_type.param)
+
+    symb_prefix = ''
+    if len(isl_symb) > 0:
+        symb_prefix = '[' + ','.join(isl_symb) + '] -> '
+
+    cl = clanpy.ClanPy()
+    cl.loop_path = plik
+    cl.Load()
+
+
+    arr = map(int, loop.dane)
+    arr = sorted(list(set(arr)))
+    for i in range(0, len(cl.statements)):
+        cl.statements[i].petit_line = arr[i]
+        cl.statements[i].bounds = tiling_v5.GetBounds(petit_loop, cl.statements[i].petit_line, BLOCK2, 0)
+
+
+
+    for i in range(0, len(cl.statements)):
+        cl.statements[i].domainpet = isl.Set(symb_prefix + ' { S'+ str(cl.statements[i].petit_line) +'[' + ','.join(cl.statements[i].original_iterators) +'] : ' + cl.statements[i].domain + '}')
+        #print cl.statements[i].domainpet
+
+    IS = isl.UnionSet(str( cl.statements[0].domainpet))
+    for i in range(1, len( cl.statements)):
+        IS = IS.union(cl.statements[i].domainpet)
+        IS = IS.coalesce()
+
+    print colored('IS', 'green')
+    print IS
+
+    #SPACE
+
 

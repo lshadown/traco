@@ -173,7 +173,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     AGGRESSIVE_SIMPLIFY = False # TODO simpl_ub
     VALIDATION = 0    # levels
 
-    FSSCHEDULE = 0 # RTILE expermiental
+    FSSCHEDULE = 1 # RTILE expermiental
     INVERSE_TILING = 0
 
 
@@ -248,6 +248,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print colored('range R', 'green')
     print loop.isl_rel.range()
 
+    IS = loop.isl_rel.domain().union(loop.isl_rel.range())
+    s = IS.compute_schedule(loop.isl_rel, loop.isl_rel)
+
+    #print s
+    #sys.exit(0)
+
+
 
     print loop.dane
 
@@ -262,6 +269,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     arr = map(int, loop.dane)
     arr = sorted(list(set(arr)))
     i=0
+
+
     for i in range(0, len(cl.statements)):
         cl.statements[i].petit_line = arr[i]
         cl.statements[i].bounds = GetBounds(petit_loop, cl.statements[i].petit_line, BLOCK2, AGGRESSIVE_SIMPLIFY)
@@ -725,11 +734,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     if(sdel.is_empty()):
         print colored('Found:  i2 -> i2 + i4', 'yellow')
-        s = s.replace('i2', 'i2 + i4')
+        #s = s.replace('i2', 'i2 + i4')
     else:
         print colored('Failed.', 'yellow')
 
-    #s = s.replace('i2', '2*i2 + i4')
+    s = s.replace('i2', '2*i2 + i4')
+    #s = s.replace('i4', 'i6')
     #s = s.replace('i10', 'i10 + i8')
     #s = s.replace('i6', '2*i2 + i4 + i6')
 
@@ -997,7 +1007,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print 'Output written to: ' + nazwa
 
 
-    sys.exit(0);
+   # sys.exit(0);
 
 ###################################################################################################
 
