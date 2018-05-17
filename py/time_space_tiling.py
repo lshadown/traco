@@ -235,8 +235,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
         TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'i0')
         tmp = str(TIMES[i])
-        tmp = tmp.replace('}', " && 16c<=i1<=16*(c+1)-1 && i0=i0' }" )
-        print tmp
+        tmp = tmp.replace('}', " && 16c<=i1<=16*(c+1)-1 && i0=i0' }" )  # podmien na bloki
         TIMES[i] = isl.Map(tmp).range()
 
     print colored("SCHED_1:=SCHED^-1", 'green')
@@ -245,9 +244,36 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print s
 
 
-    print colored("TIME", 'green')
+    print colored("TIMEi", 'green')
 
     for s in TIMES:
         print s
 
     ######################################### TIMES experimental code
+
+    print colored("TIME", 'green')
+
+    TIME = isl.UnionSet(str(TIMES[i]))
+    for i in range(1, len(TIMES)):
+        TIME = TIME.union(TIMES[i])
+        TIME = TIME.coalesce()
+
+    print TIME
+
+    #########################################
+
+    TILES = []
+
+    for i in range(0, len(TIMES)):
+        TILES.append(TIMES[i])
+        for j in range(0, spaces_num):
+            TILES[i] = TILES[i].intersect(SPACES['S' + str(cl.statements[i].petit_line)][j]).coalesce()
+
+
+    TILE = isl.UnionSet(str(TILES[0]))
+    for i in range(1, len(TILES)):
+        TILE = TILE.union(TILES[i])
+        TILE = TILE.coalesce()
+
+    print colored("TILE", 'green')
+    print TILE
