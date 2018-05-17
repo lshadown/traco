@@ -295,7 +295,23 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         for i in range(0, len(strTILE)):
             if s in strTILE[i]:
                 res = re.findall(r'S\d+\[[^\]]+', strTILE[i])
-                strTILE[i] = strTILE[i].replace(res[0], s + '[' + ','.join(st.original_iterators))
+
+                a = st.scatering
+                b = st.original_iterators
+
+                if(len(a)<cl.maxdim+1):
+                    for k in range(len(a), cl.maxdim+1):  #wyrownaj zerami
+                        a.append(u'0')
+
+                if(len(b)<cl.maxdim):
+                    for k in range(len(b), cl.maxdim):  #wyrownaj zerami
+                        b.append(u'0')
+
+                c = a + b         #scatter
+                c[::2] = a
+                c[1::2] = b
+
+                strTILE[i] = strTILE[i].replace(res[0], s + '[' + ','.join(c))
                 res = res[0].split('[')[1].replace(' ', '').split(',')
                 for r in res:
                     if '=' in r:
@@ -307,6 +323,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     TILE = ';'.join(strTILE)
+    print TILE
+
 
     #####################################################
 
@@ -336,6 +354,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print colored("MAP", 'green')
     print TILE
 
-    loop_x = iscc.iscc_communicate("L :=" + str(TILE) + "; codegen L;")
+    print 'MAP in ISL'
+    print isl.UnionMap(TILE).coalesce()
+
+    #loop_x = iscc.iscc_communicate("L :=" + str(TILE) + "; codegen L;")
+    #print loop_x
+
+    print colored("ISL AST", 'green')
+
     loop_x = iscc.isl_ast_codegen_map(isl.UnionMap(TILE))
     print loop_x
