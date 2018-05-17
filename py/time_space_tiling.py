@@ -20,6 +20,17 @@ import iscc
 import sched_parser
 
 
+def MakesSpaceConstr(st, vars, sym_exvars, symb, B, i):
+
+    tile_part = ' && '
+    #    if(st.bounds[i]['step'] == 1 or st.bounds[i]['step'] == '1'):
+    tile_part +=  st.bounds[i]['lb'] + ' + ' + B[i] + '*' + sym_exvars[i] + ' <= ' + vars[i] + ' <= '
+    tile_part +=  B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '-1, ' + st.bounds[i]['ub']
+    tile_part +=  ' && ' + sym_exvars[i] + ' >= 0 }'
+    return tile_part
+
+
+
 def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_mode = False, parallel_option = False, rplus_mode = '', cpus=2):
 
     print ''
@@ -179,5 +190,64 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print  colored('SPACES NUMBER', 'green')
     print  spaces_num
 
+    # vars
+
+    vars = []
+    sym_exvars = []
+
+    for st in cl.statements:
+        if (len(st.original_iterators) == loop.maxl):
+            vars = st.original_iterators
+            break
+
+    for v in vars:
+        sym_exvars.append(v * 2)
+
+    ##################################
+
+    SPACES = {}
+
+    for st in cl.statements:
+        tmpspaces = []
+        for i in range(0, spaces_num):
+            space = st.domainpet
+            space = space.insert_dims(isl.dim_type.param, 0, 1)
+            space = space.set_dim_name(isl.dim_type.param, 0, sym_exvars[i])
+            space = str(space)
+            space = space.replace('}', MakesSpaceConstr(st, vars, sym_exvars, isl_symb, BLOCK, i))
+            space = isl.Set(space)
+
+            tmpspaces.append(space)
+            print space
+
+        SPACES["S" + str(st.petit_line)] = tmpspaces
+
+    ##################################
+
+    sched_maps_i = sched_maps  #SCHED_1 SCHED_2
+    TIMES = []
+
+    for i in range(0, len(sched_maps_i)):
+        sched_maps_i[i] = sched_maps_i[i].fixed_power_val(-1).coalesce()
+        TIMES.append(sched_maps_i[i])
+        TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
+        TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'c')
+        TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
+        TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'i0')
+        tmp = str(TIMES[i])
+        tmp = tmp.replace('}', ' && 16c<=i1<=16*(c+1)-1 && i0=i0'' }')
+        print tmp
+        TIMES[i] = isl.Map(tmp).range()
+
+    print colored("SCHED_1:=SCHED^-1", 'green')
+
+    for s in sched_maps_i:
+        print s
 
 
+    print colored("TIME", 'green')
+
+    for s in TIMES:
+        print s
+
+    ######################################### TIMES experimental code
