@@ -278,3 +278,64 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     print colored("TILE", 'green')
     print TILE
+    print "Making MAP %%%"
+
+    ###########################################
+
+    # MAKE MAP
+
+    TILE = str(TILE).split('->')[1]
+
+    # j=i-i0 crazy thing
+
+    ####################################################   wstawia oryginalne iteratory, dodaje rownania i scattering
+    strTILE = TILE.split(';')
+    for st in cl.statements:
+        s = 'S' + str(st.petit_line)
+        for i in range(0, len(strTILE)):
+            if s in strTILE[i]:
+                res = re.findall(r'S\d+\[[^\]]+', strTILE[i])
+                strTILE[i] = strTILE[i].replace(res[0], s + '[' + ','.join(st.original_iterators))
+                res = res[0].split('[')[1].replace(' ', '').split(',')
+                for r in res:
+                    if '=' in r:
+                        strTILE[i] = strTILE[i].replace(':', ': ' + r + ' and ')
+                break
+            else:
+                continue
+
+
+
+    TILE = ';'.join(strTILE)
+
+    #####################################################
+
+    arr = []
+    arr.append('t')
+    timet = []
+    for i in range(0, spaces_num):
+        arr.append(sym_exvars[i])
+        timet.append(sym_exvars[i])
+    arr.append('i0')
+    arr.append('c,')
+    arr = ','.join(arr)
+
+    TILE = TILE.replace('[', '[' + arr)
+
+
+
+    timet = ' t = ' + '+'.join(timet)
+
+
+    TILE = symb_prefix + TILE.replace(':' , ':' + timet + ' and ')
+
+    for st in cl.statements:
+        s = 'S' + str(st.petit_line)
+        TILE = TILE.replace(s, s + '[' + ','.join(st.original_iterators) + '] -> ')
+
+    print colored("MAP", 'green')
+    print TILE
+
+    loop_x = iscc.iscc_communicate("L :=" + str(TILE) + "; codegen L;")
+    loop_x = iscc.isl_ast_codegen_map(isl.UnionMap(TILE))
+    print loop_x
