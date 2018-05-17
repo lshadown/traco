@@ -235,7 +235,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
         TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'i0')
         tmp = str(TIMES[i])
-        tmp = tmp.replace('}', ' && 16c<=i1<=16*(c+1)-1 && i0=i0'' }')
+        tmp = tmp.replace('}', " && 16c<=i1<=16*(c+1)-1 && i0=i0' }" )
         print tmp
         TIMES[i] = isl.Map(tmp).range()
 
