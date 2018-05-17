@@ -215,10 +215,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             space = space.set_dim_name(isl.dim_type.param, 0, sym_exvars[i])
             space = str(space)
             space = space.replace('}', MakesSpaceConstr(st, vars, sym_exvars, isl_symb, BLOCK, i))
+            print space
             space = isl.Set(space)
 
             tmpspaces.append(space)
-            print space
+            #print space
 
         SPACES["S" + str(st.petit_line)] = tmpspaces
 
