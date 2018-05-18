@@ -476,4 +476,4 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         del d.Relation
 
 
-
+    print '--------------------------------------------------------'

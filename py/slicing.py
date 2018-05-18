@@ -3,15 +3,28 @@
 import sys
 import re
 import os
+
+
+try:
+    import islpy as isl
+except ImportError, e:
+    print e
+    print "pip install ispy"
+    sys.exit()
+
+ctx = isl.Context()
+
+
+
 import Dependence
+
 
 import tiling_v3
 import iscc
 import convert_loop
-import gen
-import subprocess
+
 import imperf_tile
-import loop_tools
+
 
 
 
@@ -23,14 +36,6 @@ import fs_new
 import relation_util
 
 
-try:
-    import islpy as isl
-except ImportError, e:
-    print e
-    print "pip install ispy"
-    sys.exit()
-
-ctx = isl.Context()
 
 
 
@@ -401,4 +406,3 @@ def GetRapply(vars, instrukcje, i):
     isl_Rapply = isl.Map(R)
     #print isl_Rapply
     return isl_Rapply
-

@@ -1,4 +1,11 @@
 import islpy as isl
+ctx = isl.Context()
+from pygraph.classes.digraph import digraph
+
+from pygraph.readwrite.dot import write
+import functions
+from easyprocess import Proc
+import gen
 
 
 import re
@@ -8,18 +15,11 @@ import loop_tools
 import scc
 
 import gv
-from pygraph.classes.graph import graph
-from pygraph.classes.digraph import digraph
-from pygraph.algorithms.searching import breadth_first_search
-from pygraph.readwrite.dot import write
-from pygraph.algorithms.accessibility import mutual_accessibility
-from pygraph.algorithms.cycles import find_cycle
 
-import iscc
-import tiling_v3
-import functions
-from easyprocess import Proc
-import gen
+
+
+
+
 
 path_issf = os.path.dirname(os.path.realpath(__file__))[:-3]
 path_petit_rel = path_issf + "/petit/obj/petit -bg -4 "
@@ -27,6 +27,8 @@ path_petit_rel = path_issf + "/petit/obj/petit -bg -4 "
 def Petit_Rel(file):
     cmd = path_petit_rel + " " + file
     return Proc(cmd).call(timeout=5).stdout
+
+
 
 class Dependence:
 
@@ -57,15 +59,17 @@ class Kernel_Loop:
     nests = []
     dane = []
     plik = ""
+
     maxl = 0
     imperf = 0
     lines_deps = []
     st_lines = []  # statements in a loop
     var_st = []  # arrays and variables in a loop
-    isl_rel = isl.Map("{[i] : false}")
+    isl_rel = ''
     symb = []
 
     def __init__(self,plik,short_mode=0):
+        isl.Map("{[i] : false}")
         self.plik = plik
 
         self.Load_Deps()
@@ -232,70 +236,6 @@ class Kernel_Loop:
 
 
 
-
-
-            '''
-            # --------------------------------------------------
-            b = dep.Relation.power()
-            print b
-
-            if(b[1] == 0):
-                print "UNNOWN"
-                sys.exit()
-            z = isl.Map(iscc.RepairRk(str(b[0]), 0))
-            z = z.set_dim_name(isl.dim_type.param,0, "k" + str(ii))
-
-            ---
-
-            -z = z.insert_dims(isl.dim_type.in_, 0, 1)
-            -z = z.insert_dims(isl.dim_type.out, 0, 1)
-            -z = z.set_dim_name(isl.dim_type.in_, 0, "_i1")
-            -z = z.set_dim_name(isl.dim_type.out, 0, "_i2")
-            -z = z.set_dim_name(isl.dim_type.out, 1, "o2")
-
-            -c= isl.Constraint.eq_from_names(z.get_space(), {"_i1": 1, "_i2":-1, 1:-1})
-
-            -z = z.add_constraint(c)
-            -c= isl.Constraint.eq_from_names(z.get_space(), {"_i1": 1, "k" + str(ii):-1})
-            -z = z.add_constraint(c)
-            ---
-
-            z = z.coalesce()
-            #tmp_r = "[k" + str(ii) + "]->{[i1,i2,i3]->[i1,i2,i3] : k"+str(ii)+" = 0}"
-            #tmp_r = isl.Map(tmp_r)
-            #z = z.union(tmp_r).coalesce()
-
-
-            print 'R' + str(ii) + ' := ' + str(z) + ';'
-
-            if(ii==1):
-                self.isl_tmp = z
-            else:
-                self.isl_tmp = self.isl_tmp.apply_range(z).coalesce()
-
-            ii = ii+1
-            # --------------------------------------------------------
-            '''
-
-        '''
-        print self.isl_tmp
-
-        z = isl.Set(str("[i1,i2] ->{[i1,i2,v]}"))
-        z1 = isl.Set(str("[i1,i2] -> {[i1+1,i2,v]}"))
-        print z
-        w = z.apply(self.isl_tmp).intersect(z1)
-
-        isl_symb = w.get_var_names(isl.dim_type.param)
-        print w
-        for ii in range(1, len(self.Deps)+1):
-            s = "k" + str(ii)
-            l = w.plain_is_fixed(isl.dim_type.param, isl_symb.index(s))
-            print s + " = " + str(l)
-
-
-        sys.exit()
-        '''
-
         self.symb = isl_symb = self.isl_rel.get_var_names(isl.dim_type.param)
         #print self.symb
 
@@ -366,8 +306,6 @@ class Kernel_Loop:
                     if not (( 'if' in st) and ('then' in st)):
                         rw = RWCheck(v, st, [0,0])
                         self.var_st.update({v:rw})
-
-
 
 
 
@@ -451,147 +389,6 @@ def Create_LD_petit(L, petit_loop):
 
 
 
-
-'''
-plik = "/home/marek/tmp/tmp_petit0.t"
-loop = Kernel_Loop(plik)
-loop.Load_Deps()
-loop.Load_instrukcje()
-loop.Preprocess()
-loop.Get_Arrays()
-
-print loop.var_st
-
-
-#sys.exit()
-
-
-for d in loop.Deps:
-    #print d.Relation
-    #print d.delta
-
-    ds = isl.Set(d.delta.split("dd:")[1])
-    if(not is_uniform(ds)):
-        #print ds
-
-        vec = d.vector.replace("(", "")
-        vec = vec.replace(")", "")
-        vec = vec.split(",")
-
-        delta_box = []
-        for i in range(0,len(vec)):
-            delta_box.append([])
-            if vec[i] == '+':
-                tmp = str(ds.dim_min(i))
-                tmp = clear_pw(tmp)
-                delta_box[i] = [tmp]
-            if vec[i] == '*':
-                delta_box[i] = [-1,0,1]
-            if vec[i] == '0-':
-                delta_box[i] = [-1, 0]
-            if vec[i] == '0+':
-                delta_box[i] = [0, 1]
-            if vec[i] == '-':
-                tmp = str(ds.dim_max(i))
-                tmp = clear_pw(tmp)
-                delta_box[i] = [tmp]
-
-        print delta_box
-        print d.vector
-        print d.delta
-        #print d.Relation
-
-        rel_cross = "{["
-
-        for i in range(0,len(vec)+1):
-            rel_cross = rel_cross + "i" + str(i) + ","
-        rel_cross = rel_cross[:-1] + "] -> ["
-
-        for i in range(0,len(vec)+1):
-            rel_cross = rel_cross + "o" + str(i) + ","
-
-        rel_cross = rel_cross[:-1] + "] : "
-
-        for i in range(0, len(delta_box)):
-            if delta_box[i] == []:
-                continue
-            else:
-                rel_cross = rel_cross + " ("
-                for d_item in delta_box[i]:
-                    rel_cross = rel_cross + "o" + str(i) + "= i" + str(i) + "+" + str(d_item) + " or "
-                rel_cross = rel_cross[:-3] + " ) and "
-        rel_cross = rel_cross + " True }"
-
-        d.user1 =  d.Relation.intersect(isl.Map(rel_cross)).coalesce()
-
-    else:
-        d.user1 = d.Relation
-
-
-
-
-rel = loop.Deps[0].user1
-
-for i in range(0, len(loop.Deps)):
-    rel = rel.union(loop.Deps[i].user1).coalesce()
-
-
-#rel2 = "{[i,j,k,v] -> [i,j',k',v]}"
-#rel = rel.intersect(isl.Map(rel2)).coalesce()
-print rel
-
-
-
-rel_plus = rel.transitive_closure()
-print rel_plus
-print rel.power()
-
-
-
-
-if(True):
-    rk = rel.power()  #Rk
-    if(rk[1]==0):
-        print "rk approximated..."
-    rk = rk[0].coalesce()
-    #uds = slicing.Create_UDS(rel)
-    print uds
-
-    rk = isl.Map(iscc.RepairRk(str(rk), 0)) # przesun k do symb
-    sk = uds.apply(rk).subtract(uds.apply(rk).apply(rel_plus)).coalesce()
-
-    sk = sk.insert_dims(isl.dim_type.set, 0, 1)
-    sk = sk.set_dim_name(isl.dim_type.set, 0, "ink")
-
-    c = isl.Constraint.eq_from_names(sk.get_space(), {"k": -1, "ink":1})
-    sk = sk.add_constraint(c)
-    sk = tiling_v3.Project(sk, ["k"])
-
-    uds = uds.insert_dims(isl.dim_type.set, 0, 1)
-    uds = uds.set_dim_name(isl.dim_type.set, 0, "ink")
-
-    c= isl.Constraint.eq_from_names(sk.get_space(), {1: 0, "ink":1})
-    uds = uds.add_constraint(c)
-
-    sk = sk.union(uds).coalesce()
-
-    #sk = imperf_tile.SimplifySlice(sk)
-
-    nloop = iscc.iscc_communicate("L :=" + str(sk) + "; codegen L;")
-
-
-    # CODEGEN
-    nloop = tiling_v3.postprocess_loop(nloop.split('\n'))
-    print nloop
-
-#print loop.SCC()
-#loop.DrawGraph('11')
-
-
-
-
-
-'''
 
 
 

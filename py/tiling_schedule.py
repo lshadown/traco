@@ -11,7 +11,7 @@ import re
 #from subprocess import call
 
 import iscc
-#import sys
+import sys
 import tiling
 import tiling_v3
 
@@ -1181,4 +1181,3 @@ def tile_par3(isl_TILEbis, sym_exvars, isl_rel, isl_relplus, isl_relclosure, Ext
     
 
 
-    
