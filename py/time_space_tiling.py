@@ -15,6 +15,7 @@ except ImportError, e:
 import convert_loop
 import Dependence
 import clanpy
+import tiling_v3
 import tiling_v5
 import iscc
 import sched_parser
@@ -417,7 +418,46 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             line = line.replace('for (int', 'for(')
             loop_str.append(line)
 
-        # *********** post processing ****************
+    # *********** post processing end ****************
 
     for line in loop_str:
         print line
+
+    # VALIDITY
+
+    # Lex_Neg2:=[N]->{ [i0, i1]: (i0=0 and i1=0 ) or i0<0  or i0=0 and i1<0 };
+
+    lexvar = ["i%d" % i for i in range(0, spaces_num)]
+
+    lexneg = '{[' + ','.join(lexvar) + '] : ('
+
+    for i in range(0, spaces_num):
+        lexneg += lexvar[i] + '=0' + ' and '
+
+    lexneg += '1=1) or '
+
+    for i in range(0, spaces_num):
+        lexneg += lexvar[i] + ' < 0 and '
+        for j in range(0, i):
+            lexneg += lexvar[j] + ' = 0 and '
+        lexneg += ' 1 = 1 or '
+    lexneg += ' 1 = 0 }'
+
+    lexneg = isl.Set(lexneg)
+
+    print lexneg
+
+    #VALIDITY
+
+    C =  (SCHED.fixed_power_val(-1).apply_range(loop.isl_rel)).apply_range(SCHED)
+
+    P = C.deltas().intersect(lexneg).coalesce()
+
+    if P.is_empty():
+        print colored('VALIDATION OK', 'green')
+    else:
+        print colored('VALIDATION FAILED !!', 'red')
+
+
+
+
