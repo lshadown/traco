@@ -1,16 +1,16 @@
 import tiling
-import subprocess
+#import subprocess
 import gen
 import glob, os
 import correct
-import convert_loop
+#import convert_loop
 import re
-import shutil
-from easyprocess import Proc
-from subprocess import call
+#import shutil
+#from easyprocess import Proc
+#from subprocess import call
 
 import iscc
-import sys
+#import sys
 import tiling_v3
 
 
