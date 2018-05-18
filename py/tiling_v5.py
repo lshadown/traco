@@ -1006,8 +1006,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     text_file.close()
     print 'Output written to: ' + nazwa
 
+    for d in loop.Deps:
+        del d.Relation
 
-   # sys.exit(0);
+    sys.exit(0);
 
 ###################################################################################################
 
