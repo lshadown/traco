@@ -1,18 +1,35 @@
-import convert_loop
-import convert_loop
+try:
+    import islpy as isl
+except ImportError, e:
+    print e
+    print "pip install ispy"
+    sys.exit()
+
+
+# nowosc isl w pythonie do testow
+
+ctx = isl.Context()
+
 import sys
+import subprocess
+import re
+import glob, os
+import os.path
+import time
+
+import convert_loop
+
 
 import functions
 import gen
-import subprocess
-import re
 
-import glob, os
-import shutil
+
+
+
 import loop_tools
 import priv_engine
-import time
-import os.path
+
+
 
 import iscc
 
@@ -47,17 +64,7 @@ import slicing
 from CPython import codegen
 
 
-try:
-    import islpy as isl
-except ImportError, e:
-    print e
-    print "pip install ispy"
-    sys.exit()
 
-
-# nowosc isl w pythonie do testow
-
-ctx = isl.Context()
 
 
 schedule_mode = 0

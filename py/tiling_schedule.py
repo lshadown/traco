@@ -1,4 +1,5 @@
-import tiling
+import islpy as isl
+ctx = isl.Context()
 #import subprocess
 import gen
 import glob, os
@@ -11,6 +12,7 @@ import re
 
 import iscc
 #import sys
+import tiling
 import tiling_v3
 
 
@@ -22,8 +24,7 @@ import slicing
 import fs_rk
 #import fs_karl
 
-import islpy as isl
-ctx = isl.Context()
+
 
 
 
