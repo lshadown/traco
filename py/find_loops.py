@@ -5,7 +5,9 @@ import os
 import sys
 
 import convert_loop
+
 import gen
+
 
 
 #sys.exit("Error message")
@@ -80,6 +82,8 @@ if('--simplify' in sys.argv):
 
 scop = False
 acc = False  # OpenACC suport
+
+
 
 for item in sys.argv:
     if "--scop" in item:

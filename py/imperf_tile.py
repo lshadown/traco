@@ -3,15 +3,31 @@
 #Z1 := dom (W1 << W2);
 #Z1 := Z1 = W1;
 #Z1;
-import tiling
+#import tiling
+import sys
+
 import subprocess
 import re
-import sys
+import tqdm
+
 import loop_tools
-import islpy as isl
+
+
+
+try:
+    import islpy as isl
+except ImportError, e:
+    print e
+    print "pip install ispy"
+    sys.exit()
+
 import re
-import tqdm, time
+import time
 import agent
+
+
+
+
 
 ctx = isl.Context()
 

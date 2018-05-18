@@ -3,23 +3,31 @@ import re
 import subprocess
 import functions
 import shutil
+import sys
 import correct
+
+
 import loop_tools
+
 import imperf_tile
+
 import os
 import iscc
 
 # Import graphviz
-import sys
+
 #sys.path.append('..')
 #sys.path.append('/usr/lib/graphviz/python/')
 #sys.path.append('/usr/lib64/graphviz/python/')
 import gv
 
 import islpy as isl
-import tiling_v3
-ctx = isl.Context()
 
+
+
+import tiling_v3
+
+ctx = isl.Context()
 
 
 

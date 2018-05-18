@@ -13,6 +13,8 @@ import subprocess
 import imperf_tile
 import loop_tools
 
+
+
 from CPython import codegen
 import openacc
 
@@ -27,7 +29,10 @@ except ImportError, e:
     print e
     print "pip install ispy"
     sys.exit()
-    ctx = isl.Context()
+
+ctx = isl.Context()
+
+
 
 def SymbolicTuple(n):
     symb = []
@@ -104,6 +109,8 @@ def Create_Srepr(isl_rel, isl_relclosure):
         srepr = uds
     print uds
     return [srepr,rucs]
+
+
 
 
 def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
@@ -275,7 +282,7 @@ def sfs(plik, L=0, SIMPLIFY=False, fs=0, acc=False):
     
     #print srepr_loop
 
-    
+
     rucs_s = rucs.transitive_closure()[0].coalesce()
 
     for i in range(0,len(vecs)):
@@ -394,3 +401,4 @@ def GetRapply(vars, instrukcje, i):
     isl_Rapply = isl.Map(R)
     #print isl_Rapply
     return isl_Rapply
+

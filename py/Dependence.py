@@ -1,9 +1,5 @@
-try:
-    import islpy as isl
-except ImportError, e:
-    print e
-    print "pip install ispy"
-    sys.exit()
+import islpy as isl
+
 
 import re
 import os
@@ -71,7 +67,9 @@ class Kernel_Loop:
 
     def __init__(self,plik,short_mode=0):
         self.plik = plik
+
         self.Load_Deps()
+
 
         self.Load_instrukcje()
         if(short_mode==0):
@@ -126,6 +124,7 @@ class Kernel_Loop:
                     lines2.append(lines[i])
 
         lines = lines2
+
 
 
         for i in range(0, len(lines),4):

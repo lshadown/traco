@@ -1,17 +1,29 @@
 import re
 import os
+import sys
 
 import output_gen
+
 import subprocess
 import priv_engine
 import reduce
+
 import loop_tools
+
 import parfine
-import sys
+
+
+
 import scc
+
+
+
+
 from easyprocess import Proc
 import tiling_v3
 from multiprocessing import Pool
+
+
 
 # zainstalowac python-pip, pip install easyprocess
 

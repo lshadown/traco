@@ -48,6 +48,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print 'TIME SPACE TILING Module'
 
 
+
+
     LPetit = "tmp/tmp_petit"+L+".t"
 
     BLOCK = block.split(',')
@@ -92,6 +94,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     loop = Dependence.Kernel_Loop(LPetit,1)
 
     loop.Load_Deps()
+
     loop.Load_instrukcje()
     loop.PreprocessPet()
     loop.Get_Arrays()
@@ -468,6 +471,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print C.deltas()
     print colored('P*C', 'yellow')
     print P
+
+    for d in loop.Deps:
+        del d.Relation
 
 
 

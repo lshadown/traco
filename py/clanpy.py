@@ -26,6 +26,7 @@ class ClanStatement:
     original_iterators = []
     body = ''
     domain = ''
+    domainpet = ''
     domain_map = ''
     read_write = []
     nest = []
