@@ -421,6 +421,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # *********** post processing end ****************
 
     for line in loop_str:
+        if 'for( c1 ' in line:
+            print imperf_tile.get_tab(line) + colored('#pragma omp parallel for', 'green')
         print line
 
     # VALIDITY
@@ -445,7 +447,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     lexneg = isl.Set(lexneg)
 
-    print lexneg
+
 
     #VALIDITY
 
@@ -457,6 +459,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         print colored('VALIDATION OK', 'green')
     else:
         print colored('VALIDATION FAILED !!', 'red')
+
+    print colored('lexneg', 'yellow')
+    print lexneg
+    print colored('C = (SCHED^-1(R))(SCHED)', 'yellow')
+    print C
+    print colored ('P = C.deltas()', 'yellow')
+    print C.deltas()
+    print colored('P*C', 'yellow')
+    print P
 
 
 
