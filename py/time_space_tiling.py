@@ -18,6 +18,7 @@ import clanpy
 import tiling_v5
 import iscc
 import sched_parser
+import imperf_tile
 
 
 def MakesSpaceConstr(st, vars, sym_exvars, symb, B, i):
@@ -364,3 +365,59 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     loop_x = iscc.isl_ast_codegen_map(isl.UnionMap(TILE))
     print loop_x
+
+    # **************************************************************************
+    lines = loop_x.split('\n')
+
+    # *********** post processing ****************
+
+    print colored("POSTPROCESSING", 'green')
+
+    loop_str = []
+
+    for line in lines:
+        if line.endswith(');'):
+            tab = imperf_tile.get_tab(line)
+            line = line.replace(' ', '')
+            line = line[:-2]
+            line = line[1:]
+
+            line = line.split('(')
+
+
+            petit_st = line[0].replace('S', '')
+            line = line[1]
+
+            arr = line.split(',')
+
+            s = ''
+
+            for i in range(0, len(cl.statements)):
+
+                # TODO if petit_st has 'c' get all statements make if from petit_line and insert to s, solution for loop over st
+                if 'c' in petit_st:
+                    combo_st = '{'
+                    for j in range(0, len(cl.statements)):
+                        combo_st += '\n' + tab
+                        combo_st += 'if( ' + petit_st + ' == ' + str(cl.statements[j].petit_line) + ' ) ' + \
+                                    cl.statements[j].body
+                    s = combo_st + '\n' + tab + '}'
+                elif cl.statements[i].petit_line == int(petit_st):  # st.petit_line
+                    s = cl.statements[i].body
+
+            for i in range(0, len(vars)):  # todo oryginal iterators for loops with mixed indexes
+                subt = arr[i]
+                if (('+' in subt) or ('-' in subt)):
+                    subt = '(' + subt + ')'
+                s = re.sub(r'\b' + vars[i] + r'\b', subt, s)
+
+            loop_str.append(tab + s)
+
+        else:
+            line = line.replace('for (int', 'for(')
+            loop_str.append(line)
+
+        # *********** post processing ****************
+
+    for line in loop_str:
+        print line
