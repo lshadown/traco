@@ -125,6 +125,7 @@ if len(sys.argv) > 3:
             line_tmp = line_tmp.replace('--tiling3=', '')
             line_tmp = line_tmp.replace('--tiling5=', '')
             line_tmp = line_tmp.replace('--partile=', '')
+            line_tmp = line_tmp.replace('--tstile=', '')
             if(line_tmp != ''):
                 block = line_tmp
         #dla imperfectly
