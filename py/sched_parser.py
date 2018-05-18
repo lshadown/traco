@@ -20,15 +20,19 @@ def parse(lines, cl, symb_prefix):
     #print lines
     lev = 0
     sch_out = {}
-
+    poziom = -1
+    pairs = {}
 
 
     for l in lines:
+
+
         if "schedule" in l:
             result = re.findall(r'{[^{]+}', l)
-            lev = lev + 1
+
+            #lev = lev + 1
             #print 'Loop nest ' + str(lev) + '   ### '
-            pairs = {}
+
             for r in result:
 
                 maps = r.split(';')
@@ -46,11 +50,25 @@ def parse(lines, cl, symb_prefix):
                     else:
                         pairs[sd] = item
 
-                #print pairs
 
-            sch_out[str(lev)] = pairs
+        if "coincident:" in l:
+            if (poziom == -1):
+                poziom = l.count(',')
+            else:
+                if l.count(',') == poziom - 1:
+                    lev = lev + 1
+                    poziom = l.count(',')
 
-    print sch_out
+
+            if str(lev) in sch_out:
+                sch_out[str(lev)].update(pairs)
+            else:
+                sch_out[str(lev)] = pairs
+
+
+            pairs = {}
+
+
 
     j=0
     for s in statements:
@@ -61,13 +79,15 @@ def parse(lines, cl, symb_prefix):
 
 
         for i in range(0, lev_st[s]):
-            if sch_out.has_key(str(i+1)):
-                map += sch_out[str(i+1)][s] + ','
+            if sch_out.has_key(str(i)):
+                print sch_out[str(i)]
+                if s in sch_out[str(i)]:
+                    map += sch_out[str(i)][s] + ','
            # else:
             #    map += iterators[i] + ','
 
         map = map[:-1] + '] : ' + cl.statements[j].domain + '}'
-        print map
+
         maps_sched.append(isl.Map(map))
         j = j+1
 
