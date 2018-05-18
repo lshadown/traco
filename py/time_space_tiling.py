@@ -233,31 +233,41 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     sched_maps_i = sched_maps  #SCHED_1 SCHED_2
     TIMES = []
 
-    for i in range(0, len(sched_maps_i)):
-        sched_maps_i[i] = sched_maps_i[i].fixed_power_val(-1).coalesce()
-        TIMES.append(sched_maps_i[i])
-        TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
-        TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'c')
-        TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
-        TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'i0')
-        tmp = str(TIMES[i])
-        tmp = tmp.replace('}', " && 16c<=i1<=16*(c+1)-1 && i0=i0' }" )  # podmien na bloki
-        TIMES[i] = isl.Map(tmp).range()
 
-    print colored("SCHED_1:=SCHED^-1", 'green')
+    if(spaces_num < cl.maxdim):
+        for i in range(0, len(sched_maps_i)):
+            sched_maps_i[i] = sched_maps_i[i].fixed_power_val(-1).coalesce()
+            TIMES.append(sched_maps_i[i])
+            TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
+            TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'c')
+            TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
+            TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'i0')
+            tmp = str(TIMES[i])
+            tmp = tmp.replace('}', " && "+str(BLOCK[spaces_num])+"c<=i1<="+str(BLOCK[spaces_num])+"*(c+1)-1 && i0=i0' }" )  # podmien na bloki
+            TIMES[i] = isl.Map(tmp).range()
 
-    for s in sched_maps_i:
-        print s
+        print colored("SCHED_1:=SCHED^-1", 'green')
+
+        for s in sched_maps_i:
+            print s
 
 
-    print colored("TIMEi", 'green')
+        print colored("TIMEi", 'green')
 
-    for s in TIMES:
-        print s
+        for s in TIMES:
+            print s
+
+        print colored("TIME", 'green')
+    else:
+        print colored("TIME: all distance vectors elements are positive", 'green')
+        for i in range(0, len(sched_maps_i)):
+            TIMES.append(sched_maps_i[i].subtract(sched_maps_i[i]).complement().domain().coalesce())
+
+
 
     ######################################### TIMES experimental code
 
-    print colored("TIME", 'green')
+
 
     TIME = isl.UnionSet(str(TIMES[i]))
     for i in range(1, len(TIMES)):
@@ -349,8 +359,14 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     timet = ' t = ' + '+'.join(timet)
 
+    if (spaces_num >= cl.maxdim):  # dodatnie wektory
+        timet += ' and  c = 0 and i0 = 0 '
+
 
     TILE = symb_prefix + TILE.replace(':' , ':' + timet + ' and ')
+
+
+
 
     for st in cl.statements:
         s = 'S' + str(st.petit_line)
@@ -424,7 +440,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # *********** post processing end ****************
 
     for line in loop_str:
-        if 'for( c1 ' in line:
+        if 'for( c1 ' in line and spaces_num < cl.maxdim:
             print imperf_tile.get_tab(line) + colored('#pragma omp parallel for', 'green')
         print line
 
