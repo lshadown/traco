@@ -248,6 +248,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     TIMES = []
 
 
+
     if(spaces_num < cl.maxdim):
         for i in range(0, len(sched_maps_i)):
             sched_maps_i[i] = sched_maps_i[i].fixed_power_val(-1).coalesce()
