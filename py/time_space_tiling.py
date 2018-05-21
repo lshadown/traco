@@ -25,10 +25,20 @@ import imperf_tile
 def MakesSpaceConstr(st, vars, sym_exvars, symb, B, i):
 
     tile_part = ' && '
-    #    if(st.bounds[i]['step'] == 1 or st.bounds[i]['step'] == '1'):
-    tile_part +=  st.bounds[i]['lb'] + ' + ' + B[i] + '*' + sym_exvars[i] + ' <= ' + vars[i] + ' <= '
-    tile_part +=  B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '-1, ' + st.bounds[i]['ub']
-    tile_part +=  ' && ' + sym_exvars[i] + ' >= 0 }'
+
+    if (st.bounds[i]['step'] == 1 or st.bounds[i]['step'] == '1'):
+        tile_part += st.bounds[i]['lb'] + ' + ' + B[i] + '*' + sym_exvars[i] + ' <= ' + vars[i] + ' <= '
+        tile_part += B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '-1, ' + st.bounds[i]['ub']
+        tile_part += ' && ' + sym_exvars[i] + ' >= 0 } '
+    if (st.bounds[i]['step'] == '-1'):
+        tile_part += st.bounds[i]['lb'] + ' - ' + B[i] + '*' + sym_exvars[i] + ' >= ' + vars[i] + ' >= -'
+        tile_part += B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '+1, ' + st.bounds[i]['ub']
+        tile_part += ' && ' + sym_exvars[i] + ' >= 0 } '
+
+
+    #tile_part +=  st.bounds[i]['lb'] + ' + ' + B[i] + '*' + sym_exvars[i] + ' <= ' + vars[i] + ' <= '
+    #tile_part +=  B[i] + '*(1+' + sym_exvars[i] + ') + ' + st.bounds[i]['lb'] + '-1, ' + st.bounds[i]['ub']
+    #tile_part +=  ' && ' + sym_exvars[i] + ' >= 0 }'
     return tile_part
 
 
@@ -194,6 +204,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     print  colored('SPACES NUMBER', 'green')
     print  spaces_num
+
+    #spaces_num = 2
 
     # vars
 
