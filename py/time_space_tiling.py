@@ -205,7 +205,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print  colored('SPACES NUMBER', 'green')
     print  spaces_num
 
-    #spaces_num = 2
+    if spaces_num == 0:
+        print 'No spaces. Please input calculated number'
+        spaces_num = int(raw_input())
 
     # vars
 
