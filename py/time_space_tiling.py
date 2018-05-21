@@ -258,7 +258,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
             TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'i0')
             tmp = str(TIMES[i])
-            tmp = tmp.replace('}', " && "+str(BLOCK[spaces_num])+"c<=i1<="+str(BLOCK[spaces_num])+"*(c+1)-1 && i0=i0' }" )  # podmien na bloki
+
+
+            if 'i1' in tmp:
+                v = 'i1'
+            else:
+                v = 'i0'
+
+
+            tmp = tmp.replace('}', " && "+str(BLOCK[spaces_num])+"c<="+v+"<="+str(BLOCK[spaces_num])+"*(c+1)-1 && i0=i0' }" )  # podmien na bloki
             TIMES[i] = isl.Map(tmp).range()
 
         print colored("SCHED_1:=SCHED^-1", 'green')
