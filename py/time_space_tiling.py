@@ -205,7 +205,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print  colored('SPACES NUMBER', 'green')
     print  spaces_num
 
-    if spaces_num == 0:
+    if spaces_num == 0 or 1==1:
         print 'No spaces. Please input calculated number'
         spaces_num = int(raw_input())
 
@@ -326,7 +326,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 res = re.findall(r'S\d+\[[^\]]+', strTILE[i])
 
                 a = st.scatering
-                b = st.original_iterators
+                b = st.original_iterators[:]
+
+                for k in range(0, st.getDim()):
+                    if st.bounds[k]['step'] == '-1':
+                        b[k] = '-' + b[k]
 
                 if(len(a)<cl.maxdim+1):
                     for k in range(len(a), cl.maxdim+1):  #wyrownaj zerami
@@ -440,6 +444,10 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                     s = cl.statements[i].body
 
             for i in range(0, len(vars)):  # todo oryginal iterators for loops with mixed indexes
+
+                if(i+1 > len(arr)):
+                    continue
+
                 subt = arr[i]
                 if (('+' in subt) or ('-' in subt)):
                     subt = '(' + subt + ')'

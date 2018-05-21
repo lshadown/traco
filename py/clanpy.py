@@ -43,6 +43,9 @@ class ClanStatement:
         self.nest = []
         self.scatering = []
 
+    def getDim(self):
+        return len(self.nest)-1
+
 
 
 class ClanPy:
