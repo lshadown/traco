@@ -317,8 +317,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 isl_relclosure = relation_util.oc_IterateClosure(isl_rel)
                 exact_rplus = True
 
-        if rplus_mode == 'remote':
-            isl_relclosure, exact_rplus = agent.remote_tc(isl_rel)
+
 
     else: #NESTED
         stline = []
@@ -351,8 +350,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         exact_rplus = True
         print isl_relclosure
 
-
-
+    if rplus_mode == 'remote':
+        isl_relclosure, exact_rplus = agent.remote_tc(isl_rel)
 
     # **************************************************************************
 
