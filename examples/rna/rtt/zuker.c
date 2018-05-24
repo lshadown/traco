@@ -35,7 +35,7 @@ int N = 100, DIM = 102;
 int main(int argc, char *argv[]){
 
     int i,j,k;
-
+//
 
     int num_proc=1;
     num_proc = atoi(argv[1]);
