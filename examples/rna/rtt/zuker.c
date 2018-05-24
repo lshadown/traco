@@ -9,8 +9,12 @@
 #define floord(n,d) floor(((double)(n))/((double)(d)))
 #define ceild(n,d) ceil(((double)(n))/((double)(d)))
 
+#define CHECK_VALID 0
+
 long double **W;
 long double **V;
+long double **V1;
+long double **tmp_V;
 long double **EFL;
 long double **EHF;
 
@@ -24,6 +28,7 @@ int N = 100, DIM = 102;
 #include "zuker_traco2.h"
 #include "zuker_traco3.h"
 #include "mem.h"
+
 
 
 
@@ -47,6 +52,7 @@ int main(int argc, char *argv[]){
 
     W = mem();
     V = mem();
+    V1 = mem();
     EFL = mem();
     EHF = mem();
 
@@ -85,11 +91,26 @@ int main(int argc, char *argv[]){
     if(kind == 6)
         zuker_pluto2a();
 
-    if(kind == 1)
+    if(kind == 1 || CHECK_VALID)
+    {    tmp_V = V;
+        V = V1;
         zuker_seq();
+        V = tmp_V;
+
+    if(CHECK_VALID && kind > 1)
+     for(i=0; i<N; i++)
+      for(j=0; j<N; j++)
+       if(V[i][j] != V1[i][j]){
+          printf("error!\n");
+          exit(0);
+      }
+
+    }
 
     double stop = omp_get_wtime();
     printf("%.2f\n",stop - start);
+
+
 
 
 
