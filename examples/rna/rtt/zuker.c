@@ -22,6 +22,7 @@ int N = 100, DIM = 102;
 #include "zuker_pluto2a.h"
 #include "zuker_traco.h"
 #include "zuker_traco2.h"
+#include "zuker_traco3.h"
 #include "mem.h"
 
 
@@ -61,6 +62,11 @@ int main(int argc, char *argv[]){
     double start = omp_get_wtime();
 
     if(kind == 4){
+        //printf("!!!\n");
+        zuker_traco3();
+    }
+
+    if(kind == 7){
         //printf("!!!\n");
         zuker_traco2();
     }
