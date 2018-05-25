@@ -249,7 +249,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print loop.isl_rel.range()
 
     IS = loop.isl_rel.domain().union(loop.isl_rel.range())
-    s = IS.compute_schedule(loop.isl_rel, loop.isl_rel)
+    #s = IS.compute_schedule(loop.isl_rel, loop.isl_rel)
 
     #print s
     #sys.exit(0)
@@ -362,11 +362,11 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     print isl_relplus
 
     # lata Pugh - eksperymentalnie
-    isl_rel = isl_rel.subtract(isl_relplus.apply_range(isl_rel))
+    #isl_rel = isl_rel.subtract(isl_relplus.apply_range(isl_rel))
 
     print isl_rel
-    isl_relclosure = isl_rel.transitive_closure()[0]
-    isl_relplus = isl_relclosure
+    #isl_relclosure = isl_rel.transitive_closure()[0]
+    #isl_relplus = isl_relclosure
     # ---------
 
     print 'Rplus after'
@@ -691,6 +691,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for i in range(1, len(cl.statements)):
         TILE_VLD_EXT_union = TILE_VLD_EXT_union.union(TILE_VLD_EXT[i]).coalesce()
 
+
+
     if (DEBUG):
         print colored('TILE_VLD_EXT to CodeGen', 'green')
         print TILE_VLD_EXT_union
@@ -733,12 +735,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     if(sdel.is_empty()):
         print colored('Found:  i2 -> i2 + i4', 'yellow')
-        #s = s.replace('i2', 'i2 + i4')
+        s = s.replace('i2', 'i2 + i4')
     else:
         print colored('Failed.', 'yellow')
 
-    s = s.replace('i2', '2*i2 + i4')
-    #s = s.replace('i4', 'i6')
+    #s = s.replace('i2', 'i2 + i4')
+    #s = s.replace('i10', 'i8')
     #s = s.replace('i10', 'i10 + i8')
     #s = s.replace('i6', '2*i2 + i4 + i6')
 
@@ -777,6 +779,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     RSched = RSched + copyconstr.GetConstrSet(in_, TILE_VLD_EXT_union) + "  }"
 
     print 'RSCHEDULE'
+
 
     print RSched
 

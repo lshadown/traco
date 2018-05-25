@@ -82,7 +82,7 @@ def parse(lines, cl, symb_prefix):
             if sch_out.has_key(str(i)):
 #                print sch_out[str(i)]
                 if s in sch_out[str(i)]:
-                    #if sch_out[str(i)][s]!= '0':
+#                    if sch_out[str(i)][s]!= '0':
                     map += sch_out[str(i)][s] + ','
            # else:
             #    map += iterators[i] + ','

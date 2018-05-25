@@ -173,6 +173,13 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         SCHED = SCHED.union(sched_maps[i])
         SCHED = SCHED.coalesce()
 
+
+
+    #SCHED = isl.UnionMap('[N] -> { S27[i, j] -> [-i + j, 2,j] : N > 0 and 0 <= i <= -2 + N and i < j < N; S20[i, j, k] -> [-i + j, 0,0,1,k] : N > 0 and 0 <= i <= -2 + N and 2 + i <= j < N and i < k < j; S23[i, j, k] -> [-i + j, 0,k,2, j] : N > 0 and 0 <= i <= -2 + N and 2 + i <= j < N and i < k <= -2 + j; S26[i, j] -> [-i + j, 1,j] : N > 0 and 0 <= i <= -2 + N and i < j < N; S16[i, j, k, m] -> [-i + j, 0,k, 0,m] : N > 0 and 0 <= i <= -2 + N and 2 + i <= j < N and i < k <= -2 + j and k < m <= -3 - i + j + k and m < j }')
+
+    #SCHED = isl.UnionMap('[n, loop] -> { S12[l, i, k] -> [l,i,k] : n >= 2 and loop > 0 and 0 < l <= loop and 0 < i < n and 0 <= k < i }')
+
+
     print colored('SCHED', 'green')
     print SCHED
 
@@ -182,7 +189,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # wykryj liczbe na razie globalnie
 
-
+    islR = Scatter(loop.isl_rel, cl, True)
     D = loop.isl_rel.deltas()
     spaces_num = sys.maxint
 
@@ -334,6 +341,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             if s in strTILE[i]:
                 res = re.findall(r'S\d+\[[^\]]+', strTILE[i])
 
+
                 a = st.scatering
                 b = st.original_iterators[:]
 
@@ -352,6 +360,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
                 c = a + b         #scatter
                 c[::2] = a
                 c[1::2] = b
+
+
+
 
                 strTILE[i] = strTILE[i].replace(res[0], s + '[' + ','.join(c))
                 res = res[0].split('[')[1].replace(' ', '').split(',')
@@ -373,6 +384,8 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     arr = []
     arr.append('t')
     timet = []
+    if spaces_num == 0:
+        timet.append('0')
     for i in range(0, spaces_num):
         arr.append(sym_exvars[i])
         timet.append(sym_exvars[i])
@@ -470,25 +483,37 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # *********** post processing end ****************
 
-    for line in loop_str:
-        if 'for( c1 ' in line and spaces_num < cl.maxdim:
-            print imperf_tile.get_tab(line) + colored('#pragma omp parallel for', 'green')
-        print line
+    if(1==1):
+        for line in loop_str:
+            if 'for( c1 ' in line and spaces_num < cl.maxdim:
+                print imperf_tile.get_tab(line) + colored('#pragma omp parallel for', 'green')
+            print line
 
     # VALIDITY
 
     # Lex_Neg2:=[N]->{ [i0, i1]: (i0=0 and i1=0 ) or i0<0  or i0=0 and i1<0 };
 
-    lexvar = ["i%d" % i for i in range(0, spaces_num)]
+
+    # VALIDITY
+
+    SCHED2 = Scatter(SCHED, cl, False)
+
+
+
+
+
+    L = 2*cl.maxdim+1
+
+    lexvar = ["i%d" % i for i in range(0, L)]
 
     lexneg = '{[' + ','.join(lexvar) + '] : ('
 
-    for i in range(0, spaces_num):
+    for i in range(0, L):
         lexneg += lexvar[i] + '=0' + ' and '
 
     lexneg += '1=1) or '
 
-    for i in range(0, spaces_num):
+    for i in range(0, L):
         lexneg += lexvar[i] + ' < 0 and '
         for j in range(0, i):
             lexneg += lexvar[j] + ' = 0 and '
@@ -498,10 +523,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     lexneg = isl.Set(lexneg)
 
 
-
-    #VALIDITY
-
-    C =  (SCHED.fixed_power_val(-1).apply_range(loop.isl_rel)).apply_range(SCHED)
+    C =  (SCHED2.fixed_power_val(-1).apply_range(islR)).apply_range(SCHED2)
 
     P = C.deltas().intersect(lexneg).coalesce()
 
@@ -522,3 +544,76 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     for d in loop.Deps:
         del d.Relation
 
+
+
+def Scatter(R, cl, StatementinRange):
+
+    R = str(R)
+    strR = R.split(';')
+    for st in cl.statements:
+        s = 'S' + str(st.petit_line)
+        for i in range(0, len(strR)):
+            if s in strR[i]:
+
+
+                res = re.findall(r'S'+str(st.petit_line)+'\[[^\]]+', strR[i])
+
+
+                a = st.scatering
+
+
+                w = res[0]
+                w = w.replace(s, '')
+                w = w.replace('[', '')
+                w = w.replace(']', '')
+
+                b = w.split(',')
+
+                if (len(a) < cl.maxdim + 1):
+                    for k in range(len(a), cl.maxdim + 1):  # wyrownaj zerami
+                        a.append(u'0')
+
+                if (len(b) < cl.maxdim):
+                    for k in range(len(b), cl.maxdim):  # wyrownaj zerami
+                        b.append(u'0')
+
+                c = a + b  # scatter
+
+
+
+                c[::2] = a
+                c[1::2] = b
+
+                strR[i] = strR[i].replace(res[0], s + '[' + ','.join(c))
+
+                if(StatementinRange == False):
+                    res = re.findall(r'-> \[[^\]]+', strR[i])
+
+                    a = st.scatering
+
+                    w = res[0]
+                    w = w.replace('-> ', '')
+                    w = w.replace('[', '')
+                    w = w.replace(']', '')
+
+                    b = w.split(',')
+
+                    if (len(a) < cl.maxdim + 1):
+                        for k in range(len(a), cl.maxdim + 1):  # wyrownaj zerami
+                            a.append(u'0')
+
+                    if (len(b) < cl.maxdim):
+                        for k in range(len(b), cl.maxdim):  # wyrownaj zerami
+                            b.append(u'0')
+
+                    c = a + b  # scatter
+                    c[::2] = a
+                    c[1::2] = b
+
+                    strR[i] = strR[i].replace(res[0], '-> [' + ','.join(c))
+
+
+    newR = ';'.join(strR)
+
+
+    return isl.UnionMap(newR)
