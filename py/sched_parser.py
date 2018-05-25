@@ -2,6 +2,8 @@ import re
 import sys
 import islpy as isl
 
+import imperf_tile
+
 def parse(lines, cl, symb_prefix):
 
 
@@ -18,16 +20,24 @@ def parse(lines, cl, symb_prefix):
 
 
     #print lines
-    lev = 0
+    lev = -1
     sch_out = {}
     poziom = -1
     pairs = {}
+    odstep = ''
 
 
     for l in lines:
 
 
         if "schedule" in l:
+
+
+
+            if(len(odstep) <  len(imperf_tile.get_tab(l)) ):
+                odstep = imperf_tile.get_tab(l)
+                lev = lev + 1
+
             result = re.findall(r'{[^{]+}', l)
 
             #lev = lev + 1
@@ -51,20 +61,10 @@ def parse(lines, cl, symb_prefix):
                         pairs[sd] = item
 
 
-        if "coincident:" in l:
-            if (poziom == -1):
-                poziom = l.count(',')
-            else:
-                if l.count(',') == poziom - 1:
-                    lev = lev + 1
-                    poziom = l.count(',')
-
-
             if str(lev) in sch_out:
                 sch_out[str(lev)].update(pairs)
             else:
                 sch_out[str(lev)] = pairs
-
 
             pairs = {}
 
@@ -80,8 +80,9 @@ def parse(lines, cl, symb_prefix):
 
         for i in range(0, lev_st[s]):
             if sch_out.has_key(str(i)):
-                print sch_out[str(i)]
+#                print sch_out[str(i)]
                 if s in sch_out[str(i)]:
+                    #if sch_out[str(i)][s]!= '0':
                     map += sch_out[str(i)][s] + ','
            # else:
             #    map += iterators[i] + ','
