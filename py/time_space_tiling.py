@@ -232,6 +232,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     ##################################
 
     SPACES = {}
+    space = ''
 
     for st in cl.statements:
         tmpspaces = []
@@ -250,6 +251,45 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         SPACES["S" + str(st.petit_line)] = tmpspaces
 
     ##################################
+    #experimental Rk
+
+    if True:
+
+        print "=============================================="
+
+        spaceunion = None
+
+        for s in SPACES:
+            print s
+            tmpspace = None
+            for ss in SPACES[s]:
+                if tmpspace is None:
+                    tmpspace = isl.UnionSet(str(ss))
+                else:
+                    tmpspace = tmpspace.union(ss).coalesce()
+
+            if spaceunion is  None:
+                spaceunion = tmpspace
+            else:
+                spaceunion = spaceunion.union(tmpspace).coalesce()
+
+        print "Experimental Rk"
+        print "SPACE"
+        print spaceunion
+
+        print "new R"
+        R = loop.isl_rel.from_domain_and_range(spaceunion, spaceunion).coalesce()
+        print R
+
+
+        Rk = R.power()
+        print "Rk"
+        print Rk
+
+        print "=============================================="
+
+
+    ###################################
 
     sched_maps_i = sched_maps  #SCHED_1 SCHED_2
     TIMES = []
@@ -257,29 +297,53 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
     if(spaces_num < cl.maxdim):
-        for i in range(0, len(sched_maps_i)):
-            sched_maps_i[i] = sched_maps_i[i].fixed_power_val(-1).coalesce()
-            TIMES.append(sched_maps_i[i])
-            TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
-            TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'c')
-            TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
-            TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'i0')
-            tmp = str(TIMES[i])
-
-
-            if 'i1' in tmp:
-                v = 'i1'
-            else:
-                v = 'i0'
-
-
-            tmp = tmp.replace('}', " && "+str(BLOCK[spaces_num])+"c<="+v+"<="+str(BLOCK[spaces_num])+"*(c+1)-1 && i0=i0' }" )  # podmien na bloki
-            TIMES[i] = isl.Map(tmp).range()
 
         print colored("SCHED_1:=SCHED^-1", 'green')
 
-        for s in sched_maps_i:
-            print s
+
+        for i in range(0, len(sched_maps_i)):
+            sched_maps_i[i] = sched_maps_i[i].fixed_power_val(-1).coalesce()
+
+            print sched_maps_i[i]
+
+            #if i == 3:
+            #    sched_maps_i[i] = isl.Map('[N] -> {[i0, 0] -> S20[i, j = i0 + i]: N > 0 and 0 <= i <= -2 + N and i0=1}')
+
+
+
+            TIMES.append(sched_maps_i[i])
+
+            tmp = ''
+
+            if("i0" in str(TIMES[i])):
+
+
+                TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
+                TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'c')
+                TIMES[i] = TIMES[i].insert_dims(isl.dim_type.param, 0, 1)
+                TIMES[i] = TIMES[i].set_dim_name(isl.dim_type.param, 0, 'i0')
+                tmp = str(TIMES[i])
+
+
+                if 'i1' in tmp:
+                    v = 'i1'
+                else:
+                    v = 'i0'
+
+
+                tmp = tmp.replace('}', " && "+str(BLOCK[spaces_num])+"c<="+v+"<="+str(BLOCK[spaces_num])+"*(c+1)-1 && i0=i0' }" )  # podmien na bloki
+
+            else:
+                tmp = str(TIMES[i])
+
+
+
+
+            TIMES[i] = isl.Map(tmp).range()
+
+
+
+
 
 
         print colored("TIMEi", 'green')
