@@ -83,7 +83,7 @@ Tuple<int> relSCC;
 #define APROX 0  //shedule aprox R* only
 
 
-int _TC;
+int __TC;
 int findIND = 0;
 int CODEGEN_KIND = 0;
 int RETURN_R = 0;
@@ -98,7 +98,7 @@ int _NOSOURCES = 0;
 double begin2;
 
 #define _R_UCS 1
-#define _TC_N 5
+#define __TC_N 5
 
 
 #include "include/ce_lib/ce_Mathematica.h"
@@ -299,14 +299,14 @@ int main(int argc, char *argv[])
 	string rem_deps = "";
 
    // if(argc>=3)
- //     _TC = atoi(argv[2]);
+ //     __TC = atoi(argv[2]);
   //  else numSCC = 0;
 //	if(argc>=4)
  //     numSCC = atoi(argv[3]);
  //   else numSCC = -1;
 
     numSCC = -1; //all scc, >=0 selected scc
-    _TC = 0; //omega closure, 1 and 2 klimek closure
+    __TC = 0; //omega closure, 1 and 2 klimek closure
     CODEGEN_KIND = 0; // omega codegen, 1 - barvinok, 2 omega +
 
     for(int y=3; y<=argc; y++)
@@ -317,7 +317,7 @@ int main(int argc, char *argv[])
         if(val.find("--tc=") != string::npos)
         {
             val = ReplaceStr(val, "--tc=", "");
-             _TC = atoi(val.c_str());
+             __TC = atoi(val.c_str());
         }
 
         if(val.find("--scc=") != string::npos)
@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
     }
 
     if(!_SILENT)
-        cout << "Parameters: TC " << _TC << " SCC" << numSCC << " CODEGEN " << CODEGEN_KIND << endl;
+        cout << "Parameters: TC " << __TC << " SCC" << numSCC << " CODEGEN " << CODEGEN_KIND << endl;
 
 
     if(!_SILENT)
