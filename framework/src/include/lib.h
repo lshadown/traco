@@ -1270,13 +1270,13 @@ void Print_Info(Relation r1)
 // ----------------------------------------------------------------------------------------
 Relation TransitiveC(Relation R)
 {
-   if(_TC == 0)
+   if(__TC == 0)
       return TransitiveClosure(copy(R));
-   else if(_TC == 1)
-      return IterateClosure(R, _TC_N);
-   else if(_TC == 2)
-      return IterateClosure(R, _TC_N);
-   else if(_TC == 3)
+   else if(__TC == 1)
+      return IterateClosure(R, __TC_N);
+   else if(__TC == 2)
+      return IterateClosure(R, __TC_N);
+   else if(__TC == 3)
       return AdvancedIterateClosure(R);
 
 }
