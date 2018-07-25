@@ -1,18 +1,18 @@
 #!/bin/bash
 echo "C++ packages..."
 sudo apt-get install libgmp-dev libntl-dev flex bison libffi6 libffi-dev
-if [ ! -f barvinok-0.39.tar.gz ]
+if [ ! -f barvinok-0.41.tar.gz ]
 then
  echo "Barvinok download..."
- wget http://barvinok.gforge.inria.fr/barvinok-0.39.tar.gz
+ wget http://barvinok.gforge.inria.fr/barvinok-0.41.tar.gz
  echo "Barvinok unpack..."
- tar xvzf barvinok-0.39.tar.gz
+ tar xvzf barvinok-0.41.tar.gz
 fi
-if [ ! -f barvinok-0.39/iscc ]
+if [ ! -f barvinok-0.41/iscc ]
 then
  echo "Barvinok setup..."
- cd barvinok-0.39
- ./configure --enable-shared-barvinok --with-pet=bundled  
+ cd barvinok-0.41
+ ./configure --enable-shared-barvinok
  make
  sudo make install
  sudo ln -s /usr/local/lib/libbarvinok.so /usr/lib/libbarvinok.so
@@ -26,10 +26,19 @@ echo "Python packages..."
 sudo apt-get install python-pip python-dev
 echo "ISLPY..."
 sudo pip install islpy
+sudo pip install tqdm
+sudo pip install paramiko
+sudo pip install pygraph
+sudo pip install python-graph-core
+sudo pip install python-graph-dot
 sudo pip install easyprocess pexpect
+sudo pip install pydot
+sudo pip install graphviz
+sudo pip install termcolor
+sudo pip install matplotlib
 echo "Almost done, graphviz..."
-sudo apt-get install graphviz libgv-python python-pygraphviz python-pydot
-sudo easy_install python-graph-core python-graph-dot
+sudo apt-get install graphviz libgv-python python-pygraphviz python-pydot python-tk
+#sudo easy_install python-graph-core python-graph-dot
 sudo ln -s "$PWD"/issf /usr/bin/issf
 if [ ! -f framework/obj/framework ]
 then
