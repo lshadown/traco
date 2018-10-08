@@ -293,7 +293,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     # **************************************************************************
 
     RPLUSUNION = True
-    RPLUSUNION = False # NESTED strong experimental with Pugh only Valid why?
+    #RPLUSUNION = False # NESTED strong experimental with Pugh only Valid why?
 
     exact_rplus = '-1'
     isl_relclosure = isl_rel
@@ -739,8 +739,9 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     else:
         print colored('Failed.', 'yellow')
 
-    #s = s.replace('i2', 'i2 + i4')
-    #s = s.replace('i10', 'i8')
+    #s = s.replace('i4', 'i6')
+    #s = s.replace('i2', 'i2 + 2*i4')
+    #s = s.replace('i', 'i8')
     #s = s.replace('i10', 'i10 + i8')
     #s = s.replace('i6', '2*i2 + i4 + i6')
 
