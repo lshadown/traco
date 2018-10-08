@@ -268,7 +268,7 @@ def fs_new(rel, rel_plus, isl_relclosure, uds, LPetit, dane, plik, SIMPLIFY, rap
     print REPR2
     REPR = REPR.union(REPR2).coalesce()
 
-    REPR =imperf_tile.SimplifySlice(REPR)
+    #REPR =imperf_tile.SimplifySlice(REPR)
 
     #####
     #REPR1:= domain    RE2 - range    RE2;
