@@ -125,13 +125,16 @@ def convert_loop(input_loop, block=[]):
         pattern = re.compile("\W*(\}|\{)\W*")
     
         if(ifek == "" and stuff == 0 and (not pattern.match(line))):
-            print line
-
             pattern = re.compile("\w*\(");
             items = pattern.findall(line)
             for item in items:
-                if not (item.replace("(", "") in funcs):  # no reduncancy
-                    funcs.append(item.replace("(", ""))
+                z = item.replace("(", "")
+                if (z == "max" or z == "MAX" or z == "min" or z == "MIN"): # petit je zna
+                    continue
+
+
+                if not (z in funcs):  # no reduncancy
+                    funcs.append(z)
 
 
             output_loop.append(functions.ConvertSt(line))
@@ -141,7 +144,10 @@ def convert_loop(input_loop, block=[]):
 
     for f in funcs:
         def_lines.append('builtin integer ' + f +'()')
-        varsn.remove(f)        # remove variable witch is a fun()
+        if f in varsn:
+            varsn.remove(f)        # remove variable witch is a fun()
+
+
 
 
          
