@@ -197,23 +197,30 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
         depth = len(cl.statements[i].original_iterators)
         nums = 0
         for j in range(0, depth):
-            TEST = '{ S' + str(cl.statements[i].petit_line) + '[' + ','.join(cl.statements[i].original_iterators) + '] : ' + cl.statements[i].original_iterators[j] + '< 0 }'
+            direct = ' < '
+            print cl.statements[i].bounds[j]['step']  # decrementation
+            if cl.statements[i].bounds[j]['step'] == '-1':
+                direct = ' > '
+
+            TEST = '{ S' + str(cl.statements[i].petit_line) + '[' + ','.join(
+                cl.statements[i].original_iterators) + '] : ' + cl.statements[i].original_iterators[j] + direct + ' 0 }'
+            print TEST
             TEST = isl.Set(TEST)
 
             TEST = D.intersect(TEST)
-            if(TEST.is_empty()):
+            if (TEST.is_empty()):
                 nums = nums + 1
             else:
                 break  # sa ujemne
-        #print nums
+        # print nums
         if (nums < spaces_num):
             spaces_num = nums
 
     print  colored('SPACES NUMBER', 'green')
     print  spaces_num
 
-    if spaces_num == 0 or 1==1:
-        print 'No spaces. Please input calculated number'
+    if spaces_num == 0 or 1 == 1:
+        print 'No spaces or manually input calculated number'
         spaces_num = int(raw_input())
 
     # vars
@@ -253,7 +260,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
     ##################################
     #experimental Rk
 
-    if True:
+    if False:
 
         print "=============================================="
 
@@ -273,20 +280,22 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             else:
                 spaceunion = spaceunion.union(tmpspace).coalesce()
 
-        print "Experimental Rk"
-        print "SPACE"
-        print spaceunion
 
-        print "new R"
-        R = loop.isl_rel.from_domain_and_range(spaceunion, spaceunion).coalesce()
-        print R
+        if(1==0):
+            print "Experimental Rk"
+            print "SPACE"
+            print spaceunion
+
+            print "new R"
+            R = loop.isl_rel.from_domain_and_range(spaceunion, spaceunion).coalesce()
+            print R
 
 
-        Rk = R.power()
-        print "Rk"
-        print Rk
+            #Rk = R.power()
+            #print "Rk"
+            print Rk
 
-        print "=============================================="
+            print "=============================================="
 
 
     ###################################
