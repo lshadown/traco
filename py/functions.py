@@ -159,13 +159,16 @@ def MakeDef(var, dim):
 
 #przeksztalca funkcje
 def ConvertSt(st):
+
+
     st = re.compile("\]\W*\[").sub(",", st)
     st = re.compile("\[").sub("(", st)
     st = re.compile("\]").sub(")", st)
     st = st.replace(";", "")
     st = st.replace("%", " mod ")
 
-    st = st.replace("MAX", "myfun")
-    st = st.replace("MIN", "myfun")
+    #st = st.replace("MAX", "myfun")
+    #st = st.replace("MIN", "myfun")
+
 
     return st

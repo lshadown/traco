@@ -20,6 +20,7 @@ def convert_loop(input_loop, block=[]):
 #    input_loop.append("}")
     
     varsn = []
+    funcs = []
     nest = 0
     odst = 0
     
@@ -124,12 +125,29 @@ def convert_loop(input_loop, block=[]):
         pattern = re.compile("\W*(\}|\{)\W*")
     
         if(ifek == "" and stuff == 0 and (not pattern.match(line))):
+            print line
+
+            pattern = re.compile("\w*\(");
+            items = pattern.findall(line)
+            for item in items:
+                if not (item.replace("(", "") in funcs):  # no reduncancy
+                    funcs.append(item.replace("(", ""))
+
+
             output_loop.append(functions.ConvertSt(line))
-    
+            #print funcs
+            #sys.exit(0)
+
+
+    for f in funcs:
+        def_lines.append('builtin integer ' + f +'()')
+        varsn.remove(f)        # remove variable witch is a fun()
+
+
          
     for _var in varsn:
         dim_var =functions._DIM(_var)
-        if dim_var >= 0: 
+        if dim_var >= 0:
             defv = functions.MakeDef(_var, dim_var)
             def_lines.append(defv)
             
