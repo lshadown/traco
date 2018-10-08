@@ -167,8 +167,6 @@ def ConvertSt(st):
     st = st.replace(";", "")
     st = st.replace("%", " mod ")
 
-    #st = st.replace("MAX", "myfun")
-    #st = st.replace("MIN", "myfun")
 
 
     return st
