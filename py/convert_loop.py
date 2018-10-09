@@ -125,7 +125,7 @@ def convert_loop(input_loop, block=[]):
         pattern = re.compile("\W*(\}|\{)\W*")
     
         if(ifek == "" and stuff == 0 and (not pattern.match(line))):
-            pattern = re.compile("\w*\(");
+            pattern = re.compile("\w+\(");
             items = pattern.findall(line)
             for item in items:
                 z = item.replace("(", "")
