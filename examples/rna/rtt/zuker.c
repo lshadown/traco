@@ -15,7 +15,7 @@ long double **W;
 long double **V;
 long double **V1;
 long double **tmp_V;
-long double **EFL;
+long double ****EFL;
 long double **EHF;
 
 int N = 100, DIM = 102;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     W = mem();
     V = mem();
     V1 = mem();
-    EFL = mem();
+    EFL = mem4();
     EHF = mem();
 
 
