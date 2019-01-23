@@ -292,7 +292,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # **************************************************************************
 
-    RPLUSUNION = True
+    RPLUSUNION = False
     #RPLUSUNION = False # NESTED strong experimental with Pugh only Valid why?
 
     exact_rplus = '-1'
@@ -319,36 +319,65 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-    else: #NESTED
+    else: #R_UNDER still experimental, requires testing
+    #############################################################################
+        print colored('R_UNDER', 'green')
         stline = []
+        subgraphs = []
 
         isl_relclosure = isl.Map('{[i]->[i] : 1=0}').coalesce()
 
         for st in cl.statements:
             stline.append(st.petit_line)
 
+        stline.sort()
+
         for i in range(0, len(stline)):
-            for j in range(0, len(stline)):
-                cutrel = '{[' + ','.join(["a%d" % l for l in range(0,loop.maxl)]) + ',' + str(stline[i]) + ']->[' +  ','.join(["b%d" % l for l in range(0,loop.maxl)]) + ',' + str(stline[j]) + ']}'
+            w = 0
+            for sg in subgraphs:
+                if stline[i] in sg:  # it was used
+                    w = 1
+            if(w==1):
+                continue
+
+            mylist = []
+            mylist.append(stline[i])
+            for j in range(i+1, len(stline)):
+                cutrel  = '{[' + ','.join(["a%d" % l for l in range(0, loop.maxl)]) + ',' + str(stline[i]) + ']->[' + ','.join(["b%d" % l for l in range(0, loop.maxl)]) + ',' + str(stline[j]) + '];'
+                cutrel += '[' + ','.join(["a%d" % l for l in range(0, loop.maxl)]) + ',' + str(stline[j]) + ']->[' + ','.join(["b%d" % l for l in range(0, loop.maxl)]) + ',' + str(stline[i]) + ']}'
                 cutrel = isl.Map(cutrel)
                 cutrel = isl_rel.intersect(cutrel).coalesce()
+                if not cutrel.is_empty():
+                    mylist.append(stline[j])
+            #mylist.append(maxst)
+            subgraphs.append(mylist)
 
+        print subgraphs
+        ii = 0
+        for sg in subgraphs:  # calculate R_UNDER and its R+
+            ii = ii+1
+            print str(ii) + "/" + str(len(subgraphs))
+            grel = '{'
+            for i in sg:
+                for j in sg:
+                    grel += '[' + ','.join(["a%d" % l for l in range(0, loop.maxl)]) + ',' + str(i) + ']->[' + ','.join(["b%d" % l for l in range(0, loop.maxl)]) + ',' + str(j) + '];'
+            grel += '}'
+            grel = isl.Map(grel)
+            grel = isl_rel.intersect(grel).coalesce()
 
-                cpartplus =  cutrel.transitive_closure()
-                if not cpartplus[1]:
-                    print "iterate required"
-                    cpartplus = relation_util.oc_IterateClosure(cutrel) #iterate
-                else:
-                    cpartplus = cpartplus[0]
+            gp = grel.transitive_closure()
+            if not gp[1]:
+                print "iterate required"
+                gp = relation_util.oc_IterateClosure(grel)  # iterate
+            else:
+                gp = gp[0]
 
-                if isl_relclosure.is_empty():
-                    isl_relclosure = cpartplus
-                else:
-                    isl_relclosure = isl_relclosure.union(cpartplus).coalesce()
+            if isl_relclosure.is_empty():
+                isl_relclosure = gp
+            else:
+                isl_relclosure = isl_relclosure.union(gp).coalesce()
+    #############################################################################
 
-
-        exact_rplus = True
-        print isl_relclosure
 
     if rplus_mode == 'remote':
         isl_relclosure, exact_rplus = agent.remote_tc(isl_rel)
@@ -414,11 +443,15 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
 
 
-
+    vars = []
     for st in cl.statements:
         if (len(st.original_iterators) == loop.maxl):
             vars = st.original_iterators
             break
+
+    if(len(vars)==0):
+        print 'error 12, propably clan does not work'
+        exit(12)
 
     # TODO to make abstract variubles bounds with variables must be also corrected
 
