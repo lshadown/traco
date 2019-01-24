@@ -367,10 +367,12 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
             gp = grel.transitive_closure()
             if not gp[1]:
-                print "iterate required"
-                gp = relation_util.oc_IterateClosure(grel)  # iterate
-            else:
-                gp = gp[0]
+                print "NOT EXEACT R+"
+            #    print "iterate required"
+            #    gp = relation_util.oc_IterateClosure(grel)  # iterate
+
+            #else:
+            gp = gp[0]
 
             if isl_relclosure.is_empty():
                 isl_relclosure = gp
