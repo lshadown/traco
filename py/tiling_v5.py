@@ -292,7 +292,7 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
 
     # **************************************************************************
 
-    RPLUSUNION = False
+    RPLUSUNION = True
     #RPLUSUNION = False # NESTED strong experimental with Pugh only Valid why?
 
     exact_rplus = '-1'
@@ -353,6 +353,17 @@ def tile(plik, block, permute, output_file="", L="0", SIMPLIFY="False", perfect_
             subgraphs.append(mylist)
 
         print subgraphs
+
+        for item in stline:
+            count = 0
+            for sg in subgraphs:
+                if item in sg:
+                    count = count + 1
+            if count >1 and item != max(stline):
+                print 'R_UNDER untested, switch RPLUSUNION to true'
+                #exit(1)
+
+
         ii = 0
         for sg in subgraphs:  # calculate R_UNDER and its R+
             ii = ii+1
